@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Hexo</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://github.com/zhililab/"/>
+  <updated>2018-03-17T03:32:34.522Z</updated>
+  <id>https://github.com/zhililab/</id>
+  
+  <author>
+    <name>John Doe</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>书单：2018年2月</title>
+    <link href="https://github.com/zhililab/2018/02/01/Reading-Books-Feb-2018-md/"/>
+    <id>https://github.com/zhililab/2018/02/01/Reading-Books-Feb-2018-md/</id>
+    <published>2018-01-31T16:00:00.000Z</published>
+    <updated>2018-03-17T03:32:34.522Z</updated>
+    
+    <content type="html"><![CDATA[<p>Cover Photo by Kingston Chen on Unsplash</p><p>我的2018年2月的 Kindle 书目一览（含Knotes）：</p><ul><li><p>《Harry Potter and the Philosopher’s Stone》</p><ul><li><p>Everyone expects me to do as well as the others, but if I do, it’s no big deal, because they did it first. You never get anything new, either, with five brothers. I’ve got Bill’s old robes, Charlie’s old wand and Percy’s old rat.’</p></li><li><p>There are some things you can’t share without ending up liking each other, and knocking out a twelve-foot mountain troll is one of them.</p></li></ul></li><li><p>《数据挖掘与数据化运营实战:思路、方法、技巧与应用》</p><ul><li><p>以业务为核心，以思路为重点，以挖掘技术为辅佐”就是该领域的有效成长之路。</p></li><li><p>数据化运营，首先是要有企业全员参与意识;数据化运营，其次是一种常态化的制度和流程，</p></li><li><p>数据分析师和数据分析团队承担了向业务部门及其员工指导、传授有关数据分析和数据探索的能力培养的工作，这是一种授人以渔的崇高行为，值得数据分析师为之奉献。</p></li></ul></li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Cover Photo by Kingston Chen on Unsplash&lt;/p&gt;
+&lt;p&gt;我的2018年2月的 Kindle 书目一览（含Knotes）：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;《Harry Potter and the Philosopher’s Ston
+      
+    
+    </summary>
+    
+      <category term="读书" scheme="https://github.com/zhililab/categories/%E8%AF%BB%E4%B9%A6/"/>
+    
+    
+      <category term="读书" scheme="https://github.com/zhililab/tags/%E8%AF%BB%E4%B9%A6/"/>
+    
+      <category term="Kindle" scheme="https://github.com/zhililab/tags/Kindle/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>机器学习算法之【线性模型】</title>
+    <link href="https://github.com/zhililab/2017/12/10/MachineLearning-LinearModel/"/>
+    <id>https://github.com/zhililab/2017/12/10/MachineLearning-LinearModel/</id>
+    <published>2017-12-09T16:00:00.000Z</published>
+    <updated>2018-03-17T08:55:44.996Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h3><p>线性模型是大家日常学习和工程应用中广泛应用到的一种基本模型，用户刻画数据的规律和趋势。通过线性模型，我们可以对连续变量的值进行预测。此外对于那些非连续型数据，我们也可以通过一些方式将其转化成适合线性拟合的数据形式（如何甄别转换场景）。</p><blockquote><p>基本形式：y = w1x1 + w2x2 + ··· + wnxn + b </p></blockquote><p>其中 xi (i = 1,2,…n) 为变量（属性）， wi (i = 1,2,…n) 变量的权重值</p><p>最简单的线性回归为 —— y = kx + b </p><p>k 称为回归直线的斜率（slope），b 称为回归直线的截距（intercept）</p><a id="more"></a><h3 id="二、核心思想"><a href="#二、核心思想" class="headerlink" title="二、核心思想"></a>二、核心思想</h3><p>核心思想：linear regression 试图学得一个线性模型以尽可能准确地预测输出变量y的实值，为未来进行预测。</p><p>那么问题来了，如何学习并最终确定这条直线呢？</p><p>一般来说，我们会采用最小化均方误差（SSE）和来确定 w 和 b 的值，因为一旦这俩种值确定，整条直线也就确定下来了。</p><p>SSE具体求解有2种方法：</p><ol><li><p>最小二乘法（Ordinary Least Square，OLS）</p><p> 在线性回归中，最小二乘法就是试图找到一条直线，使得所有样本到直线的欧式距离之和最小。</p></li><li><p>梯度下降法（Gradient descent）</p><p> 梯度下降法是一个最优化算法，通常也称为最速下降法。最速下降法是求解无约束优化问题最简单和最古老的方法之一，虽然现已不具有实用性，但是许多有效算法都是以它为基础进行改进和修正而得到的。最速下降法是用负梯度方向为搜索方向的，最速下降法越接近目标值，步长越小，前进越慢。<br> 可以用于求解非线性方程组。</p></li></ol><p>典型场景：</p><ul><li>电力使用预测</li><li>交通流量预测</li><li>在线商铺访问预测</li><li>…</li></ul><blockquote><p>周志华老师还在🍉西瓜书中提到：“线性模式形式简答、易于建模，但却蕴含着机器学习一些重要的基本思想。许多功能强大的非线性模型（nonlinear model）可以在线性模型的基础上通过引入层级结构或高维映射而得”</p></blockquote><h3 id="三、实例"><a href="#三、实例" class="headerlink" title="三、实例"></a>三、实例</h3><p>这里给出一个 scikit-learn 官方文档的例子</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 导入线性模型包</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> sklearn <span class="keyword">import</span> linear_model </span><br><span class="line"><span class="comment">## 生成实例 </span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>reg = linear_model.LinearRegression()</span><br><span class="line"><span class="comment">## 训练</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>reg.fit([[<span class="number">0</span>, <span class="number">0</span>], [<span class="number">1</span>, <span class="number">1</span>], [<span class="number">2</span>, <span class="number">2</span>]], [<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>])</span><br><span class="line">LinearRegression(copy_X=<span class="keyword">True</span>, fit_intercept=<span class="keyword">True</span>, n_jobs=<span class="number">1</span>, normalize=<span class="keyword">False</span>)</span><br><span class="line"><span class="comment">## 求相关系数</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>reg.coef_</span><br><span class="line">array([<span class="number">0.5</span>, <span class="number">0.5</span>])</span><br></pre></td></tr></table></figure><p>这个例子虽然简单，但十分清晰了展现如何利用 scikit-learn 从零到一搭建线性模型。</p><h3 id="四、线性模型的-pros-and-cons"><a href="#四、线性模型的-pros-and-cons" class="headerlink" title="四、线性模型的 pros and cons"></a>四、线性模型的 pros and cons</h3><p>pros:</p><ul><li>适合刻画变量之间线性或类线性关系</li><li>擅长连续值预测</li></ul><p>cons:</p><ul><li>线性模型的能力被局限在线性函数里</li></ul><hr><p>参考资料：</p><ol><li>Udacity Machine Learning</li><li>周志华 《机器学习》</li></ol>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;一、介绍&quot;&gt;&lt;a href=&quot;#一、介绍&quot; class=&quot;headerlink&quot; title=&quot;一、介绍&quot;&gt;&lt;/a&gt;一、介绍&lt;/h3&gt;&lt;p&gt;线性模型是大家日常学习和工程应用中广泛应用到的一种基本模型，用户刻画数据的规律和趋势。通过线性模型，我们可以对连续变量的值进行预测。此外对于那些非连续型数据，我们也可以通过一些方式将其转化成适合线性拟合的数据形式（如何甄别转换场景）。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;基本形式：y = w1x1 + w2x2 + ··· + wnxn + b &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;其中 xi (i = 1,2,…n) 为变量（属性）， wi (i = 1,2,…n) 变量的权重值&lt;/p&gt;
+&lt;p&gt;最简单的线性回归为 —— y = kx + b &lt;/p&gt;
+&lt;p&gt;k 称为回归直线的斜率（slope），b 称为回归直线的截距（intercept）&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="技术" scheme="https://github.com/zhililab/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    
+      <category term="线性模型" scheme="https://github.com/zhililab/tags/%E7%BA%BF%E6%80%A7%E6%A8%A1%E5%9E%8B/"/>
+    
+      <category term="回归" scheme="https://github.com/zhililab/tags/%E5%9B%9E%E5%BD%92/"/>
+    
+      <category term="预测" scheme="https://github.com/zhililab/tags/%E9%A2%84%E6%B5%8B/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>南京大数据技术 Meetup 第十次会议参会内容回顾与思考</title>
+    <link href="https://github.com/zhililab/2017/11/04/Nanjing-BigData-Meetup-10-Review/"/>
+    <id>https://github.com/zhililab/2017/11/04/Nanjing-BigData-Meetup-10-Review/</id>
+    <published>2017-11-03T16:00:00.000Z</published>
+    <updated>2018-03-17T13:40:35.898Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>导语：今天下午去南京大学参加了南京大数据技术 Meetup 第十次会议，收获颇丰，不仅是对机器学习、大数据认识有了提升，而且了解当下大数据、机器学习技术在企业中的前沿应用。晚上回来后（南大仙林好远呀 😭，不过听了这场讲座还是值了），直奔教研室 🏃🏃🏃，想把自己下午参会的所听、所想、所得记录下来。</p></blockquote><h3 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h3><p>南京大学的这个大数据技术 Meetup 是由计算机学院助理研究员、南大大数据实验室的<strong>顾荣</strong>博士发起的 算上加上这次已经举办了 10 次了，特此鸣谢顾荣博士发起并组织大数据技术 Meetup，主要是邀请海内外互联网大数据公司或高等院校学者来给大家带来&amp;分享其最新的<strong>大数据技术</strong>、<strong>学术成果</strong>、<strong>工程实践应用</strong>，可以说是一场产、学、研集一身的“盛会”（虽然自己还是个数据科学“菜鸟”，但能够有机会多听听、多见见还是受益匪浅的。</p><p>这个是本次（第 10 次）<a href="http://www.huodongxing.com/event/6411201406400" target="_blank" rel="noopener">大数据 Meetup 活动详情连接</a>，感兴趣的小伙伴可以看看 o(<em>￣▽￣</em>)ブ</p><a id="more"></a><h3 id="二、主要嘉宾讲演回顾（回忆版）及个人思考-┗-｀O′-┛-嗷"><a href="#二、主要嘉宾讲演回顾（回忆版）及个人思考-┗-｀O′-┛-嗷" class="headerlink" title="二、主要嘉宾讲演回顾（回忆版）及个人思考 ┗|｀O′|┛ 嗷~~"></a>二、主要嘉宾讲演回顾（回忆版）及个人思考 ┗|｀O′|┛ 嗷~~</h3><h4 id="1-大数据时代下的自然语言处理研究进展-via-周德宇"><a href="#1-大数据时代下的自然语言处理研究进展-via-周德宇" class="headerlink" title="1. 大数据时代下的自然语言处理研究进展 via 周德宇"></a>1. 大数据时代下的自然语言处理研究进展 via 周德宇</h4><p>周德宇教授主要从事 NLP 方面的研究，通过周教授的讲述我对 NLP 有了新的认识，比如一般从事 NLP 研究过程如下：</p><p><strong>① 数据预料处理（词性标注 -&gt; 命名实体识别）</strong> -&gt; <strong>② 知识发现（关系抽取/事件抽取）</strong> -&gt; <strong>③ 创建知识图谱</strong> 或 <strong>③ 构建事件图谱（情感计算 / 事件可视化）</strong></p><blockquote><p>周教授说事理图谱是由哈工大的刘挺教授提出了，相对知识图谱更难，但作用很大，很多场合下<strong>事件图谱</strong>更能解决实际问题。有兴趣的小伙伴可以查看相关资料深度了解一下。</p></blockquote><hr><p>周教授的讲座主要分享在三个方面做的研究以及一些实际应用：</p><ul><li><p>关系抽取：周教授带学术做了药物相互作用之间的关系抽取，举个简答的例子，e.g 药物 A 和药物 B 不能和药物C同时使用，我们可以抽取出如下关系表：</p><pre><code>|    关系      |  相互作用与否  || ------------ | ------------  || &lt; A, C &gt;     |     Yes       || &lt; B , C &gt;    |     Yes       || &lt; A , B &gt;    |     No        |</code></pre><blockquote><p>我觉得这个非常有意思，每年有很多因俩种或多种药物不良反应造成的医疗事故，如果我们可以通过这种药物关系抽取出各种不良药物反应的关系，然后绘制知识图谱/事件图谱，然后在医生使用 HIS 系统开药时，智能辅助，是不是可以大大降低因药物不良反应的事故率呢 😉</p></blockquote><p>  此外，周教授还有一个处于研究中的叫做 position-aware relation extraction。</p><p>  这个对比传统的关系抽取方法，主要区别是在分词 part of bags 分词阶段加入单词位置的考虑，简单来说，一句英文不用位置的单词重要性不同，所以英文我们会强调有重读和弱读。不然很长的一句话，别人无法抓住重点，就会造成理解上的障碍。</p></li><li><p>事件抽取：事件抽取方面，周教授主要谈及利用 Topic Model 进行事件抽取方面的研究。</p><p>  Deep Learning 这俩年的超级火爆，利用 LDA 模型进行的研究的人员少了很多，但时周教授发现，Deep Learning 和 AI 占据主流技术的同时，LDA 模型仍然有其用武之地。</p><p>  周教授团队用 Topic Model 把每一个事件用一个 document 表示，然后关联不同 document，进行事件抽取。LDA 我也只了解皮毛，所以我就不阐述了。</p></li><li><p>文本情感分析：做文本情感分析的人很多，但周教授及其团队选取的角度很独特 ———— 针对 Trump 2016 大选事件做 Twitter 用户态度。不仅分析出每条 tweet 的表达 support / disapprove 的态度，更重要的是找出其支持的理由/主题 ，制作图谱 </p><blockquote><p>🔗 去年的《信息传播学》课程实践作业，我爬取了 Trump 和 Hilary 过年一年所有 tweets 作为输入语料 ，利用内容分析法，分析出了其各自主要政治态度、宗教、教育、军事等方面的 <strong>态度</strong> / <strong>观点</strong>。</p></blockquote></li><li><p>实际应用：</p><ul><li>社会舆情采集系统（Spark、Hadoop、MongoDB…）</li><li>…</li></ul></li></ul><h4 id="2-大规模场景下的智能化硬盘故障预警及修复-via-朱颖航"><a href="#2-大规模场景下的智能化硬盘故障预警及修复-via-朱颖航" class="headerlink" title="2. 大规模场景下的智能化硬盘故障预警及修复 via 朱颖航"></a>2. 大规模场景下的智能化硬盘故障预警及修复 via 朱颖航</h4><pre><code>主要通过采集服务器日志信息和多种传感器数据，分析影响硬盘故障的因素和权重，构建一个智能化硬盘故障预警及修复系统。记得吴恩达（Ng Andrew）在 Google 期间，就带领团队利用机器学习分析统计预计 Datacenter 的能耗问题，最终实现了显著的能耗降低。</code></pre><blockquote><p>这里我提了一个问题，就是 LinkedSee 灵犀在IT企业智能化运维除了硬盘故障预警及修复，对于能耗问题是否涉及？朱颖航说他在百度期间就从事了相关的工作，这里面的故事很多 ~~~</p></blockquote><blockquote><p>我还有一点感触就是 ———— 人工智能、机器学习等的应用场景还有很多，我们需要打开思路，发散思维，以全新的视角去审视问题。这个就给我们做了很多的范例。在数据极大丰富、计算能力大幅提升、算法多种多样的今天，我们更加需要深刻理解业务场景、提高问题意识，不断创新问题解决思路、方法，用新工具解决新问题，持续提升效率。</p></blockquote><h4 id="3-企业大数据在风控领域的应用与价值挖掘-via-冯娟"><a href="#3-企业大数据在风控领域的应用与价值挖掘-via-冯娟" class="headerlink" title="3. 企业大数据在风控领域的应用与价值挖掘 via 冯娟"></a>3. 企业大数据在风控领域的应用与价值挖掘 via 冯娟</h4><pre><code>企业大数据不同于以往的社交媒体数据挖掘，而且强调一种“全数据”的概念，包含各种企业公开信息（公司概况、财务、运营数据）、新闻媒体、社交媒体数据、政府监管数据等等。通过挖掘企业的全数据，我们可以绘制公司/企业的“知识图谱”，了解其错综复杂的关系网，利益链，人脉关系网；隐藏着融资风险、非法集资链条等等。</code></pre><hr><p>📌 <strong>企业大数据挖掘建模的几个要素</strong>：</p><ul><li><p>数据和技术要为业务服务 – 领域知识很重要。</p></li><li><p>抽象业务问题，合理定义目标</p></li><li><p>分群建模的重要性。不同的人群特点不同，不可能一个模型/算法通吃。</p></li><li><p>…</p></li></ul><h4 id="4-数据挖掘思维的基础-via-丁明"><a href="#4-数据挖掘思维的基础-via-丁明" class="headerlink" title="4. 数据挖掘思维的基础 via 丁明"></a>4. 数据挖掘思维的基础 via 丁明</h4><pre><code>这次收获或者感悟最多的还是要数丁明带来的《数据挖掘思维的基础》，原因有二：- peer-view 观点，一个从网络运维转型数据挖掘工程师，偶然参加了数据科学竞赛，从此走上数据挖掘道路- 分享的是数据挖掘/数据科学核心的分析思维/逻辑问题，而非传统的技术分享。</code></pre><ul><li><p>数据分析类型</p><ul><li><p>Descriptive Analysis（描述性分析，也就是我们常说的 EDA）：主要通过一些统计分析指标（平均值、众数、方差…）、变量分析（单变量、双变量、多变量）、成分分析探寻数据中一些基本特征、变量关系，为下一步的 predictive analysis 等打下基础，做些基本储备，充分了解数据特征和关系。</p></li><li><p>Diagonal Analysis（诊断性数据分析）：在描述性分析基础上，探寻某些关系、规律背后的影响因素、原因。进一步刻画数据中存在的规律、变化。</p></li><li><p>Predictive Analysis（预测性分析）：根据前俩个分析得出的结论、规律等，进行建模预测，对未来数据变化/用户行为进行预测。</p></li><li><p>Prescriptive Analysis（指导性）：这步主要是面向管理层/高层领导进行的操作，分析师们需要将发现的 <strong>Insights/Ideas</strong> 写成分析报告（包括 Visualization Analysis），以支持上级领导/公司高层进行业务/战略的 <strong>优化/决策</strong>。</p></li></ul></li><li><p>数据挖掘基本流程</p><p>  <strong>数据预处理模块</strong> -&gt; <strong>目标评分公式模块</strong> -&gt; <strong>特征工程模块</strong> -&gt; <strong>Label标签模块</strong> -&gt; <strong>训练模型模块</strong></p></li><li><p>八种常见任务类型</p><ul><li><p>分类</p></li><li><p>回归</p></li><li><p>聚类</p></li><li><p>相似匹配</p></li><li><p>频繁集发现</p></li><li><p>统计（属性、行为、状态）描述</p></li><li><p>连接预测</p></li><li><p>因果分析</p></li></ul></li></ul><blockquote><p>我印象最深刻的一句话是 ———— “我们最终要成为一个模型、算法的分拣器”。我们在了解各种算法后，需要通过大量的训练，获得成为分拣器的实践经验和相应的业务知识/领域知识。 多聆听 👂 多思考 🤔 多实践 🏃</p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;导语：今天下午去南京大学参加了南京大数据技术 Meetup 第十次会议，收获颇丰，不仅是对机器学习、大数据认识有了提升，而且了解当下大数据、机器学习技术在企业中的前沿应用。晚上回来后（南大仙林好远呀 😭，不过听了这场讲座还是值了），直奔教研室 🏃🏃🏃，想把自己下午参会的所听、所想、所得记录下来。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&quot;一、介绍&quot;&gt;&lt;a href=&quot;#一、介绍&quot; class=&quot;headerlink&quot; title=&quot;一、介绍&quot;&gt;&lt;/a&gt;一、介绍&lt;/h3&gt;&lt;p&gt;南京大学的这个大数据技术 Meetup 是由计算机学院助理研究员、南大大数据实验室的&lt;strong&gt;顾荣&lt;/strong&gt;博士发起的 算上加上这次已经举办了 10 次了，特此鸣谢顾荣博士发起并组织大数据技术 Meetup，主要是邀请海内外互联网大数据公司或高等院校学者来给大家带来&amp;amp;分享其最新的&lt;strong&gt;大数据技术&lt;/strong&gt;、&lt;strong&gt;学术成果&lt;/strong&gt;、&lt;strong&gt;工程实践应用&lt;/strong&gt;，可以说是一场产、学、研集一身的“盛会”（虽然自己还是个数据科学“菜鸟”，但能够有机会多听听、多见见还是受益匪浅的。&lt;/p&gt;
+&lt;p&gt;这个是本次（第 10 次）&lt;a href=&quot;http://www.huodongxing.com/event/6411201406400&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;大数据 Meetup 活动详情连接&lt;/a&gt;，感兴趣的小伙伴可以看看 o(&lt;em&gt;￣▽￣&lt;/em&gt;)ブ&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="技术" scheme="https://github.com/zhililab/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    
+      <category term="机器学习" scheme="https://github.com/zhililab/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="Meetup" scheme="https://github.com/zhililab/tags/Meetup/"/>
+    
+      <category term="大数据" scheme="https://github.com/zhililab/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>TOEFL Test Review</title>
+    <link href="https://github.com/zhililab/2017/10/27/TOEFL-Review/"/>
+    <id>https://github.com/zhililab/2017/10/27/TOEFL-Review/</id>
+    <published>2017-10-26T16:00:00.000Z</published>
+    <updated>2018-03-17T06:12:11.722Z</updated>
+    
+    <content type="html"><![CDATA[<p>Cover Photo by ETS.org</p><blockquote><p>后天（2017.10.28）我就要参加 TOEFL（ETS）考试了，我想在考试之前系统梳理下 TOEFL 考试流程、内容、一些应试“策略”（我这里不愿称之为技巧）~ OK，那我们正是开始吧！</p></blockquote><h1 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h1><p>TOEFL 考试全称为 Test of English as a Foreign Language，中文我们习惯称之为“托福”，举办方是美国重要考试机构 ETS（English Testing System），TOEFL是很多想要出国去英语国家留学、工作必不可少；此外，现在很多人还把 TOEFL 和 IELTS 当成介于 CET-4 、CET-6 和 专业英语等级考试（一般俗称的专四、专八）的一种语言能力证明考试，面试外企或对英语要求高的专业。</p><ul><li><p>报名要求：无要求</p></li><li><p>考试时长： 大陆考区是每周的周六 9：00 开考（ETS有时会根据情况在某个周六的下午增加一场 TOEFL 考试），持续时间一般都是3个小时以上，</p></li></ul><a id="more"></a><p>我们现在参加 TOEFL 基本上都会遇到经典加试（阅读或听力而二者之一），时间也会相应往后顺延，我记得我第一次考完出来时间已经将近下午1点钟了 T_T </p><ul><li><p>考试内容和得分：TOEFL 考试分为四块 —— 阅读、听力、口语、写作，每项满分 30 分，TOEFL考试合计满分 120 分。</p><p>  <a href="http://www.ets.org/toefl/ibt/scores/understand" target="_blank" rel="noopener">TOEFL® Score Scales</a></p><p>  | Skill       |    Score Range |    Level                                                |<br>  | ———– | ———– | —————————————————— |<br>  | Reading     |    0–30        |    High (22–30) Intermediate (15–21) Low (0–14)         |<br>  | Listening   |    0–30        |    High (22–30) Intermediate (14–21) Low (0–13)         |<br>  | Speaking    |    0–30        |    Good (26–30) Fair (18–25) Limited (10–17) Weak (0–9) |<br>  | Writing     |    0–30        |    Good (24–30) Fair (17–23) Limited (1–16) Score of zero (0) |<br>  | Total Score |    0–120        |           Good                       Limited           |</p></li><li><p>考试形式：中国大陆地区现在全部采用机考模式，也就是 iBT TOEFL (internet-based TOEFL Test Exam)</p></li></ul><p>Now，让我们开始逐一回顾下 TOEFL 考试每项具体内容和知识点总结吧。</p><h1 id="二、TOEFL-阅读"><a href="#二、TOEFL-阅读" class="headerlink" title="二、TOEFL 阅读"></a>二、TOEFL 阅读</h1><h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1. 介绍"></a>1. 介绍</h2><p>TOEFL 阅读部分总共有 3 篇文章，每篇 800 词左右，每篇题目量 16/17 题目，时长为 1 h。</p><p>经过很长时间的备考，我愈发觉得 TOEFL 阅读部分着重考察我们的<strong>逻辑思维能力</strong>、<strong>学科词汇</strong>！</p><p>主要涉及学科：艺术、生物、地理、人文…</p><p>✂ <strong>生物</strong>、<strong>地理</strong>等学科理科性比较强，<strong>人文/社会科学</strong>文章比较难理解些</p><h2 id="2-个人经验总结"><a href="#2-个人经验总结" class="headerlink" title="2. 个人经验总结"></a>2. 个人经验总结</h2><ul><li><p>首先，看到 TOEFL 文章后一定要<strong>看标题！看标题！看标题！</strong></p><p>  这样可以根据标题猜测这遍文章的主题/学科，相信大家考试之前已经做了不少题目，艺术/生物/地理/历史等类。</p></li><li><p>其次，TOEFL 阅读正常是按照文章段落顺序出题</p><p>  每题所在段落会高亮标注，开始某段的题目前最好先快速通览整段（开头/结尾，中心句，跳读例子等次要部分）。</p></li><li><p>最后，做阅读题目时刻牢记主题思想，注意前后逻辑、行为思路。</p></li></ul><hr><p><strong><em>题型拆解</em></strong></p><ul><li><p>词汇题(3-4 个/篇)：词汇题都是固定词汇反复考，经常是某个单词这回是选项，下次就变成了题干。尽量保证全对 ✔ ✔ ✔</p></li><li><p>细节题(2-4 个/篇)：注意 Except / Not 等信号词</p></li><li><p>推断题(2-4 个/篇)：一般都是取同（与文章意思相同）、取反（与文章意思相反） </p></li><li><p>句子简化题(1 个/篇)：三少（主语/宾语/逻辑），一多（逻辑）</p></li><li><p>句子插入题(1 个/篇)：这个主要根据前后主语，指代词（this/that/these/those）、逻辑关系词（therefore/because）等前后逻辑结构选出。</p></li><li><p>Prose Summary / Table ：2分题，Prose Summary 是给出6个句子让你选出与文章对应的main ideas / key points，略过 details / examples；table 表格题一般在对比型文章容易出现，对比俩种类型的区别，对号入座就可以了。</p></li></ul><p>🔗 常见逻辑关系总结：因果逻辑（therefore/because/thus/due to）、对比逻辑（contrast/while）、比较逻辑(compare/similar)、递进逻辑（in addition/furthermore）…</p><h1 id="三、TOEFL-听力"><a href="#三、TOEFL-听力" class="headerlink" title="三、TOEFL 听力"></a>三、TOEFL 听力</h1><h2 id="1-介绍-1"><a href="#1-介绍-1" class="headerlink" title="1. 介绍"></a>1. 介绍</h2><p>听力可以说 TOEFL 考试的核心、重点、要害（俗话说：得托福听力者，得高分），因为除了阅读部分，剩下 3 个 部分（听力、口语、写作的综合写作）全部和听力相关且直接影响着做题质量，可以关乎你的 TOEFL 最终成绩。</p><p>TOEFL 听力部分总共有 2 个 section，每个 section 是 1 篇对话，2 篇 lecture—</p><table><thead><tr><th>Section 1</th><th>Section 2</th></tr></thead><tbody><tr><td>Conversation 1</td><td>Conversation 2</td></tr><tr><td>Lecture 1</td><td>Lecture 3</td></tr><tr><td>Lecture 2</td><td>Lecture 4</td></tr></tbody></table><p>TOEFL 听力部分着重考察我们的<strong>听力能力</strong>、<strong>学科词汇</strong>！</p><p>无老师就建议大家，在没有听懂95%以上内容的情况下，不要做笔记，这点我自己深有体会；刚开始忙于做笔记，为了做笔记而做笔记，却忽略 😭 了听力的核心 Σ 是要听懂！要听懂！要听懂！</p><p>主要涉及学科：Arts/Life Science/Geography/Astronomy/Scoial Science…</p><h2 id="2-个人经验总结-1"><a href="#2-个人经验总结-1" class="headerlink" title="2. 个人经验总结"></a>2. 个人经验总结</h2><ul><li><p>先说下 conversation。</p><ul><li><p>conversation 一般多发生于以下场景和人群之间：① 学习场景：Prof. &amp; Stu./Advisor &amp; Stu./ Stu. &amp; Stu. ② 生活场景：Librian &amp; Stu.等。</p></li><li><p>主要任务：mainly topic(subject discussion/ paper/ part-time jobs/ urgent matters)， speaker`s attitudes， analysis of problems(one speaker)， solutions(solved/unsovled)。</p></li><li><p>笔记：建议 conversation 不做笔记。抓主要信息，听懂就好。</p></li></ul></li><li><p>接下来重头戏 lectures。</p><ul><li><p>lecture 主要分为两种：monologue or discussion</p></li><li><p>主要信息如下表：</p><p>|        分类         |         备注         |<br>| ——————  | —————— |<br>|       开头           |       主旨       |<br>|       结尾           |       重听题、预测  |<br>|      人名、地名      |        一般不考具体含义，但做题出现关键词要有印象，一般是在历史发展过程/多种类型对比出现          |<br>|      强调1           |    并列（and/also）       |<br>|      强调2           |    转折（however/while）       |<br>|      强调3           |    重点（important/especially）       |<br>|      强调4           |    重复（几个adj 并列重复某个概念）       |<br>|      强调5           |    对比/比较（though/felt，虚拟语气的一种形式，表示过去认为A，现在实际B）<br>|      指令词          |       listen/think     |</p><blockquote><p>这里特别感谢江苏南京朗阁 TOEFL 听力林幸健老师，原表是林老师总结的，林老师建议我们记住此表，听力考试具体听时做到心里有数，主次分明，听出<strong>层次感</strong>、<strong>颗粒感</strong>（practice tests perfect ！）</p></blockquote></li></ul></li></ul><h1 id="四、TOEFL-口语"><a href="#四、TOEFL-口语" class="headerlink" title="四、TOEFL 口语"></a>四、TOEFL 口语</h1><h2 id="1-介绍-2"><a href="#1-介绍-2" class="headerlink" title="1. 介绍"></a>1. 介绍</h2><pre><code>TOEFL 口语部分总共有 6 个 task（除了1、2，剩下的 task 都有听力部分）。* task 1-2：开放性回答，都是日常生活常见的话题 e.g ① 谈论一本你喜欢的书以及喜欢的理由、具体例子 ② 说一位你个你崇拜的人，说明理由、细节；二选一：① 你喜欢去市中心超时郊区的超市购物 ③ 你喜欢和哪一种室友相处：A or B or C?    **答题**：15s prepare + 45s speak* task 3-4：考试三部分组成：Reading + Listening + Speaking     * task 3：校园（campus）场景，一般发生在俩个学生之间。reading 要求我们阅读完材料听一段 conversation；conversation 中俩个学生谈论阅读材料中的 topic ，学生 A 会明确表明态度（agree / disagree），另一个学生 B 辅助谈话中，学生 A 依次说出自己的理由1、2；speaking 总结阅读材料主题 + 学术的态度以及理由1、2。        &gt; 📌 task 3 阅读材料一般可分为：#letter #announcement #proposal    * task 4：学术（academic）场景，一般是教授一个的 monologue，reading 要我们在阅读完材料（某个学科中的概念介绍 e.g swarm intelligence/ emotional intelligence/ plants...）；listening 中教授会用 1-2 例子向学术 illustrate 这个概念；speaking 中我们要总结 reading 中的概念大意，然后概述教授所说的具体例子（examples）。    **答题**：30s prepare + 60s speak * task 5-6：考试三部分组成：Listening + Speaking     * task 5：校园（campus）场景，listening 听一段学生对话，有 1 个 problem + 2 个 solutions + 对应的理由1、2（两个版本）；speaking 部分我们需要总结一下学生遇到的 problem ，选择一个 solution，并总结理由1、2（听力！听力！听力！）。        &gt; 📌 task 5 可分为：紧急情况、忘记某事/某物     * task 6：学术（academic）场景，listening 部分先听一段学术 monologue，包含 1 个 topic + 3 个 main points + 3 个例子（1个 main point &lt;-&gt; 1 个 example）；speaking 部分我们总结下听力材料中的 1 个 topic + 3 个 main points + 3 个例子。    **答题**：20s prepare + 60s speak    主要涉及场景、学科：campus service/psychology/biology/botany/animals...</code></pre><h1 id="五、TOEFL-写作"><a href="#五、TOEFL-写作" class="headerlink" title="五、TOEFL 写作"></a>五、TOEFL 写作</h1><h2 id="1-介绍-3"><a href="#1-介绍-3" class="headerlink" title="1. 介绍"></a>1. 介绍</h2><p>TOEFL 写作部分总共有 2 个部分：integrated writing + independent writing。</p><ul><li><p>综合写作（intergrated writing）：reading + listening + writing 。reading 阅读一篇短文，阐述某个 topic sentence，接下来三段阐述 3 个论据和细节；listening 一般都是反驳文章观点，然后说出 3 个 论据和细节；writing 部分我们需要总结对比 reading 观点和 listening 观点（不漏写！不漏写！不漏写！）。</p><ul><li><p>reading：阅读时间先抓首段，找出核心事件/观点，然后分别快速阅读剩下 3 段的首句和细节，抓名词，形容词，注意并列结构。</p></li><li><p>listening：一般 speaker 都会用一些<strong>声调</strong>、<strong>语气</strong>来帮我们辨别核心驳论点和细节，用心听，多感受 ~</p></li><li><p><strong>时间</strong>：20min</p></li></ul></li><li><p>独立写作（independent writing）：</p><ul><li><p>话题：工作、教育、环保、科技、政府…</p></li><li><p>注意：每段中要有 details 和 examples</p></li><li><p><strong>时间</strong>：30min</p></li></ul></li></ul><p>✂ 很多小伙伴把重心完全放到了 independent writing，却忽视了 integrated writing 的重要性（很大程度上，你的 integrated 能否上 fair 甚至 good 直接影响着我们写作部分的最终得分）</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>以上就是全部的考试主要内容和考点以及一些应试策略，仅供大家参考，大家要记住，TOEFL 毕竟是一场考试，有其局限性。我们真正着眼点还是应该放到提升自己英语能力上：听的懂，说得出，写得好（我个人总结的9字箴言）</p><blockquote><p>经过几个月的备考，祝愿自己这次能考出理想成绩，早日拿到 1 跟油条，2 个鸭蛋（100/120 分）</p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Cover Photo by ETS.org&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;后天（2017.10.28）我就要参加 TOEFL（ETS）考试了，我想在考试之前系统梳理下 TOEFL 考试流程、内容、一些应试“策略”（我这里不愿称之为技巧）~ OK，那我们正是开始吧！&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&quot;一、介绍&quot;&gt;&lt;a href=&quot;#一、介绍&quot; class=&quot;headerlink&quot; title=&quot;一、介绍&quot;&gt;&lt;/a&gt;一、介绍&lt;/h1&gt;&lt;p&gt;TOEFL 考试全称为 Test of English as a Foreign Language，中文我们习惯称之为“托福”，举办方是美国重要考试机构 ETS（English Testing System），TOEFL是很多想要出国去英语国家留学、工作必不可少；此外，现在很多人还把 TOEFL 和 IELTS 当成介于 CET-4 、CET-6 和 专业英语等级考试（一般俗称的专四、专八）的一种语言能力证明考试，面试外企或对英语要求高的专业。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;报名要求：无要求&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;考试时长： 大陆考区是每周的周六 9：00 开考（ETS有时会根据情况在某个周六的下午增加一场 TOEFL 考试），持续时间一般都是3个小时以上，&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="考试" scheme="https://github.com/zhililab/categories/%E8%80%83%E8%AF%95/"/>
+    
+    
+      <category term="英语" scheme="https://github.com/zhililab/tags/%E8%8B%B1%E8%AF%AD/"/>
+    
+      <category term="TOEFL" scheme="https://github.com/zhililab/tags/TOEFL/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>机器学习算法之【SVM】</title>
+    <link href="https://github.com/zhililab/2017/10/24/MachineLearning-SupervisedLearning-SVM/"/>
+    <id>https://github.com/zhililab/2017/10/24/MachineLearning-SupervisedLearning-SVM/</id>
+    <published>2017-10-24T14:00:00.000Z</published>
+    <updated>2018-03-17T03:45:49.931Z</updated>
+    
+    <content type="html"><![CDATA[<p>Cover Photo by scikit-learn.org</p><blockquote><p>导语：前天，手欠误删了基于 Github Pages + Hexo 搭建的个人技术博客，已经花费了2小时写了篇 SVM 算法总结，没了 T_T ( ´･･)ﾉ(._.`) 吸取这次的教训，做好数据/文档的备份操作 ！！！但是，换个角度想想，这也给我一个再次抛开书本、博客文档（当时的短时记忆加个人理解写成），再次思考什么 SVM，SVM到底说了啥，如何利用scikit-learn 快速构建一个基于 SVM 分类器/模型的机会哦 ~ 我必须谢谢我自己 🤣🤣🤣</p></blockquote><h3 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h3><p>众所周知，机器学习我们一般可以分为两大类：一是监督学习或有监督学习（Supervised Learning），另一类是自主学习或无监督学习（Unsupervised Learning）。今天，我想回顾一下或者说温习下上周学习的一种有监督学习算法 SVM。</p><p>SVM 是英文 Support Vector Machines 的英文所写，翻译成中文，我们一般称之为支持向量机。利用 SVM 我们可以实现对线性空间场景下（非线性空间下，我们可以利用 kernel tricks 进行改造，后面会详细以及）分类问题，具体举例来说，可以尝试用 SVM 解决下列问题：</p><a id="more"></a><ul><li>垃圾邮件分类</li><li>作者预测</li><li>个性化推荐 （好友推荐、音乐推荐、商品推荐）</li><li>…</li></ul><h3 id="二、核心思想"><a href="#二、核心思想" class="headerlink" title="二、核心思想"></a>二、核心思想</h3><p>SVM 核心思想是一个超平面内，找到一条直线，实现对不同类型的点进行分类的目的，且边界距离Margin达到最大值。需要注意的是，现实世界中的问题是复杂多变、多种多样，有时我们在处理分类问题遇到非典型线性分类问题，要么采用其他分类算法，要么对问题进行“改造”，把实际工程应用中具体的非线性问题转换成线性或类线性问题。</p><p>所以，在具体工程应用中，我们可能还会见到一些 SVM 的变体模型，这里我在后面如若遇到也会总结、分享 ~</p><blockquote><p>我们想要达到掌握/精通一门语言、技术的程度，不是一朝一夕能够达到的，相反的，我们不如边用边学（遇到需要使用这门技术的时候，开始按需学习、实践、反复）、边学边用（阅读GitHub源代码，是一种非常好的快速学习一门语言/技术的方法）。逆行思维，多想想自己已经 了解/理解/掌握 哪些知识/技术/工具</p></blockquote><h3 id="三、具体实例"><a href="#三、具体实例" class="headerlink" title="三、具体实例"></a>三、具体实例</h3><ol><li><p>为什么选择 scikit-learn</p><p> scikit-learn 是当下入门机器学习几乎都会用到的机器学习集成包，主要基于Python编写的。文档齐全、社区友好、支持当下几乎所有主流的机器学习算法、框架；上手快，易于实现（个人感觉 scikit-learn 有点类似深度学习中 keras 框架，基本构建模型都已经封装好，“搭积木”的方式你主要调用/组合就好了）。</p><p> ☀ 当然了，我们在享受 scikit-learn 快捷便利强大的同时，也不能过于依赖。防止自己的编程能力 keep your hands dirty，还要关注大公司（BAT，FLAG）发布新的开源包/框架（我自己一直关注微博上 “爱可可-爱生活”的微博号）</p></li></ol><ol><li><p>利用 scikit-learn 快速构建一个基于 SVM 的分类器/模型</p><p> 下面，我们看下如何使用 scikit-learn 快速搭建起一个基于 SVM 的分类器</p> <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#导入sklearn相关算法包，以及自己编写的数据预处理程序</span></span><br><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> SVC</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> accuracy_score</span><br><span class="line"><span class="keyword">from</span> prep_data <span class="keyword">import</span> makeTerrainData</span><br><span class="line"></span><br><span class="line"><span class="comment">#数据预处理：训练集 + 测试机</span></span><br><span class="line">features_train, features_test, labels_train, labels_test = makeTerrianData()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成实例</span></span><br><span class="line">clf = SVC(kernel=<span class="string">'linear'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 拟合分类器</span></span><br><span class="line">clf.fit(features_train, labels_train)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 进行预测</span></span><br><span class="line">pred = clf.predict(features_test)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 准确率</span></span><br><span class="line">accuracy = accuracy_score(pred, labels_test)</span><br></pre></td></tr></table></figure><p> 看到了吧 o(<em>^＠^</em>)o 使用 scikit-learn 构建一个基于 SVM 的分类器就是这么容易，给 scikit-learn 手动点赞吧 👍 b(￣▽￣)d</p></li><li><p>调参</p><blockquote><p>有些人会说调参，占据机器学习的大部分时间，虽然有些夸张，但却也反映出了调参对于机器学习模型好坏、质量的重要性</p></blockquote><ul><li><p>kernel：rbf(default) / linear/ sigmoid … 我们称之为 kernel trick ，非常好用。我们前面提到在分类问题非线性情况是，我们需要转换成类线性或线性问题，这里 kernel 主要起这个作用哈 ~~~ 吼吼吼 💃</p></li><li><p>C：一般来说，C 值越大，拟合程度越高</p></li><li><p>gamma：gamma 参数相比 C 参数对模型的拟合影响程度小很多，但还是存在一定影响的。根据经验值，我们得出，一般gamma </p><p>下面是 Udacity SVM 算法部分的 Mini 小项目，我的运行主要结果 </p><p>练习1：作者身份准确率<br>no. of Chris training emails: 7936<br>no. of Sara training emails: 7884<br>accuracy: 0.984072810011</p><p>练习2：对SVM分类器计时<br>training time: 321.045 s<br>predicting time: 28.493 s</p><p>练习3：降低训练集大小 （100% -&gt; 1%）<br>training time: 0.139 s<br>training time: 1.551 s<br>accuracy: 0.884527872582</p><p>练习4：改变内核（100% -&gt; 1%，linear -&gt; rbf）<br>training time: 0.153 s<br>training time: 1.783 s<br>accuracy: 0.616040955631</p><p>练习5：优化C参数（100% -&gt; 1%，C: 10.0、100.、1000. 和 10000.）<br>0.616040955631 -&gt; 0.616040955631 -&gt;  0.821387940842 -&gt;  0.892491467577</p><p>练习6：改变内核（linear -&gt; rbf, C: 10000）<br>training time: 158.059 s<br>training time: 15.595 s<br>accuracy:  0.990898748578</p></li></ul></li></ol><h3 id="四、SVM-的-pros-and-cons"><a href="#四、SVM-的-pros-and-cons" class="headerlink" title="四、SVM 的 pros and cons"></a>四、SVM 的 pros and cons</h3><p>Pros：</p><ul><li>适合处理线性分类问题</li><li>robust</li></ul><p>Cons：</p><ul><li>防止过度拟合问题，上文提及的 C 参数和 gamma 参数需要调整优化</li><li>优化问题比较复杂</li><li>对噪声敏感</li></ul><p>注：这里pros and cons 参考了 Udacity 夏季线下讨论营的 SVM 优缺点总结</p><h3 id="五、思考"><a href="#五、思考" class="headerlink" title="五、思考"></a>五、思考</h3><ol><li><p>我们该怎样学习机器学习（个人见解）</p><p> 记得周志华老师在他的“西瓜书”🍉——《机器学习》的前言如何使用本书就明确表示，希望读者，不要指望一下俩下掌握机器学习，建立读者不妨多读几遍该书，每次收获获取都不同；此外，周老师不建议初学者，上来就一头扎进“十大经典算法” 或 “二十大算法”，沉迷于某个算法的数学推导、代码实现等，“只见其木，不见其林”。我个人十分赞同周志华老师的观点。</p><p> 1）机器学习好比一大片森林，初来乍到，我们最好观其全貌，概览机器学习主要内容和知识体系；</p><p> 2）边学边思考，多实践、多总结。Andrew Ng 说过—— 人人都可以掌握机器学期、深度学习，关键要掌握掌握其的方法，很多人就忽视复现他们实验这个常见但经常被大家忽略的快速学习机器学习/深度学习的高效学习方法。</p></li></ol><ol><li>我接下来的学习计划和蓝图（仅供参考）<ol><li>参加 Kaggle / 天池 数据科学竞赛，实战中学习，学习中实战；</li><li>多写机器学习或数据分析技术、方法等博客，不断回顾学习，深化知识理解，朝着掌握/精通的方向不断努力</li><li>强化编程能力。不过度依赖 scikit-learn 等算法包</li></ol><ul><li>Be open-minded ! </li><li>Be proactive !</li><li>…</li></ul></li></ol><h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><blockquote><p>关于我的博文的几点说明：</p></blockquote><ul><li>我的博文主要是个人随笔、技术总结分享、数据科学/机器学习项目踩坑经验以及一些杂七杂八的内容，作为自己的一个小天地 ~</li><li>我的博文内容更多强调自己的个人理解和思考，而非知识、技能的提纲，合上书本、各种资料后，写出来的东西才是自己的东西，行文逻辑也将是你自己的思维过程，以及你意识中觉得比较重要的地方。这样相当于“一千个读者，就有一千个哈姆雷特一样”。</li><li>技术总结博客很多都是初学札记，难免有疏漏或理解错误的地方，恳请阅者多多包涵，但如果我的一点个人理解或思考能给你带来一点儿启发或进一步思考，我将会十分高兴的，说明我写的博客帮助提升自己的同时，也帮助到了TA人。</li></ul><p>砥砺前行，不忘初心 ，一直在路上 ε=ε=ε=(~￣▽￣)~</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Cover Photo by scikit-learn.org&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;导语：前天，手欠误删了基于 Github Pages + Hexo 搭建的个人技术博客，已经花费了2小时写了篇 SVM 算法总结，没了 T_T ( ´･･)ﾉ(._.`) 吸取这次的教训，做好数据/文档的备份操作 ！！！但是，换个角度想想，这也给我一个再次抛开书本、博客文档（当时的短时记忆加个人理解写成），再次思考什么 SVM，SVM到底说了啥，如何利用scikit-learn 快速构建一个基于 SVM 分类器/模型的机会哦 ~ 我必须谢谢我自己 🤣🤣🤣&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&quot;一、介绍&quot;&gt;&lt;a href=&quot;#一、介绍&quot; class=&quot;headerlink&quot; title=&quot;一、介绍&quot;&gt;&lt;/a&gt;一、介绍&lt;/h3&gt;&lt;p&gt;众所周知，机器学习我们一般可以分为两大类：一是监督学习或有监督学习（Supervised Learning），另一类是自主学习或无监督学习（Unsupervised Learning）。今天，我想回顾一下或者说温习下上周学习的一种有监督学习算法 SVM。&lt;/p&gt;
+&lt;p&gt;SVM 是英文 Support Vector Machines 的英文所写，翻译成中文，我们一般称之为支持向量机。利用 SVM 我们可以实现对线性空间场景下（非线性空间下，我们可以利用 kernel tricks 进行改造，后面会详细以及）分类问题，具体举例来说，可以尝试用 SVM 解决下列问题：&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="技术" scheme="https://github.com/zhililab/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    
+      <category term="机器学习" scheme="https://github.com/zhililab/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="有监督学习" scheme="https://github.com/zhililab/tags/%E6%9C%89%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="SVM" scheme="https://github.com/zhililab/tags/SVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>HelloWorld</title>
+    <link href="https://github.com/zhililab/2017/10/20/HelloWorld/"/>
+    <id>https://github.com/zhililab/2017/10/20/HelloWorld/</id>
+    <published>2017-10-20T02:10:10.000Z</published>
+    <updated>2018-03-17T03:32:21.427Z</updated>
+    
+    <content type="html"><![CDATA[<p>Photo by Vladislav Klapin on Unsplash</p><h1 id="开篇之作"><a href="#开篇之作" class="headerlink" title="开篇之作"></a>开篇之作</h1><p>今天我终于迈出了开始自己博客撰写的第一步。想想昨天自己花费了大半天时间，一直专注于博客工具的构建（zhi-li.github.io），却忘了写博客的本质 ———— 督促自己进行深度思考，打破自己以往只读、只读，没有思考的弊端，希望从现在开始，从每一篇小文章、小随笔写字。记录下自己思考的过程，产生灵感、想法；创造自己的独到的见解、看法。少点输入（控制输入数量、质量）、多点输出（深化思考）。</p><p>接下来，我的博客写作主要内容包括：个人随笔、技术学习总结与思考、考试总结等等…之前写的文章也会陆续上传的哦;)</p><blockquote><p>未完待续。。。</p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Photo by Vladislav Klapin on Unsplash&lt;/p&gt;
+&lt;h1 id=&quot;开篇之作&quot;&gt;&lt;a href=&quot;#开篇之作&quot; class=&quot;headerlink&quot; title=&quot;开篇之作&quot;&gt;&lt;/a&gt;开篇之作&lt;/h1&gt;&lt;p&gt;今天我终于迈出了开始自己博客撰写的
+      
+    
+    </summary>
+    
+      <category term="随笔" scheme="https://github.com/zhililab/categories/%E9%9A%8F%E7%AC%94/"/>
+    
+    
+      <category term="随笔" scheme="https://github.com/zhililab/tags/%E9%9A%8F%E7%AC%94/"/>
+    
+  </entry>
+  
+</feed>
