@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     
-        <title>WELCOME</title>
+        <title>Git 使用入门（1） | WELCOME</title>
     
 
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
@@ -20,7 +20,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="robots" content="all" />
 
-<link rel="canonical" href="https://github.com/zhililab/tags/回归/index.html">
+<link rel="canonical" href="https://github.com/zhililab/2018/03/19/GitFirstImpression/index.html">
 
 <link rel="icon" type="image/png" href="/assets/images/favicon/favicon.ico" sizes="32x32">
 
@@ -29,9 +29,6 @@
 
 
 
-
-    
-    
 
 
 <!-- CSS -->
@@ -67,7 +64,7 @@
 
     
     
-    <link rel="stylesheet" href="/scss/views/page/tag.css">
+    <link rel="stylesheet" href="/scss/views/page/post.css">
 
 </head>
 <body ontouchstart>
@@ -128,73 +125,123 @@
         
     <main class="page__container page__main">
     <div class="page__content">
-        <div class="page__posts clearfix">
+        <article class="page__post">
+    <div class="post__cover">
+        <img src="http://oo12ugek5.bkt.clouddn.com/images/default_cover.png" alt="Git 使用入门（1）">
+    </div>
+
+    <header class="post__info">
+        <h1 class="post__title">Git 使用入门（1）</h1>
+
+        <div class="post__mark">
+            <div class="mark__block">
+                <i class="mark__icon iconfont icon-write"></i>
+                <ul class="mark__list clearfix">
+                    <li class="mark__item">
+                        <a href="https://www.github.com/zhililab">Zhi Li</a>
+                    </li>
+                </ul>
+            </div>
             
-                <div class="page__post">
-                    <article itemscope itemtype="http://schema.org/Article" class="page__mini-article">
-    <div class="mini-article__cover">
-        
-        
-            <img itemprop="image" src="/assets/images/cover/MachineLearning-SupervisedLearning-LinearModel_cover.png" alt="机器学习算法之【线性模型】"/>
-        
-        <div itemprop="datePublished" content="" class="mini-article__date">
-            <span class="date__day">10</span>
+            <div class="mark__block">
+                <i class="mark__icon iconfont icon-time"></i>
+                <ul class="mark__list clearfix">
+                    <li class="mark__item"><span>2018-03-19</span></li>
+                </ul>
+            </div>
+
+            <div class="mark__block">
+                <i class="mark__icon iconfont icon-tab"></i>
+                <ul class="mark__list clearfix">
+                    
+                        <li class="mark__item">
+                            <a href="/tags/Git/">Git</a>
+                        </li>
+                    
+                </ul>
+            </div>
+
             
-                <span class="date__month">十二月</span>
+            <div class="mark__block">
+                <i class="mark__icon iconfont icon-eye"></i>
+                <ul class="mark__list clearfix">
+                    <li id="busuanzi_container_page_pv" class="mark__item"><span id="busuanzi_value_page_pv"></span>次</li>
+                </ul>
+            </div>
             
         </div>
-        <a itemprop="url" class="iconfont icon-enter" href="/2017/12/10/MachineLearning-LinearModel/"></a>
-    </div>
-    <div class="mini-article__info">
-        <h3 itemprop="name" class="mini-article__title">
-            <a itemprop="url" href="/2017/12/10/MachineLearning-LinearModel/" title="机器学习算法之【线性模型】">机器学习算法之【线性模型】</a>
-        </h3>
-        <p class="mini-article__author">by 
-            <span itemprop="author" itemscope itemtype="http://schema.org/Person">
-                <a itemprop="url" href="https://www.github.com/zhililab" target="_blank">
-                    <span itemprop="name">Zhi Li</span>
-                </a>
-            </span>
-        </p>
-        <p itemprop="articleSection" class="min-article__desc">
-            线性模型是大家日常学习和工程应用中广泛应用到的一种基本模型，用户刻画数据的规律和趋势。
-        </p>
-        <div class="min-article__tags">
-            <i class="iconfont icon-tab"></i>
-            <ul class="tags__list clearfix">
+    </header>
+
+    <div class="post__content">
+        <h1 id="什么是-Git"><a href="#什么是-Git" class="headerlink" title="什么是 Git"></a>什么是 Git</h1><p>Git 是一个当下十分流行的分布式版本控制工具，可以帮助我们有效管理项目开发/文档写作中的版本管理/更新/维护等多种问题，极大的提高了我们的开发效率，同时适用多人协作模式，在我看来，不管是程序员、工程师、作家、学生等等职业，学习、使用 Git 都将会对你的工作/学习/创作起到极大的效率提升作用。</p>
+<p>现在版本控制可以分为三大类：</p>
+<ul>
+<li>LVCS-本地版本控制 e.g. RCS</li>
+<li>CVCS-集中化的版本控制系统  e.g. CVCS / Subversion / Perfoce</li>
+<li>DVCS-分布式版本管理系统 e.g. Git / Bazaar</li>
+</ul>
+<h1 id="使用-Git-的好处"><a href="#使用-Git-的好处" class="headerlink" title="使用 Git 的好处"></a>使用 Git 的好处</h1><p>Git 的几大优点：</p>
+<ul>
+<li><p>简答易学，容易上手 （这里推荐新手阅读 Scott Chacon 和 Ben Straub 撰写的 <a href="https://git-scm.com/book/zh/v2" target="_blank" rel="noopener">Pro Git</a> 手册，现在已经有在线中文版 ）</p>
+</li>
+<li><p>完全分布式</p>
+</li>
+<li><p>速度快</p>
+</li>
+<li><p>保证数据完整性。所有数据在更改前都使用 <a href="https://baike.baidu.com/item/sha-1" target="_blank" rel="noopener">SHA-1</a>校验和，保证了所有更改 Git 都知悉。</p>
+</li>
+<li><p>可以高效管理超大规模项目</p>
+</li>
+</ul>
+<h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><p>正式上手之前，需要明白并记录 Git 的三个文件状态（states）和三个概念（concepts），这对之后地理解、使用 Git 十分重要！</p>
+<h2 id="3-个状态"><a href="#3-个状态" class="headerlink" title="3 个状态"></a>3 个状态</h2><ul>
+<li><p>comitted: 是“已提交”，这表示所有更改的文件已经安全地存储在你的本地库。</p>
+</li>
+<li><p>modified: 意思是“已修改”，这意味着你已经更改了你的文件，但还没有提交到你的本地库中。</p>
+</li>
+<li><p>staged: 意思是“已暂存”，你已经在当前版本库中标记了修改地文件，将在出现在。</p>
+</li>
+</ul>
+<h2 id="3-个概念"><a href="#3-个概念" class="headerlink" title="3 个概念"></a>3 个概念</h2><ul>
+<li><p>Git directory: “Git 仓库”，用来保存项目的元素据（metadata）和对象数据库的地方。Git 体系中最核心的部分。</p>
+</li>
+<li><p>working tree: “工作目录” ，对项目（project）的某个版本（version）单独拷贝、提取。</p>
+</li>
+<li><p>staging area: “暂存区域”，本质上一个文件（file），保存了下词将提交的文件列表信息，一般存放在 Git 仓库中。</p>
+</li>
+</ul>
+<p>每篇一问 (<em>^_^</em>) </p>
+<p>接下来，打算如何使用 Git，可以完成你的什么工作？</p>
+<pre><code>1. 代码管理
+2. 论文版本管理、博客文件管理
+3. 尝试使用 Git 管理数据库文件
+</code></pre><p>To Be Continued …</p>
+<p>参考文献：<br>[1] Chacon S. Pro Git[J]. 2014</p>
+
+
+        
+        <div class="post-announce">
+            感谢您的阅读，本文由
+            <a href="https://github.com/zhililab">ZHILI</a>
+            版权所有。如若转载，请注明出处：ZHILI（<a href="https://github.com/zhililab/2018/03/19/GitFirstImpression/">https://github.com/zhililab/2018/03/19/GitFirstImpression/</a>）
+        </div>
+        
+
+        <div class="post__prevs">
+            <div class="post__prev">
                 
-                    <li class="tags__item">
-                        <a href="/tags/线性模型/">线性模型</a>
-                    </li>
+                <a href="/2018/02/01/Reading-Books-Feb-2018-md/" title="书单：2018年2月"><i class="iconfont icon-prev"></i>书单：2018年2月</a>
                 
-                    <li class="tags__item">
-                        <a href="/tags/回归/">回归</a>
-                    </li>
+            </div>
+            <div class="post__prev post__prev--right">
                 
-                    <li class="tags__item">
-                        <a href="/tags/预测/">预测</a>
-                    </li>
-                
-            </ul>
+            </div>
         </div>
     </div>
 </article>
 
-                </div>
-            
-        </div>
         
         
-        <nav class="page__paginator">
-            <ul class="paginator__list clearfix">
-                
-            <li class="paginator__item">
-                <span>1</span>
-            </li>
-        
-            </ul>
-        </nav>
-    
     </div>
 
     <aside class="page__sidebar">
@@ -491,9 +538,18 @@
     <!-- endbuild -->
 
     
-    
+    <script src="/js/page/post.js"></script>
+
 
     
     
+
+
+
+    <!-- 不蒜子统计 -->
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
 </body>
 </html>
