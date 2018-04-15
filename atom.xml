@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://github.com/zhililab/"/>
-  <updated>2018-04-15T03:14:40.009Z</updated>
+  <updated>2018-04-15T07:04:13.818Z</updated>
   <id>https://github.com/zhililab/</id>
   
   <author>
@@ -15,6 +15,36 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>【转载】RAS 2018大会前瞻：热点议题与CISO的关注重点</title>
+    <link href="https://github.com/zhililab/2018/04/15/RAS-2018/"/>
+    <id>https://github.com/zhililab/2018/04/15/RAS-2018/</id>
+    <published>2018-04-15T06:51:57.000Z</published>
+    <updated>2018-04-15T07:04:13.818Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>一年一度的 RSA 大会（美国信息安全大会）将于当地时间 4 月 16 日到 4 月 20 日在美国旧金山举行。作为圈内影响力较大的会议，RSA 每年的议题和环节都有值得关注的亮点。今年预计有 500 家安全厂商参展，而参会者将有望突破 4 万人。其中，有很大一部分是安全行业从业者以及安全高管，他们的意见和经验也颇有参考价值。</p></blockquote><p>今年 RSA 大会的主题是“Now Matters”，主页列出了将近 20 个主要议题。与 DEF CON 与 BlackHat 的纯技术议题相比，RSA 的议题更加多样化，受众范围也更广。总体来看，有围绕密码学的专家讨论会、有美国国土安全部部长关于网络安全战略以及对抗网络攻击、数据泄露和网络犯罪等恶意行为的措施、也有安全研究专家对新型攻击技术与未来趋势的探讨。当然，还有目前大热的区块链、人工智能、物联网安全、网络安全法规、企业安全建设、网络战争等相关的议题，甚至还有网红、畅销书作家和优秀女性从业者等来讲解心理建设、成功学等相关的内容，这让 RSA 大会在高科技之余，多了一些人文气息。</p><p>参考 RSA 大会的安全专家、高级内容经理 Britta Glade 的观点，今年 RSA 大会的议题折射出 2018 年网络安全的几大热点趋势：人工智能、人为操纵与人的因素、ICS 与供应链攻击、物联网与医疗设备、情报共享、身份、基础设施、GDPR、风险管理与恢复能力等。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;blockquote&gt;
+&lt;p&gt;一年一度的 RSA 大会（美国信息安全大会）将于当地时间 4 月 16 日到 4 月 20 日在美国旧金山举行。作为圈内影响力较大的会议，RSA 每年的议题和环节都有值得关注的亮点。今年预计有 500 家安全厂商参展，而参会者将有望突破 4 万人。
+      
+    
+    </summary>
+    
+      <category term="技术" scheme="https://github.com/zhililab/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    
+      <category term="转载" scheme="https://github.com/zhililab/tags/%E8%BD%AC%E8%BD%BD/"/>
+    
+      <category term="RAS" scheme="https://github.com/zhililab/tags/RAS/"/>
+    
+      <category term="CISO" scheme="https://github.com/zhililab/tags/CISO/"/>
+    
+  </entry>
   
   <entry>
     <title>OWASP TOP 10 - 2017 Part 1</title>
