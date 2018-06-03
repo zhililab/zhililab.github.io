@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://github.com/zhililab/2018/04/18/OWASP-Top10-2017-Part2/</loc>
+    
+    <lastmod>2018-06-03T08:20:35.325Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://github.com/zhililab/2018/04/13/OWASP-Top10-2017/</loc>
+    
+    <lastmod>2018-06-03T08:20:13.350Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://github.com/zhililab/2018/05/02/Security-Install-KaliLinux/</loc>
     
     <lastmod>2018-06-03T06:40:23.573Z</lastmod>
@@ -26,13 +40,6 @@
     <loc>https://github.com/zhililab/2017/11/04/Nanjing-BigData-Meetup-10-Review/</loc>
     
     <lastmod>2018-06-03T03:52:55.157Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://github.com/zhililab/2018/04/13/OWASP-Top10-2017/</loc>
-    
-    <lastmod>2018-06-03T03:52:39.136Z</lastmod>
     
   </url>
   
@@ -75,13 +82,6 @@
     <loc>https://github.com/zhililab/notes/index.html</loc>
     
     <lastmod>2018-05-26T12:51:33.612Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://github.com/zhililab/2018/04/18/OWASP-Top10-2017-Part2/</loc>
-    
-    <lastmod>2018-04-22T01:53:00.988Z</lastmod>
     
   </url>
   
