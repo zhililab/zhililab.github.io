@@ -1,1 +1,24 @@
-function disableLoad(){var e=document.getElementById("page");document.getElementById("page-loading").classList.add("js-hidden"),e.classList.remove("js-hidden")}document.onreadystatechange=function(){var e=document.getElementById("page");"interactive"==document.readyState&&window.setTimeout(function(){disableLoad()},4e3),"complete"==document.readyState&&e.classList.contains("js-hidden")&&disableLoad()};
+// loading
+document.onreadystatechange = function(){
+    var page = document.getElementById('page');
+    if (document.readyState == 'interactive') {
+        window.setTimeout(function(){
+            disableLoad();
+        },4000)
+    }
+
+    if (document.readyState == 'complete') {        
+        if (page.classList.contains('js-hidden')) {
+            disableLoad();
+        }
+    }
+}
+
+function disableLoad(){
+    var
+    page = document.getElementById('page'),
+    loading = document.getElementById('page-loading');
+
+    loading.classList.add('js-hidden');
+    page.classList.remove('js-hidden');
+}
