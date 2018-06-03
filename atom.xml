@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://github.com/zhililab/"/>
-  <updated>2018-06-01T13:54:16.577Z</updated>
+  <updated>2018-06-03T02:54:44.998Z</updated>
   <id>https://github.com/zhililab/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="https://github.com/zhililab/2018/05/02/Security-Install-KaliLinux/"/>
     <id>https://github.com/zhililab/2018/05/02/Security-Install-KaliLinux/</id>
     <published>2018-05-02T02:00:00.000Z</published>
-    <updated>2018-06-01T13:54:16.577Z</updated>
+    <updated>2018-06-03T02:54:44.998Z</updated>
     
     <content type="html"><![CDATA[<p><strong>0x1 概况</strong></p><p>Kali Linux 是一个开源版的基于 Debian 的 Linux 发行版，由 Offensive Security Ltd 维护和资助。Kali Linux 预装有超过 600 个预装的渗透测程序，例如：</p><ul><li>Metasploit Framework（国际知名安全框架，为渗透测试师提供了大量的渗透测试模块和扫描模块）</li><li><a href="https://nmap.org/man/zh/index.html" target="_blank" rel="noopener">Nmap</a>（一款开放源代码的 网络探测和安全审核的工具）</li><li>Aircrack-ng（一个与802.11标准的无线网络分析有关的安全软件）</li><li>Burp suite（用于攻击web 应用程序的集成平台）</li><li>Wireshark（一个免费开源的网络数据包分析软件）</li><li>…</li></ul><p>Kali Linux 默认设置为单用户 root 账户登陆。</p><blockquote><p>Offensive Security 是一家提供世界级信息安全培训和渗透测试服务的提供商，除了 Kali Linux 之外，Offensive Securiy 也开源维护了渗透攻击模块库（<a href="https://www.exploit-db.com/" target="_blank" rel="noopener">Exploit Database</a>）和免费的在线课程 <a href="https://www.offensive-security.com/metasploit-unleashed/" target="_blank" rel="noopener">Metasploit Unleashed</a></p></blockquote><p><strong>0x2 安装</strong></p><p>这里推荐使用 VMware 或 VirtualBox 虚拟机安装 Kali Linux；</p><ol><li>笔者使用的是 VMware Workstation，下载时选择 <strong>Kali Linux 64 bit VMware VM</strong> ；</li></ol><ol><li><p>下载完成后得到 <strong>kali-linux-2018.1-vm-amd64.7z</strong> ，然后解压缩；（温馨提示，下载完成后，一定要用 sha256sum 校验 SHA256 验证码，保证系统完整性和安全性 ！！！）</p></li><li><p>打开解压缩包文件夹，找到以 “vmx” 结尾的 Kali-Linux-2018.1-vm-amd64.<strong>vmx</strong>（VMware 虚拟机配置文件） ，右键选择 “使用 Vmware Workstation 打开”；</p><p><img src="https://cl.ly/3t2K2s040P37/%E6%89%93%E5%BC%80%20Kali%20Linux%20vmx%20%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6.png" alt=""></p></li><li><p>一步步安装好后，登陆是账户名称 <strong>root</strong> ，密码可以设为 toor （Kali Linux 强制为单用户 root 登陆，方便进行渗透测试）</p></li></ol><p>系统运行如下图</p><p><img src="https://cl.ly/2Q3Y2h2D0O1u/Kali%20Linux%20%E4%B8%BB%E7%95%8C%E9%9D%A2.png" alt=""></p><blockquote><p>不得不说，Kali Linux更新很快，4.29 下载还是 2018.1 版本，现在打开官网已经是 2018.2 版本了，为 Offensive Security  团队的敬业、效率打 call 📱</p></blockquote><p><strong>0x3 总结</strong></p><ul><li>Kali Linux 免费开源</li><li>Kali Linux 采用单用户 root 登陆方式</li></ul><p><strong>0x4 附录</strong></p><p><strong>参考资料:</strong></p>]]></content>
     
