@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://github.com/zhililab/notes/index.html</loc>
+    
+    <lastmod>2018-06-04T05:31:34.538Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://github.com/zhililab/2018/04/07/GitSecondImpression/</loc>
     
     <lastmod>2018-06-04T05:06:19.594Z</lastmod>
@@ -68,13 +75,6 @@
     <loc>https://github.com/zhililab/about/index.html</loc>
     
     <lastmod>2018-06-04T04:55:38.719Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://github.com/zhililab/notes/index.html</loc>
-    
-    <lastmod>2018-06-03T10:55:56.510Z</lastmod>
     
   </url>
   
