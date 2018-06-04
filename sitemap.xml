@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://github.com/zhililab/about/index.html</loc>
+    
+    <lastmod>2018-06-04T04:48:53.319Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://github.com/zhililab/notes/index.html</loc>
     
     <lastmod>2018-06-03T10:55:56.510Z</lastmod>
@@ -40,13 +47,6 @@
     <loc>https://github.com/zhililab/2018/05/02/Security-Install-KaliLinux/</loc>
     
     <lastmod>2018-06-03T06:40:23.573Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://github.com/zhililab/about/index.html</loc>
-    
-    <lastmod>2018-06-03T06:30:11.051Z</lastmod>
     
   </url>
   
