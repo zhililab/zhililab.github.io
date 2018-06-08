@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://github.com/zhililab/"/>
-  <updated>2018-06-08T13:28:51.922Z</updated>
+  <updated>2018-06-08T13:32:00.506Z</updated>
   <id>https://github.com/zhililab/</id>
   
   <author>
@@ -21,9 +21,9 @@
     <link href="https://github.com/zhililab/2018/06/08/Vulnerability-Chrome-V8/"/>
     <id>https://github.com/zhililab/2018/06/08/Vulnerability-Chrome-V8/</id>
     <published>2018-06-08T11:54:17.000Z</published>
-    <updated>2018-06-08T13:28:51.922Z</updated>
+    <updated>2018-06-08T13:32:00.506Z</updated>
     
-    <content type="html"><![CDATA[<p><strong>0x1 概况</strong></p><p>​    今天下午，腾讯安全应急响应中心（TSRC）在新浪微博上公开感谢360阿尔法团队（截图如下），感谢360阿尔法团队提交给TSRC漏洞报告。该报告指出 —— “ Chrome 使用的 V8 引擎暴露一处严重漏洞，利用此漏洞可以实现远程任意代码执行，部分系统 Webview 的APP以及手机系统可能都会受到影响。 该漏洞可能会影响腾讯旗下的部分产品。”</p><p><img src="https://cl.ly/1s1G2x402p2B/Image%202018-06-08%20at%208.56.15%20PM.png" alt=""></p><p>​    <center><strong>图 1 致谢截图</strong></center></p><p>​    Chrome V8 是 Google 开源的高性能 JavaScript 引擎，它底层采用 C++ 编写，实现了 ECMAScript 规范的第五版。它可以运行在所有主流的操作系统，甚至移动终端中，虽然其最早是随着 Chrome 浏览器一起发布的，但其可以作为独立的模块，嵌入开发者自己的应用当中，例如：著名的 Node.js 就是基于 V8 引擎的。现在使用十分广泛，包括腾讯在内的很多互联网公司都有使用。</p><blockquote><p><strong>ECMAScript</strong> 是一种由 ECMA 国际(前身为欧洲计算机制造商协会,英文名称是European Computer Manufacturers Association)通过ECMA-262标准化的脚本程序设计语言。JavaScript 是ECMAScript 发布以来最知名的实现语言，其他实现还有 JScript 和 ActionScript。截止到目前，ECMAScript 一共累计发布了 8 个版本。</p></blockquote><p><strong>0x2 威胁等级（高危）</strong></p><p>危害评估：★★★★☆ </p><p>​    利用此次曝出的漏洞，恶意攻击者可以实现远程任意代码执行，危害程度较大。</p><p>影响评估：★★★☆ ☆ </p><p>​    主要威胁部分系统 Webview 的 App 以及手机操作系统</p><p><strong>0x3 技术细节</strong></p><p>​    腾讯安全响应中心（TSRC）收到此报告后第一时间推动业务团队进行修复工作，现已修复漏洞并启动紧急在线更新机制。具体漏洞技术细节，360 阿尔法团队和腾讯团队尚未公开。</p><p><strong>0x4 附录</strong></p><ol><li>Chrome V8 | Google Developers <a href="https://developers.google.com/v8/" target="_blank" rel="noopener">https://developers.google.com/v8/</a></li><li>Chrome V8 引擎入门 <a href="https://blog.csdn.net/xyqzki/article/details/45745507" target="_blank" rel="noopener">https://blog.csdn.net/xyqzki/article/details/45745507</a></li><li>使用 Google V8 引擎开发可定制的应用程序 <a href="https://www.ibm.com/developerworks/cn/opensource/os-cn-v8engine/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/opensource/os-cn-v8engine/index.html</a></li></ol>]]></content>
+    <content type="html"><![CDATA[<p><strong>0x1 概况</strong></p><p>​    今天下午，腾讯安全应急响应中心（TSRC）在新浪微博上公开感谢360阿尔法团队（截图如下），感谢360阿尔法团队提交给TSRC漏洞报告。该报告指出 —— “ Chrome 使用的 V8 引擎暴露一处严重漏洞，利用此漏洞可以实现远程任意代码执行，部分系统 Webview 的APP以及手机系统可能都会受到影响。 该漏洞可能会影响腾讯旗下的部分产品。”</p><p><img src="https://cl.ly/1s1G2x402p2B/Image%202018-06-08%20at%208.56.15%20PM.png" alt=""></p><p>​    <center><strong>图 1 致谢截图</strong></center></p><p>​    Chrome V8 是 Google 开源的高性能 JavaScript 引擎，它底层采用 C++ 编写，实现了 ECMAScript 规范的第五版。它可以运行在所有主流的操作系统，甚至移动终端中，虽然其最早是随着 Chrome 浏览器一起发布的，但其可以作为独立的模块，嵌入开发者自己的应用当中，例如：著名的 Node.js 就是基于 V8 引擎的。现在使用十分广泛，包括腾讯在内的很多互联网公司都有使用。</p><blockquote><p><strong>ECMAScript</strong> 是一种由 ECMA 国际(前身为欧洲计算机制造商协会,英文名称是European Computer Manufacturers Association)通过ECMA-262标准化的脚本程序设计语言。JavaScript 是ECMAScript 发布以来最知名的实现语言，其他实现还有 JScript 和 ActionScript。截止到目前，ECMAScript 一共累计发布了 8 个版本。</p></blockquote><p><strong>0x2 威胁等级（高危）</strong></p><p>※ 危害评估：★★★★☆ </p><p>利用此次曝出的漏洞，恶意攻击者可以实现远程任意代码执行，危害程度较大。</p><p>※ 影响评估：★★★☆ ☆ </p><p>主要威胁部分系统 Webview 的 App 以及手机操作系统</p><p><strong>0x3 技术细节</strong></p><p>​    腾讯安全响应中心（TSRC）收到此报告后第一时间推动业务团队进行修复工作，现已修复漏洞并启动紧急在线更新机制。具体漏洞技术细节，360 阿尔法团队和腾讯团队尚未公开。</p><p><strong>0x4 附录</strong></p><ol><li>Chrome V8 | Google Developers <a href="https://developers.google.com/v8/" target="_blank" rel="noopener">https://developers.google.com/v8/</a></li><li>Chrome V8 引擎入门 <a href="https://blog.csdn.net/xyqzki/article/details/45745507" target="_blank" rel="noopener">https://blog.csdn.net/xyqzki/article/details/45745507</a></li><li>使用 Google V8 引擎开发可定制的应用程序 <a href="https://www.ibm.com/developerworks/cn/opensource/os-cn-v8engine/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/opensource/os-cn-v8engine/index.html</a></li></ol>]]></content>
     
     <summary type="html">
     
