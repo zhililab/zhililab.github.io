@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://github.com/zhililab/2018/09/19/Paper2/</loc>
+    <loc>https://github.com/zhililab/2018/09/17/Paper2/</loc>
     
-    <lastmod>2018-09-19T07:11:12.814Z</lastmod>
+    <lastmod>2018-09-19T07:22:27.840Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://github.com/zhililab/2018/09/17/Paper1/</loc>
+    
+    <lastmod>2018-09-19T07:22:14.259Z</lastmod>
     
   </url>
   
@@ -54,13 +61,6 @@
     <loc>https://github.com/zhililab/2017/12/10/MachineLearning-LinearModel/</loc>
     
     <lastmod>2018-09-19T02:57:55.620Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://github.com/zhililab/2018/09/19/Paper1/</loc>
-    
-    <lastmod>2018-09-19T02:41:04.197Z</lastmod>
     
   </url>
   
