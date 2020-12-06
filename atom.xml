@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://github.com/zhililab/"/>
-  <updated>2018-04-22T01:53:00.988Z</updated>
+  <updated>2020-12-06T14:43:19.260Z</updated>
   <id>https://github.com/zhililab/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Git 使用入门（3）</title>
+    <link href="https://github.com/zhililab/2020/12/06/GitThirdImpression/"/>
+    <id>https://github.com/zhililab/2020/12/06/GitThirdImpression/</id>
+    <published>2020-12-06T14:40:08.000Z</published>
+    <updated>2020-12-06T14:43:19.260Z</updated>
+    
+    <content type="html"><![CDATA[<p>Cover Photo by Ashley Harpp on beanstalk Guides</p><blockquote><p>上一篇已经介绍本篇主要介绍 Git 常用的命令,本片介绍本地操作相关，看完这篇你将对本地文件修改如何撤销比较清楚 Let`s begin 😎</p></blockquote><h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><p>【Git 使用入门（1）】<a href="https://zhililab.github.io/2018/03/19/GitFirstImpression/" target="_blank" rel="noopener">什么是 Git</a><br>【Git 使用入门（2）】<a href="https://zhililab.github.io/2018/04/07/GitSecondImpression/" target="_blank" rel="noopener">Git 常用命令</a></p><h4 id="本地文件修改撤销"><a href="#本地文件修改撤销" class="headerlink" title="本地文件修改撤销"></a>本地文件修改撤销</h4><ol><li>查看本地文件修改内容</li></ol><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看本地文件修改内容）</span></span><br><span class="line">git diff fileName.xxx</span><br></pre></td></tr></table></figure><ol><li>撤销本地文件修改</li></ol><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 撤销本地所有文件修改</span></span><br><span class="line">git check . </span><br><span class="line"><span class="comment"># 撤销本地文件 fileName.xxx 的修改</span></span><br><span class="line">git check fileName.xxx</span><br></pre></td></tr></table></figure><ol><li>本地修改了一些文件，且已提交到暂缓区</li></ol><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 撤销本地所有文件修改和add操作</span></span><br><span class="line">git reset HEAD .</span><br><span class="line"><span class="comment"># 撤销本地 fileName.xxx 的修改和add操作</span></span><br><span class="line">git reset HEAD fileName.xxx</span><br></pre></td></tr></table></figure><p>例如，我在工程里对两个头文件做了修改，还未提交到暂缓区，这时如果想撤销修改，可以运行下面的命令：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 当前目录只有2个头文件，采用通配符</span></span><br><span class="line">git checkout Learn-To-Program-With-CPP/SimpleClasses/*.h</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;Cover Photo by Ashley Harpp on beanstalk Guides&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;上一篇已经介绍本篇主要介绍 Git 常用的命令,本片介绍本地操作相关，看完这篇你将对本地文件修改如何撤销比较清楚 Let`s begin 
+      
+    
+    </summary>
+    
+      <category term="技术" scheme="https://github.com/zhililab/categories/%E6%8A%80%E6%9C%AF/"/>
+    
+    
+      <category term="Git" scheme="https://github.com/zhililab/tags/Git/"/>
+    
+  </entry>
   
   <entry>
     <title>OWASP TOP 10 - 2017 Part 2</title>
