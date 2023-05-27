@@ -1,22 +1,740 @@
-{% extends '_layout.swig' %}
 
-{% block pageCss %}
-    {{ css('scss/views/page/post') }}
-{% endblock %}
 
-{% block header %}
-    {% include './_partial/common/small-header.swig' %}
-{% endblock %}
+<!DOCTYPE html>
+<html lang="zh-cn" data-default-color-scheme=auto>
 
-{% block main %}
-    {% include './_partial/post/main.swig' %}
-{% endblock %}
 
-{% block pagejs %}
-    {{ js('js/page/post.js') }}
-{% endblock %}
 
-{% block other %}
-    {% include './_partial/common/comment.swig' %}
-    {% include './_partial/post/post-statistical.swig' %}
-{% endblock %}
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="[object Object]">
+  <meta name="keywords" content="威胁情报，网络安全，数据分析, python, devops">
+  
+    <meta name="description" content="今天，我们来一起回顾下 2017年 OWASP TOP 10 安全风险报告 的主要内容，了解 2013  到 2017 全球安全风险发现了哪些变化？有哪些新兴风险类型？本文大部分内容翻译自 报告原文 ，如需阅读详情，请自行浏览访问 ~ OWASP 简介 OWASP (Open Web Application Security Project) 是一个开源的、非盈利的全球性安全组织，致力于应用软件的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OWASP TOP 10 - 2017 Part 1">
+<meta property="og:url" content="https://zhililab.github.io/2018/04/13/OWASP-Top10-2017/index.html">
+<meta property="og:site_name" content="ZHILI">
+<meta property="og:description" content="今天，我们来一起回顾下 2017年 OWASP TOP 10 安全风险报告 的主要内容，了解 2013  到 2017 全球安全风险发现了哪些变化？有哪些新兴风险类型？本文大部分内容翻译自 报告原文 ，如需阅读详情，请自行浏览访问 ~ OWASP 简介 OWASP (Open Web Application Security Project) 是一个开源的、非盈利的全球性安全组织，致力于应用软件的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://f.cl.ly/items/1H2B1r2a0d2u27010b1X/What%20Are%20Application%20Security%20Risks.png">
+<meta property="article:published_time" content="2018-04-13T06:26:10.000Z">
+<meta property="article:modified_time" content="2023-05-27T19:49:27.361Z">
+<meta property="article:author" content="[object Object]">
+<meta property="article:tag" content="OWASP">
+<meta property="article:tag" content="安全风险">
+<meta property="article:tag" content="报告">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://f.cl.ly/items/1H2B1r2a0d2u27010b1X/What%20Are%20Application%20Security%20Risks.png">
+  
+  
+  
+  <title>OWASP TOP 10 - 2017 Part 1 - ZHILI</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"zhililab.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Startseite</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archiv</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Kategorien</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Schlagwörter</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>Über</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="OWASP TOP 10 - 2017 了解一下 😎"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2018-04-13 14:26" pubdate>
+          2018年4月13日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.6k wörter
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          22 minuten
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">OWASP TOP 10 - 2017 了解一下 😎</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>今天，我们来一起回顾下 <strong>2017年 OWASP TOP 10 安全风险报告</strong> 的主要内容，了解 2013  到 2017 全球安全风险发现了哪些变化？有哪些新兴风险类型？本文大部分内容翻译自 <a target="_blank" rel="noopener" href="https://www.owasp.org/images/7/72/OWASP_Top_10-2017_%28en%29.pdf.pdf">报告原文</a> ，如需阅读详情，请自行浏览访问 ~</p>
+<h3 id="OWASP-简介"><a href="#OWASP-简介" class="headerlink" title="OWASP 简介"></a>OWASP 简介</h3><blockquote>
+<p>OWASP (Open Web Application Security Project) 是一个开源的、非盈利的全球性安全组织，致力于应用软件的安全研究。我们的使命是使应用软件更加安全，使企业和组织能够对应用安全风险作出更清晰的决策。目前OWASP全球拥有220个分部近六万名会员，共同推动了安全标准、安全测试工具、安全指导手册等应用安全技术的发展。</p>
+</blockquote>
+<h3 id="OWASP-Top-10-2017"><a href="#OWASP-Top-10-2017" class="headerlink" title="OWASP Top 10 - 2017"></a>OWASP Top 10 - 2017</h3><p><strong>提要</strong></p>
+<ul>
+<li>更新: 2017 Top 10 主要更新在于添加了若干个新的问题，其中有两个是由社区中选出的 —— <strong>A8:2017-不安全反序列化</strong> 和 <strong>A10:2017-不充分的登陆和监控</strong> </li>
+<li>来源: OWASP Top 10 - 2017 主要基于超过 40 个来自专注应用安全领域的公司和一份超过500人的行业调查报告得出。数据横跨成百上千的组织机构收集的漏洞和超过 100,000 真实应用和 APIs</li>
+<li>编撰目的: 向<strong>开发者</strong>、<strong>设计师</strong>、<strong>架构师</strong>、<strong>经理</strong>和<strong>组织机构</strong>传播关于最常见和最重要网络应用安全风险的后果；同时提供一些基础技术指导 —— 保护这些高风险区域，提供现在开始着手处理的指南</li>
+<li>风险确定: OWASP Top 10 聚焦于识别对广泛范围内的公司来说最严重的网络应用安全风险。对于每个风险，OWASP 都会使用简单评分模式，提供相关性和技术影响的基本信息</li>
+</ul>
+<p><strong>什么是应用安全风险</strong></p>
+<p>攻击者们会通过你的应用使用多种潜在路径损害你的生意或组织。每条路径代表一个也许会或不会严重到引起注意的风险。</p>
+<p><img src="http://f.cl.ly/items/1H2B1r2a0d2u27010b1X/What%20Are%20Application%20Security%20Risks.png" srcset="/img/loading.gif" lazyload alt="What Are Application Security Risks?"></p>
+<center> 图片来源: OWASP Top 10 - 2017 Report <center>
+
+<ul>
+<li>Threat Agents ——威胁来源</li>
+<li>Attack Vectors —— 攻击载体</li>
+<li>Security Weakness —— 安全薄弱点</li>
+<li>Security Controls —— 安全控制</li>
+<li>Technical Impacts —— 技术影响</li>
+<li>Business Impacts —— 商业影响</li>
+</ul>
+<p>有时这些路径很容易找到和利用，有时候它们又极其困难。类似的，这种损害也许没造成实质结果，也可能让你破产。为了得到组织的风险情况，我们可以评估每个威胁来源、攻击载体等之间的相似性，并将它们和对你所在组织造成的技术、商业影响估值合并。这样，我们可以最终确定总体风险。</p>
+<p><strong>Top 10 安全风险内容</strong></p>
+<table>
+<thead>
+<tr>
+<th align="center">Top N</th>
+<th align="center">介绍</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">A1: 2017-Injection(注入攻击)</td>
+<td align="center">注入攻击发生在不可信数据作为一条命令或查询的解析器被发送时，例如: SQL 、NoSQL、OS 和 LDAP 注入。攻击者的恶意数据可以迷惑解析器以执行非预设的命令或没有正确验证情况获取数据</td>
+</tr>
+<tr>
+<td align="center">A2: 2017-Broken Authentication(验证破坏)</td>
+<td align="center">认证和会话管理方面的应用功能经常得不到合规开发，这使得攻击者可以窃取密码、密钥或会话，又或者挖掘其他开发缺陷，暂时或永久地假设其他用户身份。</td>
+</tr>
+<tr>
+<td align="center">A3: 2017-Sensitive Data Exposure(敏感数据暴漏)</td>
+<td align="center">许多网页应用程序和 API 没有妥善地保护敏感数据 (e.g. 金融数据、医疗数据和 PII)。攻击者可以窃取或修改这些弱保护的数据，然后实施信用卡欺诈、身份窃取或进行其他犯罪行为。敏感数据没有得到额外措施保护情况 (e.g. 在存储或传输过程中加密、与浏览器交互时格外小心等)，可能会被窃取</td>
+</tr>
+<tr>
+<td align="center">A4: 2017-XML External Entities (XXE)(XML 外部实体)</td>
+<td align="center">很多老旧配置的 XML 处理器在 XML 文档内评估外部实体参考。外部实体可以通过使用文件 URI 处理程序、内部文件共享、内部端口扫描、远程代码执行和服务访问拒绝攻击的方式纰漏内部文件</td>
+</tr>
+<tr>
+<td align="center">A5: 2017-Broken Access Control(失效的访问控制)</td>
+<td align="center">对于认证用户行为权限的限制经常得不到完整的实施。攻击者可以挖掘这些缺陷去获得非授权的功能和 (或) 数据，例如访问其他用户账号、查看敏感文件、修改其他用户数据，更改访问权限等等</td>
+</tr>
+<tr>
+<td align="center">A6: 2017-Security Misconfiguration(不安全的组态配置)</td>
+<td align="center">安全配置不当是最常见的问题。这通常是由于不安全的默认设置、不完整或临时的配置，开放云存储，HTTP 头部错误配置和包含敏感信息的强制报告信息造成的。不仅所有操作系统、框架、库、应用程序需要安全配置，而且必须及时的打补丁和升级。</td>
+</tr>
+<tr>
+<td align="center">A7: 2017-Cross-Site Scripting (XSS)(跨站点脚本攻击)</td>
+<td align="center">XSS 缺陷发生情景: ① 应用程序在没有经过验证或溢出式在新网页加载非可信数据 ② 通过可以生成 HTML 或 JavaScript 代码的浏览器 API，应用程序使用用户数据更新网页时。XSS 使得攻击者可以在受害者的浏览器执行脚本，造成会话劫持、破坏网站或引导用户访问恶意网站。</td>
+</tr>
+<tr>
+<td align="center">A8: 2017-Insecure Deserialization(不安全反序列化)</td>
+<td align="center">不安全反序列化经常造成远程代码运行。有时尽管反序列化缺陷没有导致远程代码运行，但它们可以用于执行各种攻击，例如: 重播攻击、注入攻击和权限提升攻击。</td>
+</tr>
+<tr>
+<td align="center">A9: 2017-Using Components with Known Vulnerabilities(使用组件已知的漏洞)</td>
+<td align="center">各种组件 (例如: 库、框架和其他软件模块) 运行时与应用程序权限相同。如此一来，如果一个脆弱的组件被利用，这个攻击可以最终造成严重数据丢失或服务器被接管。使用已知漏洞组件的应用程序和 API 可能会降低应用的防范能力，造成各种各样的攻击和影响。</td>
+</tr>
+<tr>
+<td align="center">A10: 2017-Insufficient Logging &amp; Monitoring(不足的日志记录和监测)</td>
+<td align="center">当不充分的日志和监测与遗漏的或无效的事件响应凑在一起，攻击者就可以发动更深层次的系统攻击、保持持久性、转移攻击到更多的系统，并且篡改、窃取甚至破坏数据。大部分 breach 研究表明——检测到 breach 需要超过 200 天时间，而且通常还是外部机构检测出来而非内部处理或监测。</td>
+</tr>
+</tbody></table>
+<p><strong>推荐阅读</strong></p>
+<ol>
+<li><p><a target="_blank" rel="noopener" href="https://www.owasp.org/images/f/f8/OWASP_Top_10_-_2013.pdf">OWASP Top 10 - 2013 Report</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.owasp.org/images/7/72/OWASP_Top_10-2017_%28en%29.pdf.pdf">OWASP Top 10 - 2017 Report</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.acunetix.com/blog/articles/what-is-insecure-deserialization/">What is Insecure Deserialization?</a></p>
+<p>​</p>
+</li>
+</ol>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本篇我们介绍了OWASP组织、应用安全威胁相关内容、Top 10 风险内容，下次将会介绍 Top 10 安全威胁的常见攻击场景以及防范措施等内容，敬请期待 (☆▽☆)</p>
+<p>未完待续….</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/OWASP/">#OWASP</a>
+      
+        <a href="/tags/%E5%AE%89%E5%85%A8%E9%A3%8E%E9%99%A9/">#安全风险</a>
+      
+        <a href="/tags/%E6%8A%A5%E5%91%8A/">#报告</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>OWASP TOP 10 - 2017 Part 1</div>
+      <div>https://zhililab.github.io/2018/04/13/OWASP-Top10-2017/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Beitragsautor</div>
+          <div>[object Object]</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Veröffentlicht am</div>
+          <div>2018年4月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Urheberrechtshinweis</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/04/15/RAS-2018/" title="【转载】RAS 2018大会前瞻：热点议题与CISO的关注重点">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【转载】RAS 2018大会前瞻：热点议题与CISO的关注重点</span>
+                        <span class="visible-mobile">Vorheriger</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/04/08/CTI/" title="威胁情报漫谈">
+                        <span class="hidden-mobile">威胁情报漫谈</span>
+                        <span class="visible-mobile">Nächster</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Inhaltsverzeichnis</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Suchen</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Stichwort</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog funktioniert am besten mit aktiviertem JavaScript</div>
+  </noscript>
+</body>
+</html>

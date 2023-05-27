@@ -1,22 +1,743 @@
-{% extends '_layout.swig' %}
 
-{% block pageCss %}
-    {{ css('scss/views/page/post') }}
-{% endblock %}
 
-{% block header %}
-    {% include './_partial/common/small-header.swig' %}
-{% endblock %}
+<!DOCTYPE html>
+<html lang="zh-cn" data-default-color-scheme=auto>
 
-{% block main %}
-    {% include './_partial/post/main.swig' %}
-{% endblock %}
 
-{% block pagejs %}
-    {{ js('js/page/post.js') }}
-{% endblock %}
 
-{% block other %}
-    {% include './_partial/common/comment.swig' %}
-    {% include './_partial/post/post-statistical.swig' %}
-{% endblock %}
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="[object Object]">
+  <meta name="keywords" content="威胁情报，网络安全，数据分析, python, devops">
+  
+    <meta name="description" content="Cover Photo by scikit-learn.org  导语：前天，手欠误删了基于 Github Pages + Hexo 搭建的个人技术博客，已经花费了2小时写了篇 SVM 算法总结，没了 T_T ( ´･･)ﾉ(._.&#96;) 吸取这次的教训，做好数据&#x2F;文档的备份操作 ！！！但是，换个角度想想，这也给我一个再次抛开书本、博客文档（当时的短时记忆加个人理解写成），再次思考">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习算法之【SVM】">
+<meta property="og:url" content="https://zhililab.github.io/2017/10/24/MachineLearning-SupervisedLearning-SVM/index.html">
+<meta property="og:site_name" content="ZHILI">
+<meta property="og:description" content="Cover Photo by scikit-learn.org  导语：前天，手欠误删了基于 Github Pages + Hexo 搭建的个人技术博客，已经花费了2小时写了篇 SVM 算法总结，没了 T_T ( ´･･)ﾉ(._.&#96;) 吸取这次的教训，做好数据&#x2F;文档的备份操作 ！！！但是，换个角度想想，这也给我一个再次抛开书本、博客文档（当时的短时记忆加个人理解写成），再次思考">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-10-24T14:00:00.000Z">
+<meta property="article:modified_time" content="2023-05-27T19:49:27.360Z">
+<meta property="article:author" content="[object Object]">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="有监督学习">
+<meta property="article:tag" content="SVM">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>机器学习算法之【SVM】 - ZHILI</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"zhililab.github.io","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Startseite</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archiv</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Kategorien</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Schlagwörter</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>Über</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="导语：前天，手欠误删了基于 Github Pages + Hexo 搭建的个人技术博客，已经花费了2小时写了篇 SVM 算法总结，没了 T_T ( ´･･)ﾉ(._.`) 吸取这次的教训，做好数据/文档的备份操作 ！！！但是，换个角度想想，这也给我一个再次抛开书本、博客文档（当时的短时记忆加个人理解写成），再次思考什么 SVM，SVM到底说了啥，如何利用scikit-learn 快速构建一个基于 SVM 分类器/模型的机会哦 ~ 我必须谢谢我自己 🤣🤣🤣"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2017-10-24 22:00" pubdate>
+          2017年10月24日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.6k wörter
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          31 minuten
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">导语：前天，手欠误删了基于 Github Pages + Hexo 搭建的个人技术博客，已经花费了2小时写了篇 SVM 算法总结，没了 T_T ( ´･･)ﾉ(._.`) 吸取这次的教训，做好数据/文档的备份操作 ！！！但是，换个角度想想，这也给我一个再次抛开书本、博客文档（当时的短时记忆加个人理解写成），再次思考什么 SVM，SVM到底说了啥，如何利用scikit-learn 快速构建一个基于 SVM 分类器/模型的机会哦 ~ 我必须谢谢我自己 🤣🤣🤣</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>Cover Photo by scikit-learn.org</p>
+<blockquote>
+<p>导语：前天，手欠误删了基于 Github Pages + Hexo 搭建的个人技术博客，已经花费了2小时写了篇 SVM 算法总结，没了 T_T ( ´･･)ﾉ(._.&#96;) 吸取这次的教训，做好数据&#x2F;文档的备份操作 ！！！但是，换个角度想想，这也给我一个再次抛开书本、博客文档（当时的短时记忆加个人理解写成），再次思考什么 SVM，SVM到底说了啥，如何利用scikit-learn 快速构建一个基于 SVM 分类器&#x2F;模型的机会哦 ~ 我必须谢谢我自己 🤣🤣🤣</p>
+</blockquote>
+<h3 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h3><p>众所周知，机器学习我们一般可以分为两大类：一是监督学习或有监督学习（Supervised Learning），另一类是自主学习或无监督学习（Unsupervised Learning）。今天，我想回顾一下或者说温习下上周学习的一种有监督学习算法 SVM。</p>
+<p>SVM 是英文 Support Vector Machines 的英文所写，翻译成中文，我们一般称之为支持向量机。利用 SVM 我们可以实现对线性空间场景下（非线性空间下，我们可以利用 kernel tricks 进行改造，后面会详细以及）分类问题，具体举例来说，可以尝试用 SVM 解决下列问题：</p>
+<span id="more"></span>
+
+<ul>
+<li>垃圾邮件分类</li>
+<li>作者预测</li>
+<li>个性化推荐 （好友推荐、音乐推荐、商品推荐）</li>
+<li>…</li>
+</ul>
+<h3 id="二、核心思想"><a href="#二、核心思想" class="headerlink" title="二、核心思想"></a>二、核心思想</h3><p>SVM 核心思想是一个超平面内，找到一条直线，实现对不同类型的点进行分类的目的，且边界距离Margin达到最大值。需要注意的是，现实世界中的问题是复杂多变、多种多样，有时我们在处理分类问题遇到非典型线性分类问题，要么采用其他分类算法，要么对问题进行“改造”，把实际工程应用中具体的非线性问题转换成线性或类线性问题。</p>
+<p>所以，在具体工程应用中，我们可能还会见到一些 SVM 的变体模型，这里我在后面如若遇到也会总结、分享 ~</p>
+<blockquote>
+<p>我们想要达到掌握&#x2F;精通一门语言、技术的程度，不是一朝一夕能够达到的，相反的，我们不如边用边学（遇到需要使用这门技术的时候，开始按需学习、实践、反复）、边学边用（阅读GitHub源代码，是一种非常好的快速学习一门语言&#x2F;技术的方法）。逆行思维，多想想自己已经 了解&#x2F;理解&#x2F;掌握 哪些知识&#x2F;技术&#x2F;工具</p>
+</blockquote>
+<h3 id="三、具体实例"><a href="#三、具体实例" class="headerlink" title="三、具体实例"></a>三、具体实例</h3><ol>
+<li><p>为什么选择 scikit-learn</p>
+<p> scikit-learn 是当下入门机器学习几乎都会用到的机器学习集成包，主要基于Python编写的。文档齐全、社区友好、支持当下几乎所有主流的机器学习算法、框架；上手快，易于实现（个人感觉 scikit-learn 有点类似深度学习中 keras 框架，基本构建模型都已经封装好，“搭积木”的方式你主要调用&#x2F;组合就好了）。</p>
+<p> ☀ 当然了，我们在享受 scikit-learn 快捷便利强大的同时，也不能过于依赖。防止自己的编程能力 keep your hands dirty，还要关注大公司（BAT，FLAG）发布新的开源包&#x2F;框架（我自己一直关注微博上 “爱可可-爱生活”的微博号）</p>
+</li>
+<li><p>利用 scikit-learn 快速构建一个基于 SVM 的分类器&#x2F;模型</p>
+<p> 下面，我们看下如何使用 scikit-learn 快速搭建起一个基于 SVM 的分类器</p>
+ <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#导入sklearn相关算法包，以及自己编写的数据预处理程序</span><br><span class="hljs-keyword">from</span> sklearn.svm <span class="hljs-keyword">import</span> SVC<br><span class="hljs-keyword">from</span> sklearn.metrics <span class="hljs-keyword">import</span> accuracy_score<br><span class="hljs-keyword">from</span> prep_data <span class="hljs-keyword">import</span> makeTerrainData<br><br><span class="hljs-comment">#数据预处理：训练集 + 测试机</span><br>features_train, features_test, labels_train, labels_test = makeTerrianData()<br><br><span class="hljs-comment"># 生成实例</span><br>clf = SVC(kernel=<span class="hljs-string">&#x27;linear&#x27;</span>)<br><br><span class="hljs-comment"># 拟合分类器</span><br>clf.fit(features_train, labels_train)<br><br><span class="hljs-comment"># 进行预测</span><br>pred = clf.predict(features_test)<br><br><span class="hljs-comment"># 准确率</span><br>accuracy = accuracy_score(pred, labels_test)<br></code></pre></td></tr></table></figure>
+
+<p> 看到了吧 o(<em>^＠^</em>)o 使用 scikit-learn 构建一个基于 SVM 的分类器就是这么容易，给 scikit-learn 手动点赞吧 👍 b(￣▽￣)d</p>
+</li>
+<li><p>调参</p>
+<blockquote>
+<p>有些人会说调参，占据机器学习的大部分时间，虽然有些夸张，但却也反映出了调参对于机器学习模型好坏、质量的重要性</p>
+</blockquote>
+<ul>
+<li><p>kernel：rbf(default) &#x2F; linear&#x2F; sigmoid … 我们称之为 kernel trick ，非常好用。我们前面提到在分类问题非线性情况是，我们需要转换成类线性或线性问题，这里 kernel 主要起这个作用哈 ~~~ 吼吼吼 💃</p>
+</li>
+<li><p>C：一般来说，C 值越大，拟合程度越高</p>
+</li>
+<li><p>gamma：gamma 参数相比 C 参数对模型的拟合影响程度小很多，但还是存在一定影响的。根据经验值，我们得出，一般gamma</p>
+</li>
+</ul>
+<p> 下面是 Udacity SVM 算法部分的 Mini 小项目，我的运行主要结果 </p>
+<p> 练习1：作者身份准确率<br> no. of Chris training emails: 7936<br> no. of Sara training emails: 7884<br> accuracy: 0.984072810011</p>
+<p> 练习2：对SVM分类器计时<br> training time: 321.045 s<br> predicting time: 28.493 s</p>
+<p> 练习3：降低训练集大小 （100% -&gt; 1%）<br> training time: 0.139 s<br> training time: 1.551 s<br> accuracy: 0.884527872582</p>
+<p> 练习4：改变内核（100% -&gt; 1%，linear -&gt; rbf）<br> training time: 0.153 s<br> training time: 1.783 s<br> accuracy: 0.616040955631</p>
+<p> 练习5：优化C参数（100% -&gt; 1%，C: 10.0、100.、1000. 和 10000.）<br> 0.616040955631 -&gt; 0.616040955631 -&gt;  0.821387940842 -&gt;  0.892491467577</p>
+<p> 练习6：改变内核（linear -&gt; rbf, C: 10000）<br> training time: 158.059 s<br> training time: 15.595 s<br> accuracy:  0.990898748578</p>
+</li>
+</ol>
+<h3 id="四、SVM-的-pros-and-cons"><a href="#四、SVM-的-pros-and-cons" class="headerlink" title="四、SVM 的 pros and cons"></a>四、SVM 的 pros and cons</h3><p>Pros：</p>
+<ul>
+<li>适合处理线性分类问题</li>
+<li>robust</li>
+</ul>
+<p>Cons：</p>
+<ul>
+<li>防止过度拟合问题，上文提及的 C 参数和 gamma 参数需要调整优化</li>
+<li>优化问题比较复杂</li>
+<li>对噪声敏感</li>
+</ul>
+<p>注：这里pros and cons 参考了 Udacity 夏季线下讨论营的 SVM 优缺点总结</p>
+<h3 id="五、思考"><a href="#五、思考" class="headerlink" title="五、思考"></a>五、思考</h3><ol>
+<li><p>我们该怎样学习机器学习（个人见解）</p>
+<p> 记得周志华老师在他的“西瓜书”🍉——《机器学习》的前言如何使用本书就明确表示，希望读者，不要指望一下俩下掌握机器学习，建立读者不妨多读几遍该书，每次收获获取都不同；此外，周老师不建议初学者，上来就一头扎进“十大经典算法” 或 “二十大算法”，沉迷于某个算法的数学推导、代码实现等，“只见其木，不见其林”。我个人十分赞同周志华老师的观点。</p>
+<p> 1）机器学习好比一大片森林，初来乍到，我们最好观其全貌，概览机器学习主要内容和知识体系；</p>
+<p> 2）边学边思考，多实践、多总结。Andrew Ng 说过—— 人人都可以掌握机器学期、深度学习，关键要掌握掌握其的方法，很多人就忽视复现他们实验这个常见但经常被大家忽略的快速学习机器学习&#x2F;深度学习的高效学习方法。</p>
+</li>
+<li><p>我接下来的学习计划和蓝图（仅供参考）</p>
+<ol>
+<li>参加 Kaggle &#x2F; 天池 数据科学竞赛，实战中学习，学习中实战；</li>
+<li>多写机器学习或数据分析技术、方法等博客，不断回顾学习，深化知识理解，朝着掌握&#x2F;精通的方向不断努力</li>
+<li>强化编程能力。不过度依赖 scikit-learn 等算法包</li>
+</ol>
+<ul>
+<li>Be open-minded ! </li>
+<li>Be proactive !</li>
+<li>…</li>
+</ul>
+</li>
+</ol>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><blockquote>
+<p>关于我的博文的几点说明：</p>
+</blockquote>
+<ul>
+<li>我的博文主要是个人随笔、技术总结分享、数据科学&#x2F;机器学习项目踩坑经验以及一些杂七杂八的内容，作为自己的一个小天地 ~</li>
+<li>我的博文内容更多强调自己的个人理解和思考，而非知识、技能的提纲，合上书本、各种资料后，写出来的东西才是自己的东西，行文逻辑也将是你自己的思维过程，以及你意识中觉得比较重要的地方。这样相当于“一千个读者，就有一千个哈姆雷特一样”。</li>
+<li>技术总结博客很多都是初学札记，难免有疏漏或理解错误的地方，恳请阅者多多包涵，但如果我的一点个人理解或思考能给你带来一点儿启发或进一步思考，我将会十分高兴的，说明我写的博客帮助提升自己的同时，也帮助到了TA人。</li>
+</ul>
+<p>砥砺前行，不忘初心 ，一直在路上 ε&#x3D;ε&#x3D;ε&#x3D;(<del>￣▽￣)</del></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">#机器学习</a>
+      
+        <a href="/tags/%E6%9C%89%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0/">#有监督学习</a>
+      
+        <a href="/tags/SVM/">#SVM</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>机器学习算法之【SVM】</div>
+      <div>https://zhililab.github.io/2017/10/24/MachineLearning-SupervisedLearning-SVM/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Beitragsautor</div>
+          <div>[object Object]</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Veröffentlicht am</div>
+          <div>2017年10月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Urheberrechtshinweis</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2017/10/27/TOEFL-Review/" title="TOEFL Test Review">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">TOEFL Test Review</span>
+                        <span class="visible-mobile">Vorheriger</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2017/10/20/HelloWorld/" title="HelloWorld">
+                        <span class="hidden-mobile">HelloWorld</span>
+                        <span class="visible-mobile">Nächster</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Inhaltsverzeichnis</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Suchen</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Stichwort</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog funktioniert am besten mit aktiviertem JavaScript</div>
+  </noscript>
+</body>
+</html>
