@@ -1,0 +1,25 @@
+friend_links:
+  - name: Sebastian Ruder
+    desc: Sebastian Ruder
+    link: http://ruder.io/
+
+  - name: Free Will
+    desc: Free Will
+    link: https://plushunter.github.io/
+
+  - name: Crazy Milk
+    desc: Crazy Milk
+    link: http://crazymilk.github.io/
+
+  - name: Kindem
+    desc: Kindem's Blog
+    link: https://www.kindem.xyz/
+
+  - name: IOGL
+    desc: sumcai's blog
+    link: http://iogl.cn/
+
+build_tools:
+  - name: Hexo
+    desc: Blog Framework
+    link: https://hexo.io/
