@@ -205,6 +205,11 @@ gitTalk:
   owner: zhililab
   admin: [zhililab]
 
+# Admin
+hexo_admin:
+  username: admin
+  password_hash: 28e11f73e3a5b122d3726f2af1404f45df7c7e4c # 通过运行 `echo -n 'your_password' | openssl sha1` 命令生成密码的哈希值
+
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
