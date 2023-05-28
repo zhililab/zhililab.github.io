@@ -76,7 +76,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"github.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"github.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -318,7 +318,7 @@
                 
                 <h3 id="威胁情报、分类及其作用"><a href="#威胁情报、分类及其作用" class="headerlink" title="威胁情报、分类及其作用"></a>威胁情报、分类及其作用</h3><h4 id="什么是威胁情报"><a href="#什么是威胁情报" class="headerlink" title="什么是威胁情报"></a>什么是威胁情报</h4><p>威胁情报，又被称为安全威胁情报，是一种关于潜在或正在发生的威胁组织安全的信息，是一种关于攻击对手自身、使用工具及相关技术的情报。威胁情报的核心目的在于帮助组织机构理解常见的、严重外部威胁的风险，提前做好预判，准备相应防范措施，最大程度的避免或减少由于外部网络威胁给组织机构带来的损失。</p>
 <h4 id="威胁情报分类"><a href="#威胁情报分类" class="headerlink" title="威胁情报分类"></a>威胁情报分类</h4><p>同时，威胁情报一词涵盖范围太广，无法准确传递，我们需要对威胁情报进行分类，这里列举两种——基于用途的分类和基于数据类型的分类。</p>
-<p><img src="http://f.cl.ly/items/132G08270226343M3F1I/Image%202018-04-08%20at%207.04.08%20PM.png" srcset="/img/loading.gif" lazyload alt="威胁情报分类"></p>
+<p><img src="http://f.cl.ly/items/132G08270226343M3F1I/Image%202018-04-08%20at%207.04.08%20PM.png" alt="威胁情报分类"></p>
 <ul>
 <li><p>基于用途的分类</p>
 <ul>
@@ -446,7 +446,7 @@
 <li><strong>集合(Collection)</strong> — 一个集合是 CTI 对象的逻辑库的接口，它由 TAXII 服务器提供，允许情报生产者握持一系列可以由情报消费者获取的 CTI 数据: TAXII 客户端和服务器通过“请求-响应”模型交换信息。</li>
 <li><strong>通道 (Channel)</strong> — 一个通道允许情报生产者推送给大量消费者数据，消费者也可以从大量生产者那里接收数据，这个通道由 TAXII 服务器负责维护: TAXII 客户端和其他客户端通过“发布-订阅”模型交换信息。注意: TAXII 2.0 说明书保留了通道必须的关键字，但并未指定通道的服务。通道和他们的服务将会在 TAXII 稍后版本中的明确。</li>
 </ul>
-<p><img src="http://f.cl.ly/items/2f1X1D1M172J202d3N23/taxii_diagram2.png" srcset="/img/loading.gif" lazyload alt="TAXII Architecture"></p>
+<p><img src="http://f.cl.ly/items/2f1X1D1M172J202d3N23/taxii_diagram2.png" alt="TAXII Architecture"></p>
 <p>集合和通道可以用不同的方式组织。例如：它们可以组合在一起以支持某一特定信赖团体的需求。</p>
 <p>一个 TAXII 服务器实例可以支持一个或多个 API Roots。API Roots 是 TAXII 通道和集合的逻辑组合，可以被认为是在不同 URL 可用时的 TAXII API 的实例 (这里每个 API Root 是TAXII API 的特定实例的”根” URL) 。</p>
 <p>TAXII 尽可能的依赖现有的协议，尤其当通过 DNS 服务记录发现 TAXII 服务器在同一网络内时。此外，TAXII 使用 HTTPS 作为所有通信的传输协议，并使用 HTTP 作为内容协商和认证的协议。</p>
@@ -753,10 +753,6 @@
 
 
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 
