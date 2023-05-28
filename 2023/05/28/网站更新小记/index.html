@@ -73,7 +73,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"github.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"github.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -393,7 +393,7 @@
 <p>通过 <strong>hexo admin</strong> 界面，我们就可以轻松实现登录并管理博客文章，包括创建新文章、编辑现有文章、预览和发布等。</p>
 <p>安装和配置Hexo Admin插件后，需要在访问管理界面之前登录使用预先设置的用户名和密码。确保将用户名和密码配置为安全且不易猜测的值。</p>
 <p>另外，还有其他一些Hexo插件和工具可用于添加后台管理界面，例如Netlify CMS、Admino、Easymotion等。您可以根据个人喜好和需求选择适合您的插件来增强Hexo的管理功能。</p>
-<p><img src="https://i.imgtg.com/2023/05/28/OoZxwl.png" alt="Hexo Admin"></p>
+<p><img src="https://i.imgtg.com/2023/05/28/OoZxwl.png" srcset="/img/loading.gif" lazyload alt="Hexo Admin"></p>
 <blockquote>
 <p>made with ChatGPT ♥</p>
 </blockquote>
@@ -505,7 +505,7 @@
             
   
   
-    <article id="comments">
+    <article id="comments" lazyload>
       
 
     </article>
@@ -675,6 +675,10 @@
 
 
 
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
 
 
 
