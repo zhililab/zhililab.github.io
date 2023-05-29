@@ -2,6 +2,7 @@ title: XMind Copilot
 author: Zhi Li
 tags:
   - XMind
+  - ChatGPT
 categories:
   - 技术
 index_img: /assets/images/cover/xmind_copilot_cover.png
