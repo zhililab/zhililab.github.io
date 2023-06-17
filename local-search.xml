@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>Conan 包管理</title>
+    <link href="/2023/06/18/CM-Conan/"/>
+    <url>/2023/06/18/CM-Conan/</url>
+    
+    <content type="html"><![CDATA[<p>Conan是一个用于C++项目的包管理器，它可以帮助您管理项目所需的依赖项和库。它可以提高构建速度和可靠性，并使您的项目更易于维护。在本文中，我们将探讨Conan的使用、Conan recipe以及踩坑经验。</p><ol><li>Conan是什么以及为什么要使用它？</li></ol><p>Conan是一个开源的C++包管理器，它可以帮助您管理项目所需的依赖项和库。Conan可以自动下载和构建依赖项，并将它们编译成二进制文件，这可以提高构建速度和可靠性。Conan还提供了一种简单的方法来共享代码和依赖项，并使您的项目更易于维护。</p><ol start="2"><li>如何安装和配置Conan？</li></ol><p>您可以使用pip或安装程序来安装Conan，并使用<code>conan config</code>命令来配置Conan。您还可以使用<code>conan remote</code>命令添加远程存储库，以便获取和分发包。配置Conan是很容易的，只需运行以下命令：</p><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">pip <span class="hljs-keyword">install </span>conan<br>conan <span class="hljs-built_in">config</span> <span class="hljs-keyword">install </span>&lt;path-to-<span class="hljs-built_in">config</span>-file&gt;<br></code></pre></td></tr></table></figure><p>在配置文件中，您可以指定默认的编译器、构建类型和其他设置。</p><ol start="3"><li>如何创建和使用Conan recipe？</li></ol><p>Conan recipe是一个描述如何构建和打包C++库或应用程序的文件。您可以使用<code>conan new</code>命令创建新的Conan recipe，并使用<code>conan create</code>命令构建和上传包。您还可以使用<code>conan install</code>命令安装包，并使用<code>conan info</code>命令查看有关包的信息。</p><p>创建一个新的Conan recipe非常简单，只需运行以下命令：</p><figure class="highlight d"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs d">conan <span class="hljs-keyword">new</span> &lt;<span class="hljs-keyword">package</span>-name&gt;/&lt;<span class="hljs-keyword">version</span>&gt;<br></code></pre></td></tr></table></figure><p>这将创建一个名为<code>&lt;package-name&gt;</code>的目录，其中包含一个名为<code>conanfile.py</code>的文件。在此文件中，您可以指定依赖项、构建设置和其他选项，以及如何构建和打包代码。</p><p>要构建和上传包，请运行以下命令：</p><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">conan create . <span class="hljs-tag">&lt;<span class="hljs-name">user</span>&gt;</span>/<span class="hljs-tag">&lt;<span class="hljs-name">channel</span>&gt;</span><br></code></pre></td></tr></table></figure><p>这将自动下载、构建和上传包到指定的远程存储库。</p><ol start="4"><li>更新社区 patch</li></ol><p>针对 grpc 1.41.1 版本的问题，我们需要一个社区 patch 进行修复。如何快速纳入 patch，制作 Conan 包。</p><p>（1）准备好 grpc 1.41.1 源码包<br>（2）社区 patch (针对问题 <a href="https://github.com/grpc/grpc/issues/22803">InsecureChannelCredentials stuck on call</a>)<br>（3）grpc conan recipie<br>（4）构建制作 grpc with patch </p><ol start="5"><li>踩坑经验和解决方案</li></ol><p>在使用Conan时，您可能会遇到一些问题。以下是一些常见问题及其解决方案：</p><ul><li><p>问题：无法找到依赖项。<br>解决方案：请确保您已正确指定依赖项，并将其添加到<code>conanfile.py</code>文件中。</p></li><li><p>问题：构建失败。<br>解决方案：请检查您的构建设置是否正确，并确保您已正确安装所有依赖项。</p></li><li><p>问题：无法上传包。<br>解决方案：请确保您已正确配置远程存储库，并使用正确的用户名和密码进行身份验证。</p></li></ul><ol start="6"><li>优化</li></ol><p>Conan是一个用于C++项目的包管理器，可以帮助您管理项目所需的依赖项和库。在使用Conan时，可以通过指定不同的选项和设置来优化Conan的行为，以提高构建速度和可靠性。</p><p>以下是一些优化Conan的方法：</p><p>（1）缓存Conan包：Conan包可以被缓存到本地，以便在需要时快速访问。可以使用<code>conan install</code>命令的<code>--build</code>选项来控制是否重新构建包。例如，使用<code>conan install -s build_type=Release --build missing</code>命令可以缓存Release版本的包，并在需要时重新构建缺失的包。</p><p>（2）使用远程存储库：Conan支持使用远程存储库来获取和分发包。您可以使用<code>conan remote add</code>命令添加远程存储库，并使用<code>conan install</code>命令的<code>--remote</code>选项指定要使用的远程存储库。这有助于加快包的下载速度和分发速度。</p><p>（3）指定Conanfile位置：如果您的项目中有多个Conanfile文件，则可以使用<code>-if</code>选项指定要使用的Conanfile文件。这有助于避免不必要的构建，并加快构建速度。</p><p>（4）并行构建：Conan支持并行构建，可以使用<code>-j</code>选项指定要使用的并行任务数。这有助于加快构建速度。</p><p>总体而言，优化Conan的方法取决于项目的具体情况和需求。您可以根据需要选择不同的选项和设置来优化Conan的行为。</p><ol start="7"><li>总结</li></ol><p>Conan是一个非常有用的工具，它可以帮助C++开发人员管理项目所需的依赖项和库，提高构建速度和可靠性，并使项目更易于维护。在本文中，我们介绍了如何安装和配置Conan，创建和使用Conan recipe，并分享了一些踩坑经验和解决方案。希望这些信息能对您有所帮助！</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>技术</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Conan</tag>
+      
+      <tag>CM</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>XMind Copilot</title>
     <link href="/2023/05/29/XMind-Copilot/"/>
     <url>/2023/05/29/XMind-Copilot/</url>
