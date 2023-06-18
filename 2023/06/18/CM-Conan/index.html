@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://github.com/assets/images/cover/jfrog_conan2_conver.jpg">
 <meta property="article:published_time" content="2023-06-18T01:23:34.000Z">
-<meta property="article:modified_time" content="2023-06-18T02:33:40.407Z">
+<meta property="article:modified_time" content="2023-06-18T03:04:16.224Z">
 <meta property="article:author" content="[object Object]">
 <meta property="article:tag" content="Conan">
 <meta property="article:tag" content="CM">
@@ -252,7 +252,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2k 字
+          3.1k 字
         
       </span>
     
@@ -263,7 +263,7 @@
         
         
         
-          17 分钟
+          27 分钟
         
       </span>
     
@@ -335,16 +335,72 @@
 
 <p>4.2 社区 patch </p>
 <p>(针对问题 <a href="https://github.com/grpc/grpc/issues/22803">InsecureChannelCredentials stuck on call</a>)</p>
-<p><img src="https://user-images.githubusercontent.com/11768073/246640159-a89c996c-6c84-4a33-8c09-bcbd66433606.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">shasum -a 256 grpc-1.41.1.tar<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://user-images.githubusercontent.com/11768073/246641079-fc4a103c-064c-4dd5-8353-2b3c2191c527.png" srcset="/img/loading.gif" lazyload></p>
 <p>4.3 grpc conan recipie</p>
+<p><a target="_blank" rel="noopener" href="https://conan.io/center/grpc?version=1.41.1&tab=recipe">grpc-1.41.1-recipe</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> conan.tools.microsoft.visual <span class="hljs-keyword">import</span> msvc_version_to_vs_ide_version<br><span class="hljs-keyword">from</span> conan.tools.files <span class="hljs-keyword">import</span> rename<br><span class="hljs-keyword">from</span> conans <span class="hljs-keyword">import</span> ConanFile, CMake, tools<br><span class="hljs-keyword">from</span> conans.errors <span class="hljs-keyword">import</span> ConanInvalidConfiguration<br><span class="hljs-keyword">import</span> os<br><br>required_conan_version = <span class="hljs-string">&quot;&gt;=1.43.0&quot;</span><br><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">grpcConan</span>(<span class="hljs-title class_ inherited__">ConanFile</span>):<br>    name = <span class="hljs-string">&quot;grpc&quot;</span><br>    description = <span class="hljs-string">&quot;Google&#x27;s RPC (remote procedure call) library and framework.&quot;</span><br>    topics = (<span class="hljs-string">&quot;grpc&quot;</span>, <span class="hljs-string">&quot;rpc&quot;</span>)<br>    url = <span class="hljs-string">&quot;https://github.com/conan-io/conan-center-index&quot;</span><br>    homepage = <span class="hljs-string">&quot;https://github.com/grpc/grpc&quot;</span><br>    license = <span class="hljs-string">&quot;Apache-2.0&quot;</span><br>    .....<br><br></code></pre></td></tr></table></figure>
+
+<p>下面列出 conan recipe 常见函数和用途</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>def configure(self)</td>
+<td>配置构建环境，例如设置编译器、编译选项等。</td>
+</tr>
+<tr>
+<td>def requirements(self)</td>
+<td>定义依赖项，例如其他库或工具。</td>
+</tr>
+<tr>
+<td>def build(self)</td>
+<td>构建软件包，例如编译、链接等。</td>
+</tr>
+<tr>
+<td>def package(self)</td>
+<td>打包软件包，例如创建二进制文件、库文件等。</td>
+</tr>
+<tr>
+<td>def package_info(self)</td>
+<td>配置链接和运行时依赖项，例如设置库路径、头文件路径等。</td>
+</tr>
+<tr>
+<td>def source(self)</td>
+<td>下载源代码，并可选地对其进行解压缩和修补。</td>
+</tr>
+<tr>
+<td>def build_requirements(self)</td>
+<td>定义构建时依赖项，例如构建工具或编译器插件。</td>
+</tr>
+<tr>
+<td>def test(self)</td>
+<td>运行测试套件，例如使用 CTest 运行测试用例。</td>
+</tr>
+<tr>
+<td>def package_id(self)</td>
+<td>定义软件包的唯一标识符，例如版本号、ABI 等。</td>
+</tr>
+</tbody></table>
 <p>4.4 构建制作 grpc with patch </p>
-<h3 id="5-踩坑经验和解决方案"><a href="#5-踩坑经验和解决方案" class="headerlink" title="5. 踩坑经验和解决方案"></a>5. 踩坑经验和解决方案</h3><p>在使用Conan时，您可能会遇到一些问题。以下是一些常见问题及其解决方案：</p>
+<p>(1) 确保在 conanfile.py 中正确修改目标版本号 e.g 1.41.1<br><img src="https://user-images.githubusercontent.com/11768073/246630032-acc19648-428e-448f-8119-4917bd425db3.png" srcset="/img/loading.gif" lazyload><br>(2) 安装依赖项</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">conan install . --building=missing<br></code></pre></td></tr></table></figure>
+<p>(3) 本地构建</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">conan create . &lt;username&gt;/&lt;chanel&gt;<br></code></pre></td></tr></table></figure>
+
+<p><img src="https://user-images.githubusercontent.com/11768073/246641149-5c9e44a7-4706-412d-bdc3-7ff40ec6fe83.png" srcset="/img/loading.gif" lazyload alt="conan create"></p>
+<h3 id="5-踩坑经验和解决方案"><a href="#5-踩坑经验和解决方案" class="headerlink" title="5. 踩坑经验和解决方案"></a>5. 踩坑经验和解决方案</h3><p>在使用Conan时，可能会遇到一些问题。以下是一些常见问题及其解决方案：</p>
 <ul>
-<li><p>问题：无法找到依赖项。<br>解决方案：请确保您已正确指定依赖项，并将其添加到<code>conanfile.py</code>文件中。</p>
+<li><p>问题：无法找到依赖项。<br>解决方案：确保已正确指定依赖项，并将其添加到<code>conanfile.py</code>文件中。</p>
 </li>
-<li><p>问题：构建失败。<br>解决方案：请检查您的构建设置是否正确，并确保您已正确安装所有依赖项。</p>
+<li><p>问题：构建失败。<br>解决方案：检查构建设置是否正确，并确保已正确安装所有依赖项。</p>
 </li>
-<li><p>问题：无法上传包。<br>解决方案：请确保您已正确配置远程存储库，并使用正确的用户名和密码进行身份验证。</p>
+<li><p>问题：无法上传包。<br>解决方案：确保已正确配置远程存储库，并使用正确的用户名和密码进行身份验证。</p>
 </li>
 </ul>
 <h3 id="6-优化"><a href="#6-优化" class="headerlink" title="6. 优化"></a>6. 优化</h3><p>Conan是一个用于C++项目的包管理器，可以帮助您管理项目所需的依赖项和库。在使用Conan时，可以通过指定不同的选项和设置来优化Conan的行为，以提高构建速度和可靠性。</p>
