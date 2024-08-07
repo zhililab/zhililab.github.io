@@ -5,7 +5,7 @@ tags:
   - Programming
 categories:
   - 技术
-index_img: /assets/images/cover/jfrog_conan2_conver.jpg
+index_img: /assets/images/cover/golang_cover.png
 date: 2024-08-07 14:30:00
 ---
 
