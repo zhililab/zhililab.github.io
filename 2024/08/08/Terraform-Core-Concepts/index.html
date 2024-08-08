@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://github.com/assets/images/cover/Terraform_Cover.png">
 <meta property="article:published_time" content="2024-08-08T12:30:00.000Z">
-<meta property="article:modified_time" content="2024-08-08T16:15:21.402Z">
+<meta property="article:modified_time" content="2024-08-08T16:19:51.303Z">
 <meta property="article:author" content="[object Object]">
 <meta property="article:tag" content="Terraform">
 <meta property="article:tag" content="IaC">
@@ -378,10 +378,12 @@
 <h3 id="三、结语"><a href="#三、结语" class="headerlink" title="三、结语"></a>三、结语</h3><p>Terraform 通过提供强大的 IaC 功能，极大地简化了基础设施管理和部署。理解和掌握 Terraform 是云行业从业者（DevOps）必不可少的，后面我们会展开介绍。</p>
 <h3 id="四、附录"><a href="#四、附录" class="headerlink" title="四、附录"></a>四、附录</h3><h4 id="示例-1-官方教材"><a href="#示例-1-官方教材" class="headerlink" title="示例 1 官方教材"></a>示例 1 官方教材</h4><p>官方教材实践 <a target="_blank" rel="noopener" href="https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli">https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli</a></p>
 <ol>
-<li><p>安装并查看 terraform 版本</p>
-</li>
-<li><p>编写 nginx docker 配置文件</p>
-</li>
+<li>安装并查看 terraform 版本</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">terraform --<span class="hljs-built_in">help</span><br></code></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>编写 nginx docker 配置文件</li>
 </ol>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs hcl">terraform &#123;<br>    required_providers &#123;<br>        docker = &#123;<br>            source  = &quot;kreuzwerker/docker&quot;<br>            version = &quot;~&gt; 3.0.1&quot;<br>        &#125;<br>    &#125;<br>&#125;<br><br>provider &quot;docker&quot; &#123;&#125;<br><br>resource &quot;docker_image&quot; &quot;nginx&quot; &#123;<br>  name          = &quot;nginx&quot;<br>  keep_locally  = false<br>&#125;<br><br>resource &quot;docker_container&quot; &quot;nginx&quot; &#123;<br>  image = docker_image.nginx.image_id<br>  name = &quot;tutorial&quot;  <br> <br>  ports &#123;<br>    internal = 80<br>    external = 8081<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
