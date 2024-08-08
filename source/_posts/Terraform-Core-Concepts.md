@@ -83,7 +83,9 @@ Terraform 提供了一个功能强大的命令行接口（CLI），用于管理�
 
 以下是使用 Terraform 部署基础设施的步骤：
 
-1. 范围（Scope）- 确定项目所需的基础设施。这一步涉及明确你需要管理的基础设施组件，确定项目中的哪些资源需要被创建、修改或删除。
+1. 审查（Scope）- 确定项目所需的基础设施。这一步涉及明确你需要管理的基础设施组件，确定项目中的哪些资源需要被创建、修改或删除。
+
+> 这里需要注意，如果没有明确提供程序版本的范围（scope provider version），Terraform 将下载满足版本约束的`最新提供程序版本`。这可能会导致意外的基础设施更改。通过仔细指定范围明确的提供程序版本并使用依赖项锁定文件，可以确保 Terraform 使用正确的提供程序版本，从而使项目的配置保持一致。
 	
 2. 编写（Author） - 为基础设施编写配置文件。在这一步，使用 HCL 语言编写 Terraform 配置文件，定义`基础设施资源`、`提供者`、`变量`等内容。
 
@@ -94,11 +96,65 @@ Terraform 提供了一个功能强大的命令行接口（CLI），用于管理�
 5. 应用（Apply） - 执行规划的更改。使用 terraform apply 命令实际应用配置中的更改，使基础设施达到配置文件中的期望状态。
 
 ### 三、结语
-Terraform 通过提供强大的 IaC 功能，极大地简化了基础设施管理和部署。理解和掌握 Terraform 是云行业总从业者（DevOps）必不可少的，后面我们会展开介绍。
+Terraform 通过提供强大的 IaC 功能，极大地简化了基础设施管理和部署。理解和掌握 Terraform 是云行业从业者（DevOps）必不可少的，后面我们会展开介绍。
 
-### 附录
+### 四、附录
 
-学一个东西最好的方式就是实际应用，下面通过一个例子定义一个 aws 使用云环境 —— Autoware是一个基于ROS的开源软件项目，专为自动驾驶车辆设计，涵盖了感知、定位、规划、控制等所有功能模块，并支持多种车辆类型和应用场景（感兴趣的朋友可以阅读我之前写的一篇文章 ——  [AutoWare 初探](http://www.zhililab.cn/2024/08/07/AutoWare-Intro/)）。这里为了配置文件将自动部署一个集成了高性能计算和存储资源的Kubernetes集群，并支持Autoware的核心模块。
+#### 示例 1 官方教材
+
+官方教材实践 https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+
+1. 安装并查看 terraform 版本
+ 
+
+
+2. 编写 nginx docker 配置文件
+
+```hcl
+terraform {
+    required_providers {
+        docker = {
+            source  = "kreuzwerker/docker"
+            version = "~> 3.0.1"
+        }
+    }
+}
+
+provider "docker" {}
+
+resource "docker_image" "nginx" {
+  name          = "nginx"
+  keep_locally  = false
+}
+
+resource "docker_container" "nginx" {
+  image = docker_image.nginx.image_id
+  name = "tutorial"  
+ 
+  ports {
+    internal = 80
+    external = 8081
+  }
+}
+```
+
+3. terraform 部署步骤
+
+```bash
+terraform init # 初始化
+terraform plan # 检查变化修改
+terraform apply # 部署应用
+```
+
+4. 验证部署结果
+  
+  ![docker 客户端控制面板](https://imgos.cn/2024/08/09/66b4ec4418c8e.png)
+
+  ![打开网站实际效果](https://imgos.cn/2024/08/08/66b4eb72b241b.png)
+
+#### 示例 2 复合配置
+
+下面一个例子定义一个 aws 使用云环境 —— Autoware是一个基于ROS的开源软件项目，专为自动驾驶车辆设计，涵盖了感知、定位、规划、控制等所有功能模块，并支持多种车辆类型和应用场景（感兴趣的朋友可以阅读我之前写的一篇文章 ——  [AutoWare 初探](http://www.zhililab.cn/2024/08/07/AutoWare-Intro/)）。这里为了配置文件将自动部署一个集成了高性能计算和存储资源的Kubernetes集群，并支持Autoware的核心模块。
 
 ```hcl
 provider "aws" {
@@ -125,7 +181,7 @@ resource "aws_eks_cluster" "autoware_cluster" {
   # 设置Kubernetes版本和节点组
   version    = "1.23"
   node_group {
-    instance_type = "m5.large" # 配备了2个vCPU（基于Intel Xeon Platinum处理器）+ 8 GB内存 + EBS优化的网络性能
+    instance_type = "m5.large"
     desired_size  = 3
   }
 }
@@ -156,6 +212,8 @@ output "efs_dns_name" {
   value = aws_efs_file_system.autoware_storage.dns_name
 }
 ```
+
+> Kubernetes 从 V1.24.x 开始，把 containerd 作为了主要的容器运行方式，不再使用 Docker
 
 这个配置文件包括了以下关键组件：
 
