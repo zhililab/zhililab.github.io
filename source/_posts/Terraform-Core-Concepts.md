@@ -9,7 +9,7 @@ index_img: /assets/images/cover/Terraform_Cover.png
 date: 2024-08-08 20:30:00
 ---
 
-在现代 DevOps 和云计算的背景下，基础设施即代码（Infrastructure as Code, IaC）已经成为管理和部署基础设施的标准方式。Terraform 作为一种广受欢迎的 IaC 工具，因其多云支持和灵活性受到了广泛的青睐，更有很多 DevOps 岗位招聘的 JD 更是明确要求了解/熟悉 Terraform。本文将详细解释 Terraform 的基本概念，通过学习、实践掌握这个强大的工具。
+在现代 DevOps 和云计算的背景下，基础设施即代码（Infrastructure as Code, IaC）已经成为管理和部署基础设施的标准方式。Terraform 作为一种广受欢迎的 IaC 工具，因其多云支持和灵活性受到了广泛的青睐，更有很多 DevOps 岗位招聘的 JD 更是明确要求了解/熟悉 Terraform。本文将会梳理 Terraform 的基本概念，通过学习、实践掌握这个强大的工具。
 
 ### 一、核心概念（Core Concepts）
 
@@ -95,7 +95,7 @@ Terraform 通过提供强大的 IaC 功能，极大地简化了基础设施管�
 
 ### 附录
 
-学一个东西最好的方式就是实际应用，下面通过一个例子定义一个 aws 使用云环境 —— Autoware是一个基于ROS的开源软件项目，专为自动驾驶车辆设计，涵盖了感知、定位、规划、控制等所有功能模块，并支持多种车辆类型和应用场景（感兴趣的朋友可以阅读我之前写的一篇文章 ——  [AutoWare 初探](http://www.zhililab.cn/2024/08/07/AutoWare-01/)）。这里为了配置文件将自动部署一个集成了高性能计算和存储资源的Kubernetes集群，并支持Autoware的核心模块。
+学一个东西最好的方式就是实际应用，下面通过一个例子定义一个 aws 使用云环境 —— Autoware是一个基于ROS的开源软件项目，专为自动驾驶车辆设计，涵盖了感知、定位、规划、控制等所有功能模块，并支持多种车辆类型和应用场景（感兴趣的朋友可以阅读我之前写的一篇文章 ——  [AutoWare 初探](http://www.zhililab.cn/2024/08/07/AutoWare-Intro/)）。这里为了配置文件将自动部署一个集成了高性能计算和存储资源的Kubernetes集群，并支持Autoware的核心模块。
 
 ```hcl
 provider "aws" {
@@ -161,4 +161,4 @@ output "efs_dns_name" {
 3. **EFS存储**：为高效处理自动驾驶数据提供弹性文件存储。
 4. **Autoware核心模块**：通过模块化的方式部署Autoware核心软件包。
 
-这将提供一个完整的基础设施环境，支持Autoware的部署和扩展。后续我们根据项目需求进一步调整配置文件。
+这将提供一个完整的基础设施环境，支持Autoware的部署和扩展，后续我们就可以根据项目需求进一步调整配置文件。
