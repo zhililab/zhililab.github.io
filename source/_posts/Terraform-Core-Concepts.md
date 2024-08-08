@@ -3,6 +3,7 @@ author: Zhi Li
 tags:
   - Terraform
   - IaC
+  - DevOps
 categories:
   - 技术
 index_img: /assets/images/cover/Terraform_Cover.png
@@ -19,9 +20,11 @@ Infrastructure as Code（IaC）是一种通过编写代码来定义和管理基�
 Terraform 作为一种 IaC 工具，使用 HCL（HashiCorp Configuration Language）来定义基础设施配置。你可以在代码中描述你需要的云资源、网络配置、数据库等，然后使用 Terraform 来创建、修改或销毁这些资源。
 
 #### 2. **Providers**
-Terraform 的 Providers 是一种插件机制，用于与不同的云服务和 API 进行交互。每个 Provider 负责与特定的服务平台通信，例如 AWS、Azure、Google Cloud、Kubernetes、GitHub 等。通过 Providers，Terraform 可以管理几乎任何基础设施资源。
+Terraform 的 [Providers](https://registry.terraform.io/browse/providers) 是一种插件机制，用于与不同的云服务和 API 进行交互。每个 Provider 负责与特定的服务平台通信，例如 AWS、Azure、Google Cloud、Kubernetes、GitHub 等（如下图所示）。通过 Providers，Terraform 可以管理几乎任何基础设施资源。
 
 每个 Provider 都需要进行配置，通常包括访问凭据和目标服务的地址等信息。Terraform 使用这些配置与云服务 API 交互，创建或管理资源。一个 Terraform 配置文件可以同时使用多个 Providers，这样你可以在多个云平台上管理你的基础设施。
+
+![terraform_provider](https://imgos.cn/2024/08/08/66b4d34c29d78.png)
 
 #### 3. **Resources**
 Resources 是 Terraform 中的核心概念，它代表了基础设施中的一个组件。例如，在 AWS 中，资源可以是 EC2 实例、S3 存储桶、RDS 数据库实例等。在 Terraform 配置中，每个资源都使用一个特定的 Provider，并需要指定资源类型和相应的配置属性。
@@ -90,7 +93,7 @@ Terraform 提供了一个功能强大的命令行接口（CLI），用于管理�
 
 5. 应用（Apply） - 执行规划的更改。使用 terraform apply 命令实际应用配置中的更改，使基础设施达到配置文件中的期望状态。
 
-### 结语
+### 三、结语
 Terraform 通过提供强大的 IaC 功能，极大地简化了基础设施管理和部署。理解和掌握 Terraform 是云行业总从业者（DevOps）必不可少的，后面我们会展开介绍。
 
 ### 附录
