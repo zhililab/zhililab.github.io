@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://github.com/assets/images/cover/Docker_Cover.png">
 <meta property="article:published_time" content="2024-08-13T15:17:00.000Z">
-<meta property="article:modified_time" content="2024-08-13T15:27:15.444Z">
+<meta property="article:modified_time" content="2024-08-13T16:07:20.692Z">
 <meta property="article:author" content="[object Object]">
 <meta property="article:tag" content="Programming">
 <meta property="article:tag" content="Docker">
@@ -252,7 +252,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.3k 字
+          1.5k 字
         
       </span>
     
@@ -263,7 +263,7 @@
         
         
         
-          12 分钟
+          13 分钟
         
       </span>
     
@@ -330,6 +330,7 @@
 </li>
 </ul>
 <p>总结：<br>    •	CMD 指定容器的默认命令，且可以被覆盖。<br>    •	ENTRYPOINT 指定容器的主命令，通常不可被覆盖。<br>    •	此外，还有 RUN 是在镜像构建阶段执行的，而 CMD 和 ENTRYPOINT 是在容器启动时执行的。</p>
+<p>思考：<br>    为什么要区分 entrypoint 和 cmd，从设计理念来说 —— ENTRYPOINT：定义容器的主要入口点，通常用于指定一个固定的命令，这些命令是属于关键命令，需要确保不可以被篡改或覆盖；CMD 更像是一个建议，用于指定当用户没有明确命令时，容器应该执行什么。同时提供 entrypoint 和 cmd 兼顾灵活性和准确性，适应各种使用场景。</p>
 <h3 id="COPY-vs-ADD"><a href="#COPY-vs-ADD" class="headerlink" title="COPY vs ADD"></a><code>COPY</code> vs <code>ADD</code></h3><ul>
 <li><p>**<code>COPY</code>**：将文件或目录从构建上下文复制到镜像中，仅用于简单的文件复制。</p>
 <ul>
