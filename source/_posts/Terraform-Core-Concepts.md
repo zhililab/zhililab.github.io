@@ -104,11 +104,13 @@ Terraform 通过提供强大的 IaC 功能，极大地简化了基础设施管�
 
 官方教材实践 https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
 
-1. 安装并查看 terraform 版本
+1.安装并查看 terraform 版本
  
+```bash
+terraform --help
+```
 
-
-2. 编写 nginx docker 配置文件
+2.编写 nginx docker 配置文件
 
 ```hcl
 terraform {
@@ -138,7 +140,7 @@ resource "docker_container" "nginx" {
 }
 ```
 
-3. terraform 部署步骤
+3.terraform 部署步骤
 
 ```bash
 terraform init # 初始化
@@ -146,11 +148,17 @@ terraform plan # 检查变化修改
 terraform apply # 部署应用
 ```
 
-4. 验证部署结果
+4.验证部署结果
   
   ![docker 客户端控制面板](https://imgos.cn/2024/08/09/66b4ec4418c8e.png)
 
   ![打开网站实际效果](https://imgos.cn/2024/08/08/66b4eb72b241b.png)
+
+5.其他
+
+在 local 进行部署测试中，可以发现 `terraform apply` 后，自动化生成了 `terraform.tfstate`，它是 Terraform 用于管理和存储状态的文件，记录了 Terraform 管理的基础设施的当前状态。
+
+  ![terraform.tfstate](https://imgos.cn/2024/08/09/66b4f10a4dd7e.png)
 
 #### 示例 2 复合配置
 
