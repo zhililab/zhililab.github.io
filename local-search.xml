@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>Kubernetes 学习 —— node 🆚 pod</title>
+    <link href="/2024/08/22/Learning-Kubernetes-002/"/>
+    <url>/2024/08/22/Learning-Kubernetes-002/</url>
+    
+    <content type="html"><![CDATA[<p>上一篇，我们介绍了 kubernetes 的控制面板组件、节点组件和其他附加组件，这一篇我们将针对资源对象 Pod 和 Node 进行辨析，理清二者关系。</p><h3 id="1-Pod"><a href="#1-Pod" class="headerlink" title="1. Pod"></a>1. <strong>Pod</strong></h3><h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><ul><li><strong>Pod</strong> 是 Kubernetes 中最小的可部署单元，它封装了一个或多个容器（通常是 Docker 容器），以及这些容器共享的存储、网络和配置信息。</li><li>一个 Pod 内的所有容器共享相同的网络命名空间，可以通过 <code>localhost</code> 相互通信。</li></ul><h4 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h4><ul><li>Pod 是 Kubernetes 调度的基本单位，每个 Pod 都运行在一个 Node 上。</li><li>Pod 内的容器共同协作完成某个任务，通常一个 Pod 会包含一个主容器，可能还有一些辅助容器（如日志处理容器）。</li></ul><h4 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h4><ul><li><strong>短生命周期</strong>: Pod 通常是短暂的，当 Pod 被删除、崩溃或被替换时，会由控制器（如 Deployment）自动创建新的 Pod 来代替。</li><li><strong>不可变性</strong>: 在 Kubernetes 中，Pod 是不可变的，更新 Pod 会创建一个新的 Pod 来替换旧的。</li></ul><blockquote><p>pods 在 kubernetes 中主要有两种使用方式：运行单个容器和运行多个需要协同工作的容器。</p></blockquote><h3 id="2-Node"><a href="#2-Node" class="headerlink" title="2. Node"></a>2. <strong>Node</strong></h3><h4 id="定义-1"><a href="#定义-1" class="headerlink" title="定义"></a>定义</h4><ul><li><strong>Node</strong> 是 Kubernetes 集群中的一个工作节点，代表一台物理机或虚拟机。每个 Node 都包含多个 Pod，并负责运行这些 Pod 的容器。</li><li>Node 上运行着 Kubernetes 的关键组件，如 <code>kubelet</code>、<code>kube-proxy</code> 和容器运行时（如 Docker）。</li></ul><h4 id="作用-1"><a href="#作用-1" class="headerlink" title="作用"></a>作用</h4><ul><li><strong>资源管理</strong>: Node 管理其上的计算资源（CPU、内存、存储等），并将这些资源分配给运行的 Pod。</li><li><strong>Pod 运行环境</strong>: Node 提供了容器运行时环境和必要的系统资源，确保 Pod 能正常运行。</li></ul><h4 id="特点-1"><a href="#特点-1" class="headerlink" title="特点"></a>特点</h4><ul><li><strong>集群组成部分</strong>: 一个 Kubernetes 集群由多个 Node 组成，集群中的 Node 数量可以动态伸缩。</li><li><strong>节点状态</strong>: Node 可能处于不同的状态，如 <code>Ready</code>（就绪）、<code>NotReady</code>（未就绪）等，这些状态会影响 Pod 的调度。</li></ul><h3 id="3-Worker-Node"><a href="#3-Worker-Node" class="headerlink" title="3. Worker Node"></a>3. <strong>Worker Node</strong></h3><h4 id="定义-2"><a href="#定义-2" class="headerlink" title="定义"></a>定义</h4><ul><li><strong>Worker Node</strong> 通常是指用于运行应用负载的 Node。Kubernetes 中的 Worker Node 和 Node 在概念上是相同的，Worker Node 是 Node 的一种类型或角色。</li></ul><h4 id="作用-2"><a href="#作用-2" class="headerlink" title="作用"></a>作用</h4><ul><li>Worker Node 专门负责运行用户的应用容器（Pod），处理工作负载。相比之下，Master Node（控制节点）负责管理和调度整个集群，而不运行应用负载。</li><li>每个 Worker Node 都报告其状态和资源使用情况到 Kubernetes 控制平面（如 API Server），并接受调度指令。</li></ul><h4 id="特点-2"><a href="#特点-2" class="headerlink" title="特点"></a>特点</h4><ul><li><strong>Pod 承载</strong>: Worker Node 是实际承载和运行 Pod 的节点。</li><li><strong>集群扩展</strong>: 集群扩展时，通常会增加 Worker Node 的数量，以增加集群的计算资源和负载能力。</li></ul><h3 id="4-Pod、Node-和-Worker-Node-的关系"><a href="#4-Pod、Node-和-Worker-Node-的关系" class="headerlink" title="4. Pod、Node 和 Worker Node 的关系"></a>4. <strong>Pod、Node 和 Worker Node 的关系</strong></h3><ul><li><p><strong>Pod 与 Node 的关系</strong>:</p><ul><li>Pod 是 Kubernetes 中的基本运行单元，Pod 在 Node 上运行。</li><li>每个 Node 上可以运行多个 Pod，不同的 Pod 可以在同一个 Node 上，也可以分布在不同的 Node 上。</li><li>Pod 由调度器（Scheduler）决定在哪个 Node 上运行，调度的依据是资源需求和 Node 的资源状况。</li></ul></li><li><p><strong>Node 与 Worker Node 的关系</strong>:</p><ul><li>Node 是 Kubernetes 集群的构成元素，Worker Node 是专门用于运行用户工作负载的 Node。</li><li>集群的 Worker Node 越多，能够承载的 Pod 数量越多，因此集群的负载能力也越强。</li></ul></li><li><p><strong>集群管理</strong>:</p><ul><li>集群中的 Master Node 管理 Worker Node，Master Node 不直接运行工作负载，而是管理调度、控制、监控等功能。</li><li>Worker Node 接受 Master Node 的指令，运行实际的 Pod，并通过 kubelet 与 Master Node 保持通信。</li></ul></li></ul><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ul><li><strong>Pod</strong> 是最小的运行单元，包含一个或多个容器。</li><li><strong>Node</strong> 是运行 Pod 的物理或虚拟机，提供必要的计算资源。</li><li><strong>Worker Node</strong> 是运行应用负载的 Node，实际承载了集群中的 Pod。</li></ul><p>这三者构成了 Kubernetes 集群中基本的运行和调度体系，Pod 依赖于 Node 的资源，而 Node 又是由 Kubernetes 控制平面管理的基础设施单元。</p><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://kubernetes.io/docs/concepts/architecture/nodes/">Kubernetes Doc: nodes</a><br><a href="https://kubernetes.io/docs/concepts/workloads/pods/">Kubernetes Doc: pods</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>技术</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Programming</tag>
+      
+      <tag>Kubernetes</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Kubernetes 学习 —— 基础组件和概念梳理</title>
     <link href="/2024/08/19/Learning-Kubernetes-001/"/>
     <url>/2024/08/19/Learning-Kubernetes-001/</url>
