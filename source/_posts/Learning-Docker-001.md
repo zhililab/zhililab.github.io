@@ -2,7 +2,6 @@ title: Docker 学习 —— 基础指令对比学习
 author: Zhi Li
 tags:
   - Docker
-  - Programming
 categories:
   - 技术
 index_img: /assets/images/cover/Docker_Cover.png
