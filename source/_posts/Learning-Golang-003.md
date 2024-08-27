@@ -92,11 +92,16 @@ Talk is cheap, show me the code. 本篇目标是通过 mini-task ，掌握如何
    - **观察容器内的内存使用情况**，并调整容器的内存限制、CPU 配额等，查看程序的运行表现。
 
    （1）构建镜像
+   
    ![1724737873596.png](https://img.picui.cn/free/2024/08/27/66cd692c54adc.png)
+   
    （2）观察容器的内存使用情况
+   
    ![1724738055726.png](https://img.picui.cn/free/2024/08/27/66cd69e213b67.png)
    可以上图发现 alloc、TotalAlloc、Sys、NumGC 等内存使用情况，我们可以对代码做一些小修改，增加波动。
+   
    （3）修改代码
+   
     ```go
     package main
 
