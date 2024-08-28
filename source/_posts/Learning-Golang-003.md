@@ -101,7 +101,7 @@ Talk is cheap, show me the code. 本篇目标是通过 mini-task ，掌握如何
    可以上图发现 alloc、TotalAlloc、Sys、NumGC 等内存使用情况，我们可以对代码做一些小修改，增加波动。
    
    （3）修改代码
-   
+
     ```go
     package main
 
@@ -162,3 +162,7 @@ Talk is cheap, show me the code. 本篇目标是通过 mini-task ，掌握如何
 
 docker desktop(macos) 4.31.0 (153195)
 go version go1.23.0 darwin/arm64
+
+#### 附录2 完整代码示例
+
+[docker-runtime-monitor](https://github.com/zhililab/zhililab.github.io/tree/code-samples/Project/docker-runtime-monitor)
