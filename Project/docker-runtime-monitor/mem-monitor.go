@@ -4,36 +4,44 @@ import (
 	"fmt"
 	"runtime"
 	"time"
+	"math/rand"
 )
 
 func main() {
 	var memStats runtime.MemStats
 	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
 
 	// 模拟的内存分配
 	var allocations [][]byte
 
 	for range ticker.C {
-		// 分配 10 MiB 内存
-		allocations = append(allocations, make([]byte, 10*1024*1024))
+		// 随机分配 5-15 MiB 内存，更接近实际情况
+		allocSize := 5 + rand.Intn(11)
+		allocations = append(allocations, make([]byte, allocSize*1024*1024))
 
-		// 每隔 5 次释放一部分内存
-		if len(allocations) > 5 {
-			allocations = allocations[2:]  // 保留最近三次的分配
+		// 模拟内存释放，随机释放一些内存
+		if len(allocations) > 10 && rand.Float32() < 0.3 {
+			releaseCount := rand.Intn(len(allocations) / 2)
+			allocations = allocations[releaseCount:]
 		}
 
 		// 读取当前内存状态
 		runtime.ReadMemStats(&memStats)
-		fmt.Printf("Alloc = %v MiB", bToMb(memStats.Alloc))
-		fmt.Printf("\tTotalAlloc = %v MiB", bToMb(memStats.TotalAlloc))
-		fmt.Printf("\tSys = %v MiB", bToMb(memStats.Sys))
-		fmt.Printf("\tNumGC = %v\n", memStats.NumGC)
+		fmt.Printf("Alloc = %v MiB\tTotalAlloc = %v MiB\tSys = %v MiB\tNumGC = %v\n",
+			bToMb(memStats.Alloc), bToMb(memStats.TotalAlloc), bToMb(memStats.Sys), memStats.NumGC)
+
+		// 当内存使用超过阈值时，模拟OOM情况
+		if memStats.Alloc > 500*1024*1024 {
+			fmt.Println("模拟OOM情况，程序退出")
+			return
+		}
 
 		// 可选：如果某个条件成立，主动触发垃圾回收
-		 if memStats.Alloc > 100*1024*1024 { // 这里设置当内存分配超过 100 MiB 时，主动触发垃圾回收
-			 fmt.Println("Triggering GC...")
-			 runtime.GC()
-		 }
+		if memStats.Alloc > 300*1024*1024 {
+			fmt.Println("触发GC...")
+			runtime.GC()
+		}
 	}
 }
 
