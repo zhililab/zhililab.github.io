@@ -1,0 +1,34 @@
+@Library('my-shared-library') _
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    // 使用共享库中的 compile 闭包
+                    compile("ZhiProject")
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    // 使用共享库中的 runTests 闭包
+                    runTests("ZhiProject")
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    // 使用共享库中的 deploy 闭包
+                    deploy("ZhiProject", "production-server")
+                }
+            }
+        }
+    }
+}
