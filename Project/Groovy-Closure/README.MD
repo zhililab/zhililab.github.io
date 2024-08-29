@@ -2,7 +2,7 @@
 
 ### **1. 创建共享库**
 
-首先，我们需要在你的 Git 仓库中创建一个共享库。共享库是一个包含 Groovy 脚本的 Git 仓库，这些脚本可以被多个 Jenkins Pipelines 共享。
+首先，我们需要在 Git 仓库中创建一个共享库。共享库是一个包含 Groovy 脚本的 Git 仓库，这些脚本可以被多个 Jenkins Pipelines 共享。
 
 #### **目录结构**
 ```plaintext
@@ -56,7 +56,7 @@ def call(String project, String environment) {
 
 ### **2. 使用共享库**
 
-在你的 Jenkins Pipeline 中，我们可以像使用本地定义的函数一样使用这些共享库函数。
+在 Jenkins Pipeline 中，我们可以像使用本地定义的函数一样使用这些共享库函数。
 
 ```groovy
 // Jenkinsfile
