@@ -11,6 +11,7 @@ categories:
   - AI DevOps
 date: 2026-07-22 17:00:00
 index_img: /assets/images/cover/agentic-devops-research-report.png
+banner_img: /assets/images/cover/agentic-devops-research-report.png
 ---
 
 # Agentic DevOps 调研报告
