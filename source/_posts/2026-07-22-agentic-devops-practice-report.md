@@ -1,5 +1,5 @@
 ---
-title: "Agentic DevOps 落地实践研究报告"
+title: "Agentic DevOps 调研报告"
 author: "ChatGPT Deep Research"
 tags:
   - Agentic DevOps
@@ -10,9 +10,10 @@ tags:
 categories:
   - AI DevOps
 date: 2026-07-22 17:00:00
+index_img: /assets/images/cover/agentic-devops-research-report.png
 ---
 
-# Agentic DevOps 落地实践研究报告
+# Agentic DevOps 调研报告
 
 ## 执行摘要
 
