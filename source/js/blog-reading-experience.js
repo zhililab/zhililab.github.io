@@ -8,6 +8,7 @@ function hasClass(element, className) {
 
 function enhanceTables(root) {
   root.querySelectorAll('.markdown-body table').forEach((table) => {
+    if (typeof table.closest === 'function' && table.closest('figure.highlight')) return;
     if (hasClass(table.parentNode, 'table-scroll')) return;
 
     const wrapper = table.ownerDocument.createElement('div');

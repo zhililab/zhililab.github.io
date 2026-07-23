@@ -67,6 +67,16 @@ function makeTableFixture(columnCount = 7) {
   return { root, table };
 }
 
+test('does not wrap syntax-highlight layout tables as data tables', () => {
+  const { root, table } = makeTableFixture();
+  table.closest = (selector) => selector === 'figure.highlight' ? {} : null;
+
+  enhanceTables(root);
+
+  assert.equal(root.wrapperCount, 0);
+  assert.equal(table.parentNode.className, undefined);
+});
+
 function makeImageFixture() {
   return {
     decoding: 'auto',
