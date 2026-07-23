@@ -70,19 +70,44 @@ function prefetchResponsiveImages(documentObject, windowObject) {
     return false;
   }
 
+  const activate = (image) => {
+    const source = image.parentNode && image.parentNode.querySelector
+      ? image.parentNode.querySelector('source[data-srcset]')
+      : null;
+    if (source && source.dataset && source.dataset.srcset) {
+      source.srcset = source.dataset.srcset;
+    }
+    image.src = image.dataset.src;
+    image.srcset = image.dataset.srcset;
+    image.removeAttribute('data-blog-deferred-image');
+  };
   const prefetch = () => {
     const images = Array.from(documentObject.querySelectorAll(
-      '.markdown-body img[srcset*="/assets/images/optimized/"]'
+      '.markdown-body img[data-blog-deferred-image]'
     )).slice(0, 2);
     const requests = images.map((image) => {
       const request = new windowObject.Image();
+      request.onload = () => activate(image);
+      request.onerror = () => activate(image);
       request.sizes = image.sizes;
-      request.srcset = image.srcset;
+      request.srcset = image.dataset.srcset;
       return request;
     });
     windowObject.__blogImagePrefetches = requests;
   };
   const schedule = () => {
+    if (typeof windowObject.IntersectionObserver === 'function') {
+      const observer = new windowObject.IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          activate(entry.target);
+          observer.unobserve(entry.target);
+        });
+      }, { rootMargin: '200px 0px' });
+      documentObject.querySelectorAll(
+        '.markdown-body img[data-blog-deferred-image]'
+      ).forEach((image) => observer.observe(image));
+    }
     if (typeof windowObject.requestIdleCallback === 'function') {
       windowObject.requestIdleCallback(prefetch, { timeout: 2000 });
       return;

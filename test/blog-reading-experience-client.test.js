@@ -232,19 +232,35 @@ test('loads visitor analytics only after page load and browser idle time', () =>
   );
 });
 
-test('prefetches at most two responsive post images after page load', () => {
+test('loads at most two deferred responsive post images after page load', () => {
   const listeners = [];
   const idleCallbacks = [];
   const created = [];
   const images = Array.from({ length: 3 }, (_, index) => ({
-    srcset: `/assets/images/optimized/image-${index}-640.webp 640w`,
-    sizes: '100vw'
+    dataset: {
+      src: `/assets/images/posts/image-${index}.png`,
+      srcset: `/assets/images/optimized/image-${index}-640.webp 640w`
+    },
+    sizes: '100vw',
+    parentNode: {
+      querySelector() {
+        return {
+          dataset: {
+            srcset: `/assets/images/optimized/image-${index}-640.webp 640w`
+          },
+          srcset: ''
+        };
+      }
+    },
+    removeAttribute(name) {
+      this.removedAttribute = name;
+    }
   }));
   const document = {
     querySelectorAll(selector) {
       assert.equal(
         selector,
-        '.markdown-body img[srcset*="/assets/images/optimized/"]'
+        '.markdown-body img[data-blog-deferred-image]'
       );
       return images;
     }
@@ -253,6 +269,13 @@ test('prefetches at most two responsive post images after page load', () => {
     Image: class {
       constructor() {
         created.push(this);
+      }
+      set srcset(value) {
+        this._srcset = value;
+        if (typeof this.onload === 'function') this.onload();
+      }
+      get srcset() {
+        return this._srcset;
       }
     },
     addEventListener(name, handler) {
@@ -268,6 +291,10 @@ test('prefetches at most two responsive post images after page load', () => {
   idleCallbacks[0]();
 
   assert.equal(created.length, 2);
-  assert.equal(created[0].srcset, images[0].srcset);
+  assert.equal(created[0].srcset, images[0].dataset.srcset);
   assert.equal(created[1].sizes, images[1].sizes);
+  assert.equal(images[0].src, images[0].dataset.src);
+  assert.equal(images[0].srcset, images[0].dataset.srcset);
+  assert.equal(images[0].removedAttribute, 'data-blog-deferred-image');
+  assert.equal(images[2].src, undefined);
 });

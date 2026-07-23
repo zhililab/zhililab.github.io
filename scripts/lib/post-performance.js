@@ -3,6 +3,7 @@
 const RESPONSIVE_WIDTHS = [640, 960, 1440];
 const LOCAL_IMAGE_PATTERN = /^\/assets\/images\//;
 const RASTER_FORMATS = new Set(['jpeg', 'jpg', 'png', 'webp', 'avif', 'tiff']);
+const IMAGE_PLACEHOLDER = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22/%3E';
 
 const DEPENDENCY_REPLACEMENTS = new Map([
   [
@@ -157,12 +158,17 @@ async function rewritePostImages(html, options) {
       'sizes',
       '(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px'
     );
-    image = setAttribute(image, 'srcset', sourceSet);
+    const fallback = image;
+    image = setAttribute(image, 'data-blog-deferred-image', 'true');
+    image = setAttribute(image, 'data-src', source);
+    image = setAttribute(image, 'data-srcset', sourceSet);
+    image = setAttribute(image, 'src', IMAGE_PLACEHOLDER);
     return [
       '<picture>',
-      `<source type="image/webp" srcset="${sourceSet}" sizes="${getAttribute(image, 'sizes')}">`,
+      `<source type="image/webp" data-srcset="${sourceSet}" sizes="${getAttribute(image, 'sizes')}">`,
       image,
-      '</picture>'
+      '</picture>',
+      `<noscript>${fallback}</noscript>`
     ].join('');
   });
 }

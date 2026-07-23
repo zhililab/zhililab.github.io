@@ -47,7 +47,11 @@ test('rewrites a local raster image as responsive WebP with stable dimensions', 
   assert.match(output, /loading="lazy"/);
   assert.match(output, /decoding="async"/);
   assert.match(output, /fetchpriority="low"/);
-  assert.match(output, new RegExp(`src="${LARGE_IMAGE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`));
+  assert.match(output, /data-blog-deferred-image/);
+  assert.match(output, new RegExp(`data-src="${LARGE_IMAGE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`));
+  assert.match(output, /src="data:image\/svg\+xml,/);
+  assert.match(output, /data-srcset="[^"]*kubernetes-pod-creation-sequence-diagram-640\.webp 640w/);
+  assert.match(output, /<noscript><img\b[^>]*src="\/assets\/images\/posts\/kubernetes-pod-creation-sequence-diagram\.png"/);
   assert.doesNotMatch(output, /srcset="\/img\/loading\.gif"/);
   assert.doesNotMatch(output, /\slazyload(?:\s|>)/);
   assert.deepEqual(emitted.map((item) => item.width), [640, 960, 1440]);

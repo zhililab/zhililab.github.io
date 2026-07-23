@@ -64,15 +64,17 @@ test('Kubernetes article uses the cached sequence diagram image', () => {
 
   assert.match(
     html,
-    /<picture>[\s\S]*src="\/assets\/images\/posts\/kubernetes-pod-creation-sequence-diagram\.png"/
+    /<picture>[\s\S]*data-src="\/assets\/images\/posts\/kubernetes-pod-creation-sequence-diagram\.png"/
   );
   assert.match(html, /kubernetes-pod-creation-sequence-diagram-640\.webp 640w/);
   assert.match(html, /kubernetes-pod-creation-sequence-diagram-960\.webp 960w/);
   assert.match(html, /kubernetes-pod-creation-sequence-diagram-1440\.webp 1440w/);
   assert.match(
     html,
-    /<img\b[^>]*src="\/assets\/images\/posts\/kubernetes-pod-creation-sequence-diagram\.png"[^>]*srcset="[^"]*kubernetes-pod-creation-sequence-diagram-640\.webp/
+    /<img\b[^>]*data-src="\/assets\/images\/posts\/kubernetes-pod-creation-sequence-diagram\.png"[^>]*data-srcset="[^"]*kubernetes-pod-creation-sequence-diagram-640\.webp/
   );
+  assert.match(html, /data-blog-deferred-image/);
+  assert.match(html, /src="data:image\/svg\+xml,/);
   assert.match(html, /width="4558"/);
   assert.match(html, /height="3602"/);
   assert.match(html, /loading="lazy"/);
