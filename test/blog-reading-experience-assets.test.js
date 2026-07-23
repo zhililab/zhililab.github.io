@@ -30,6 +30,18 @@ test('CSS contains scoped table overflow and mobile pet hiding', () => {
   assert.match(css, /max-width:\s*991\.98px[\s\S]*#blog-pet[\s\S]*display:\s*none/);
 });
 
+test('wide tables use a bounded readable canvas instead of intrinsic max-content width', () => {
+  const css = read('source/css/blog-reading-experience.css');
+  const tableRule = css.match(/\.markdown-body \.table-scroll > table\s*\{([^}]*)\}/);
+  const cellRule = css.match(/\.table-scroll td\s*\{([^}]*)\}/);
+
+  assert.ok(tableRule, 'missing scroll table rule');
+  assert.ok(cellRule, 'missing table cell rule');
+  assert.match(tableRule[1], /width:\s*100%/);
+  assert.doesNotMatch(tableRule[1], /max-content/);
+  assert.match(cellRule[1], /overflow-wrap:\s*anywhere/);
+});
+
 test('CSS gives the post and sidebar the specified responsive widths', () => {
   const css = read('source/css/blog-reading-experience.css');
 
