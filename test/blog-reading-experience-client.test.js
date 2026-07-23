@@ -3,6 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
+  deferAnalytics,
   enhanceImages,
   enhanceTables,
   initMermaid,
@@ -184,4 +185,48 @@ test('clicking the desktop pet reveals then hides its status bubble', () => {
 
   fixture.runTimer();
   assert.equal(fixture.pet.classList.contains('is-speaking'), false);
+});
+
+test('loads visitor analytics only after page load and browser idle time', () => {
+  const listeners = [];
+  const idleCallbacks = [];
+  const appended = [];
+  const document = {
+    createElement(tagName) {
+      assert.equal(tagName, 'script');
+      return { async: false, src: '' };
+    },
+    head: {
+      appendChild(node) {
+        appended.push(node);
+      }
+    }
+  };
+  const window = {
+    addEventListener(name, handler, options) {
+      listeners.push({ name, handler, options });
+    },
+    requestIdleCallback(handler, options) {
+      idleCallbacks.push({ handler, options });
+    }
+  };
+
+  assert.equal(deferAnalytics(document, window), true);
+  assert.equal(appended.length, 0);
+  assert.equal(listeners.length, 1);
+  assert.equal(listeners[0].name, 'load');
+  assert.deepEqual(listeners[0].options, { once: true });
+
+  listeners[0].handler();
+  assert.equal(appended.length, 0);
+  assert.equal(idleCallbacks.length, 1);
+  assert.equal(idleCallbacks[0].options.timeout, 3000);
+
+  idleCallbacks[0].handler();
+  assert.equal(appended.length, 1);
+  assert.equal(appended[0].async, true);
+  assert.equal(
+    appended[0].src,
+    'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js'
+  );
 });

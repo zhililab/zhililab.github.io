@@ -6,6 +6,8 @@
     "build": "hexo generate",
     "clean": "hexo clean",
     "deploy": "hexo deploy",
+    "measure:performance": "node tools/measure-blog-performance.js",
+    "serve:public": "node tools/serve-public.js",
     "server": "hexo server",
     "test": "node --test test/*.test.js"
   },
@@ -13,7 +15,12 @@
     "version": "6.3.0"
   },
   "dependencies": {
+    "@fancyapps/fancybox": "3.5.7",
+    "anchor-js": "4.3.1",
+    "bootstrap": "4.6.1",
+    "clipboard": "2.0.11",
     "css": "^3.0.0",
+    "github-markdown-css": "4.0.0",
     "hexo": "^6.3.0",
     "hexo-admin": "^2.3.0",
     "hexo-deployer-git": "^4.0.0",
@@ -25,6 +32,13 @@
     "hexo-renderer-marked": "^6.0.0",
     "hexo-renderer-stylus": "^3.0.0",
     "hexo-server": "^3.0.0",
-    "hexo-theme-landscape": "^1.0.0"
+    "hexo-theme-landscape": "^1.0.0",
+    "hint.css": "2.7.0",
+    "jquery": "3.6.0",
+    "sharp": "0.34.3",
+    "tocbot": "4.18.2"
+  },
+  "devDependencies": {
+    "playwright-core": "1.61.1"
   }
 }

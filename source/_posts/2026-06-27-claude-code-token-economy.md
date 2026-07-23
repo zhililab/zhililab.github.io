@@ -9,6 +9,7 @@ tags:
 categories:
   - 技术
 index_img: /assets/images/cover/claude-code-token-economy.svg
+banner_img: /assets/images/cover/claude-code-token-economy.svg
 date: 2026-06-27 08:43:46
 updated: 2026-06-27 08:43:46
 ---

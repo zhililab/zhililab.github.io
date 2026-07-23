@@ -24,6 +24,14 @@ const kubernetesArticlePath = path.join(
   '2026-07-23-kubernetes-pod-creation-workflow',
   'index.html'
 );
+const claudeArticlePath = path.join(
+  publicRoot,
+  '2026',
+  '06',
+  '27',
+  '2026-06-27-claude-code-token-economy',
+  'index.html'
+);
 
 function read(file) {
   return fs.readFileSync(file, 'utf8');
@@ -56,11 +64,52 @@ test('Kubernetes article uses the cached sequence diagram image', () => {
 
   assert.match(
     html,
-    /src="\/assets\/images\/posts\/kubernetes-pod-creation-sequence-diagram\.png"/
+    /<picture>[\s\S]*src="\/assets\/images\/posts\/kubernetes-pod-creation-sequence-diagram\.png"/
   );
+  assert.match(html, /kubernetes-pod-creation-sequence-diagram-640\.webp 640w/);
+  assert.match(html, /kubernetes-pod-creation-sequence-diagram-960\.webp 960w/);
+  assert.match(html, /kubernetes-pod-creation-sequence-diagram-1440\.webp 1440w/);
+  assert.match(
+    html,
+    /<img\b[^>]*src="\/assets\/images\/posts\/kubernetes-pod-creation-sequence-diagram\.png"[^>]*srcset="[^"]*kubernetes-pod-creation-sequence-diagram-640\.webp/
+  );
+  assert.match(html, /width="4558"/);
+  assert.match(html, /height="3602"/);
+  assert.match(html, /loading="lazy"/);
   assert.match(html, /alt="Kubernetes Pod 从创建到 Ready 的完整时序图"/);
+  assert.doesNotMatch(html, /srcset="\/img\/loading\.gif"/);
   assert.doesNotMatch(html, /mermaid\.min\.js/);
   assert.doesNotMatch(html, /sequenceDiagram/);
+});
+
+test('rendered post has one high-priority banner preload and no blocking CDN styles', () => {
+  const html = read(kubernetesArticlePath);
+  const externalStyles = Array.from(
+    html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/gi)
+  ).map((match) => match[1]).filter((url) => /^https?:|^\/\//.test(url));
+
+  assert.equal((html.match(/data-post-banner-preload/g) || []).length, 1);
+  assert.match(html, /rel="preload" as="image"[^>]*fetchpriority="high"/);
+  assert.deepEqual(externalStyles, []);
+  assert.doesNotMatch(html, /NProgress/);
+  assert.doesNotMatch(html, /busuanzi\.pure\.mini\.js/);
+});
+
+test('Claude article uses its compact SVG as the detail-page banner', () => {
+  const html = read(claudeArticlePath);
+
+  assert.match(
+    html,
+    /data-post-banner-preload[^>]*|rel="preload" as="image"[^>]*claude-code-token-economy\.svg/
+  );
+  assert.match(
+    html,
+    /id="banner"[\s\S]{0,500}claude-code-token-economy\.svg/
+  );
+  assert.doesNotMatch(
+    html,
+    /id="banner"[\s\S]{0,500}\/img\/default\.png/
+  );
 });
 
 test('rendered home page does not contain the post pet', () => {

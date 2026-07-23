@@ -30,6 +30,35 @@ function enhanceImages(root) {
   });
 }
 
+function deferAnalytics(documentObject, windowObject) {
+  if (
+    !documentObject ||
+    !documentObject.head ||
+    typeof documentObject.createElement !== 'function' ||
+    !windowObject ||
+    typeof windowObject.addEventListener !== 'function'
+  ) {
+    return false;
+  }
+
+  const loadScript = () => {
+    const script = documentObject.createElement('script');
+    script.async = true;
+    script.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+    documentObject.head.appendChild(script);
+  };
+  const schedule = () => {
+    if (typeof windowObject.requestIdleCallback === 'function') {
+      windowObject.requestIdleCallback(loadScript, { timeout: 3000 });
+      return;
+    }
+    windowObject.setTimeout(loadScript, 1500);
+  };
+
+  windowObject.addEventListener('load', schedule, { once: true });
+  return true;
+}
+
 function initMermaid(documentObject, windowObject, attempt = 0) {
   const diagrams = documentObject.querySelectorAll(
     '.mermaid:not([data-processed="true"])'
@@ -79,10 +108,12 @@ function boot(documentObject, windowObject) {
   enhanceImages(documentObject);
   initMermaid(documentObject, windowObject);
   initPet(documentObject, windowObject);
+  deferAnalytics(documentObject, windowObject);
 }
 
 const api = {
   boot,
+  deferAnalytics,
   enhanceImages,
   enhanceTables,
   initMermaid,
