@@ -9,7 +9,6 @@ categories:
 date: 2026-07-23 23:48:27
 index_img: /assets/images/cover/Kubernetes-logo.webp
 banner_img: /assets/images/cover/Kubernetes-logo.webp
-mermaid: true
 ---
 
 最近在工作中遇到了一次 Kubernetes Toolchain 挂载问题，涉及 Linux 文件系统、Kubernetes 集群、Volume 挂载、Mount Options、节点环境差异等多个层面。
@@ -534,57 +533,7 @@ kube-proxy / CNI 数据面
 
 ## 五、Pod 创建全过程时序图
 
-```mermaid
-sequenceDiagram
-    participant User as User
-    participant Kubectl as kubectl
-    participant API as kube-apiserver
-    participant ETCD as etcd
-    participant Scheduler as kube-scheduler
-    participant Kubelet as kubelet
-    participant CSI as CSI / Mount
-    participant Runtime as Container Runtime
-    participant CNI as CNI
-    participant EPS as EndpointSlice Controller
-
-    User->>Kubectl: Apply Pod YAML
-    Kubectl->>API: POST /api/v1/namespaces/{ns}/pods
-
-    API->>API: Authentication
-    API->>API: Authorization
-    API->>API: Admission Control
-    API->>ETCD: Persist Pod Spec
-    API-->>Kubectl: Return Pod Object
-
-    Scheduler->>API: Watch unscheduled Pods
-    API-->>Scheduler: Pod with empty nodeName
-    Scheduler->>Scheduler: Filter + Score
-    Scheduler->>API: Bind Pod to Node
-    API->>ETCD: Persist binding result
-
-    Kubelet->>API: Watch Pods assigned to this Node
-    API-->>Kubelet: Assigned Pod Spec
-    Kubelet->>Kubelet: SyncPod
-
-    Kubelet->>CSI: Attach / Mount Volume
-    CSI-->>Kubelet: Volume ready
-
-    Kubelet->>Runtime: RunPodSandbox
-    Runtime->>CNI: Configure Pod Network
-    CNI-->>Runtime: Pod network ready
-
-    Kubelet->>Runtime: Pull Image
-    Kubelet->>Runtime: CreateContainer
-    Kubelet->>Runtime: StartContainer
-    Runtime-->>Kubelet: Container running
-
-    Kubelet->>Kubelet: Execute startup/liveness/readiness probes
-    Kubelet->>API: Update Pod Status and Conditions
-    API->>ETCD: Persist Pod Status
-
-    EPS->>API: Watch Service and Pod changes
-    EPS->>API: Update EndpointSlice
-```
+![Kubernetes Pod 从创建到 Ready 的完整时序图](/assets/images/posts/kubernetes-pod-creation-sequence-diagram.png)
 
 推荐结合源码分析工具继续阅读：
 

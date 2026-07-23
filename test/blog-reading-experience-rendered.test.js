@@ -51,12 +51,16 @@ test('rendered enhancement assets exist and remain compact', () => {
   assert.ok(fs.statSync(css).size + fs.statSync(js).size < 20 * 1024);
 });
 
-test('Kubernetes article loads Mermaid and keeps sequence source renderable', () => {
+test('Kubernetes article uses the cached sequence diagram image', () => {
   const html = read(kubernetesArticlePath);
 
-  assert.match(html, /<code class="[^"]*mermaid[^"]*">sequenceDiagram/);
-  assert.match(html, /mermaid\.min\.js/);
-  assert.match(html, /mermaid\.initialize/);
+  assert.match(
+    html,
+    /src="\/assets\/images\/posts\/kubernetes-pod-creation-sequence-diagram\.png"/
+  );
+  assert.match(html, /alt="Kubernetes Pod 从创建到 Ready 的完整时序图"/);
+  assert.doesNotMatch(html, /mermaid\.min\.js/);
+  assert.doesNotMatch(html, /sequenceDiagram/);
 });
 
 test('rendered home page does not contain the post pet', () => {
