@@ -3,14 +3,12 @@ title: "从一次 K8s Toolchain 挂载故障，重新理解 Pod 从创建到 Rea
 author: "Zhi Li"
 tags:
   - Kubernetes
-  - Pod
-  - kubelet
-  - CSI
-  - SRE
+  - Linux
 categories:
   - 技术
 date: 2026-07-23 23:48:27
 index_img: /assets/images/cover/Kubernetes-logo.webp
+banner_img: /assets/images/cover/Kubernetes-logo.webp
 ---
 
 最近在工作中遇到了一次 Kubernetes Toolchain 挂载问题，涉及 Linux 文件系统、Kubernetes 集群、Volume 挂载、Mount Options、节点环境差异等多个层面。
@@ -378,7 +376,7 @@ CNI 负责为 Pod 准备网络，例如：
 - 建立 veth；
 - 应用 NetworkPolicy 相关能力。
 
-因此，当 Pod 长时间处于 `ContainerCreating` 时，问题不一定是镜像拉取，也可能是 CNI 网络配置失败。
+因此，当 Pod 长时间处于 `ContainerCreating` 时，问题不一定是镜像拉取，也可能是 CNI 网络配置失败（例如，网络插件未加载、网络命名空间未创建等）。
 
 #### 4.5.3 CSI：Container Storage Interface
 
@@ -426,6 +424,23 @@ Mount Options
 - I/O 延迟；
 - 节点内核版本；
 - 容器运行时差异。
+
+延伸本次 Toolchain 挂载缓存问题：Pod 重建本身不会 自动刷新 Linux 内核级的 NFS 属性缓存。但是，Pod 重建触发的 CSI Unstage/Stage 流程会强制刷新缓存（前提是 CSI 驱动正确实现了卸载再挂载）。
+
+为了方便理解，这里大致写了 POD Create/Delete CSI 相关调用流程：
+```
+Pod Delete → Kubelet 调用:
+  1. CSI NodeUnpublishVolume  ← 解除 bind mount（容器视角）
+  2. CSI NodeUnstageVolume    ← 执行 umount（节点视角）
+
+Pod Create → Kubelet 调用:
+  3. CSI NodeStageVolume      ← 执行 mount -t nfs ...
+  4. CSI NodePublishVolume    ← 创建 bind mount
+```
+
+说明：
+1. 如果 Step 2 成功执行了 umount → 内核释放 superblock → Step 3 的 mount 建立全新会话 → 缓存彻底刷新 ✅
+2. 如果 Step 2 因 "device busy" 失败 → 旧 mount 仍存活 → Step 3 可能复用旧 superblock 或直接报错 → 缓存未刷新 ❌
 
 ### 4.6 Pod Ready 到底是怎么来的
 
@@ -706,8 +721,7 @@ kubectl get nodes -o wide
 kubectl describe node <node-name>
 ```
 
-
-## 8.2 ContainerCreating
+### 8.2 ContainerCreating
 
 ```text
 ContainerCreating
