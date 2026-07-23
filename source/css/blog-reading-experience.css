@@ -1,0 +1,204 @@
+.blog-post-enhanced #board-ctn {
+  width: 100%;
+  max-width: none;
+}
+
+.blog-post-enhanced .post-content {
+  padding-right: clamp(1rem, 3vw, 3.5rem);
+  padding-left: clamp(1rem, 3vw, 3.5rem);
+}
+
+.blog-post-enhanced .table-scroll {
+  width: 100%;
+  max-width: 100%;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border: 1px solid var(--line-color);
+  border-radius: 0.5rem;
+  overscroll-behavior-inline: contain;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+
+.blog-post-enhanced .table-scroll:focus-visible {
+  outline: 3px solid var(--link-hover-color, #4aa3ff);
+  outline-offset: 3px;
+}
+
+.blog-post-enhanced .markdown-body .table-scroll > table {
+  width: max-content;
+  min-width: 100%;
+  margin: 0;
+  border: 0;
+}
+
+.blog-post-enhanced .markdown-body .table-scroll--wide > table {
+  min-width: 64rem;
+}
+
+.blog-post-enhanced .markdown-body .table-scroll th,
+.blog-post-enhanced .markdown-body .table-scroll td {
+  min-width: 7rem;
+  word-break: normal;
+  overflow-wrap: normal;
+  vertical-align: top;
+}
+
+.blog-post-enhanced .markdown-body .table-scroll th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--board-bg-color);
+}
+
+#blog-pet {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 6.75rem;
+  z-index: 90;
+  display: block;
+  width: 6rem;
+  height: 6.75rem;
+  padding: 0;
+  color: #17377d;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  filter: drop-shadow(0 0.65rem 0.85rem rgba(19, 43, 91, 0.24));
+  animation: blog-pet-idle 4.8s ease-in-out infinite;
+}
+
+#blog-pet:focus-visible {
+  outline: 3px solid #4ea8ff;
+  outline-offset: 0.3rem;
+  border-radius: 1rem;
+}
+
+.blog-pet__robot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.blog-pet__arm--right {
+  transform-box: fill-box;
+  transform-origin: 10% 90%;
+  transition: transform 180ms ease-out;
+}
+
+#blog-pet:hover .blog-pet__arm--right,
+#blog-pet:focus-visible .blog-pet__arm--right {
+  animation: blog-pet-wave 650ms ease-in-out 2;
+}
+
+.blog-pet__bubble {
+  position: absolute;
+  right: calc(100% - 0.5rem);
+  bottom: 4.35rem;
+  width: max-content;
+  max-width: 12rem;
+  padding: 0.55rem 0.75rem;
+  color: #17315f;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  pointer-events: none;
+  visibility: hidden;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(49, 93, 220, 0.28);
+  border-radius: 0.7rem 0.7rem 0 0.7rem;
+  box-shadow: 0 0.35rem 1rem rgba(19, 43, 91, 0.16);
+  opacity: 0;
+  transform: translateY(0.4rem);
+  transition:
+    opacity 160ms ease-out,
+    transform 160ms ease-out,
+    visibility 160ms;
+}
+
+#blog-pet.is-speaking .blog-pet__bubble {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes blog-pet-idle {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.5deg);
+  }
+  50% {
+    transform: translateY(-0.45rem) rotate(0.5deg);
+  }
+}
+
+@keyframes blog-pet-wave {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(-28deg);
+  }
+}
+
+@media (min-width: 992px) {
+  .blog-post-enhanced main > .container-fluid > .row > .side-col:first-child {
+    display: none !important;
+  }
+
+  .blog-post-enhanced main > .container-fluid > .row > .col-lg-8 {
+    flex: 0 0 75%;
+    max-width: 75%;
+  }
+
+  .blog-post-enhanced main > .container-fluid > .row > .side-col:last-child {
+    display: block !important;
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .blog-post-enhanced main > .container-fluid > .row > .col-lg-8 {
+    flex: 0 0 83.333333%;
+    max-width: 83.333333%;
+  }
+
+  .blog-post-enhanced main > .container-fluid > .row > .side-col:last-child {
+    flex: 0 0 16.666667%;
+    max-width: 16.666667%;
+  }
+}
+
+@media (max-width: 991.98px) {
+  #blog-pet {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #blog-pet,
+  #blog-pet .blog-pet__arm,
+  #blog-pet .blog-pet__bubble {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media print {
+  #blog-pet {
+    display: none;
+  }
+
+  .blog-post-enhanced .table-scroll {
+    overflow: visible;
+    border: 0;
+  }
+
+  .blog-post-enhanced .markdown-body .table-scroll--wide > table {
+    width: 100%;
+    min-width: 0;
+  }
+}
