@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const sharp = require('sharp');
 const {
-  addBannerPreload,
+  optimizePostBanner,
   rewritePostDependencies,
   rewriteSharedDependencies,
   rewritePostImages,
@@ -153,7 +153,22 @@ function createAssetPipeline(hexoInstance) {
       const imageRoutes = await generateImageRoutes();
       return [...vendorRoutes(hexoInstance), ...imageRoutes];
     },
-    imageApi
+    imageApi,
+    async loadBanner(url) {
+      const sourcePath = sourcePathForUrl(hexoInstance, url);
+      const buffer = await fs.promises.readFile(sourcePath);
+      if (buffer.length > 48 * 1024) return null;
+      const mime = new Map([
+        ['.avif', 'image/avif'],
+        ['.gif', 'image/gif'],
+        ['.jpg', 'image/jpeg'],
+        ['.jpeg', 'image/jpeg'],
+        ['.png', 'image/png'],
+        ['.svg', 'image/svg+xml'],
+        ['.webp', 'image/webp']
+      ]).get(path.extname(sourcePath).toLowerCase());
+      return mime ? { buffer, mime } : null;
+    }
   };
 }
 
@@ -172,7 +187,9 @@ function register(hexoInstance, options = {}) {
       if (!isPost(data)) return rewriteSharedDependencies(html);
 
       let output = rewritePostDependencies(html);
-      output = addBannerPreload(output);
+      output = await optimizePostBanner(output, {
+        loadBanner: pipeline.loadBanner
+      });
       output = await rewritePostImages(output, pipeline.imageApi);
       return output;
     },

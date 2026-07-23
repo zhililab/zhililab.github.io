@@ -6,6 +6,7 @@ const assert = require('node:assert/strict');
 const {
   addBannerPreload,
   extractLocalBanner,
+  optimizePostBanner,
   rewritePostDependencies,
   rewritePostImages
 } = require('../scripts/lib/post-performance');
@@ -107,6 +108,28 @@ test('extracts and preloads one local post banner', () => {
   assert.match(once, /rel="preload" as="image"/);
   assert.match(once, /fetchpriority="high"/);
   assert.equal((twice.match(/data-post-banner-preload/g) || []).length, 1);
+});
+
+test('inlines a compact local banner and removes its network preload', async () => {
+  const html = [
+    '<html><head></head><body>',
+    '<div id="banner" style="background: url(\'/assets/images/cover/compact.webp\') no-repeat center">',
+    '</div></body></html>'
+  ].join('');
+  const output = await optimizePostBanner(html, {
+    loadBanner: async (url) => {
+      assert.equal(url, '/assets/images/cover/compact.webp');
+      return {
+        mime: 'image/webp',
+        buffer: Buffer.from('compact-banner')
+      };
+    }
+  });
+
+  assert.match(output, /data-post-banner-inline/);
+  assert.match(output, /data:image\/webp;base64,/);
+  assert.doesNotMatch(output, /data-post-banner-preload/);
+  assert.doesNotMatch(output, /url\(['"]\/assets\/images\/cover\/compact\.webp/);
 });
 
 test('rewrites blocking post dependencies to same-origin assets', () => {

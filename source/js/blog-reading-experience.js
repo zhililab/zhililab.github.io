@@ -59,6 +59,41 @@ function deferAnalytics(documentObject, windowObject) {
   return true;
 }
 
+function prefetchResponsiveImages(documentObject, windowObject) {
+  if (
+    !documentObject ||
+    typeof documentObject.querySelectorAll !== 'function' ||
+    !windowObject ||
+    typeof windowObject.addEventListener !== 'function' ||
+    typeof windowObject.Image !== 'function'
+  ) {
+    return false;
+  }
+
+  const prefetch = () => {
+    const images = Array.from(documentObject.querySelectorAll(
+      '.markdown-body img[srcset*="/assets/images/optimized/"]'
+    )).slice(0, 2);
+    const requests = images.map((image) => {
+      const request = new windowObject.Image();
+      request.sizes = image.sizes;
+      request.srcset = image.srcset;
+      return request;
+    });
+    windowObject.__blogImagePrefetches = requests;
+  };
+  const schedule = () => {
+    if (typeof windowObject.requestIdleCallback === 'function') {
+      windowObject.requestIdleCallback(prefetch, { timeout: 2000 });
+      return;
+    }
+    windowObject.setTimeout(prefetch, 500);
+  };
+
+  windowObject.addEventListener('load', schedule, { once: true });
+  return true;
+}
+
 function initMermaid(documentObject, windowObject, attempt = 0) {
   const diagrams = documentObject.querySelectorAll(
     '.mermaid:not([data-processed="true"])'
@@ -109,6 +144,7 @@ function boot(documentObject, windowObject) {
   initMermaid(documentObject, windowObject);
   initPet(documentObject, windowObject);
   deferAnalytics(documentObject, windowObject);
+  prefetchResponsiveImages(documentObject, windowObject);
 }
 
 const api = {
@@ -117,7 +153,8 @@ const api = {
   enhanceImages,
   enhanceTables,
   initMermaid,
-  initPet
+  initPet,
+  prefetchResponsiveImages
 };
 
 if (typeof module !== 'undefined' && module.exports) {

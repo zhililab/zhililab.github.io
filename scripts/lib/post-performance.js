@@ -187,6 +187,30 @@ function addBannerPreload(html) {
   return html.replace(/<\/head>/i, `  ${preload}\n</head>`);
 }
 
+async function optimizePostBanner(html, options = {}) {
+  const banner = extractLocalBanner(html);
+  if (!banner || typeof options.loadBanner !== 'function') {
+    return addBannerPreload(html);
+  }
+
+  const asset = await options.loadBanner(banner);
+  if (!asset || !asset.buffer || !asset.mime) {
+    return addBannerPreload(html);
+  }
+
+  const dataUrl = `data:${asset.mime};base64,${asset.buffer.toString('base64')}`;
+  const escapedBanner = banner.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  let output = html.replace(
+    new RegExp(`url\\((["']?)${escapedBanner}\\1\\)`, 'i'),
+    `url('${dataUrl}')`
+  );
+  output = output.replace(
+    /id=(["'])banner\1/i,
+    'id="banner" data-post-banner-inline'
+  );
+  return output;
+}
+
 function removeNprogress(html) {
   let output = html.replace(
     /\s*<(?:script|link)\b[^>]*(?:src|href)=(["'])https:\/\/lib\.baomitu\.com\/nprogress\/0\.2\.0\/[^"']+\1[^>]*>(?:\s*<\/script>)?/gi,
@@ -220,6 +244,7 @@ module.exports = {
   DEPENDENCY_REPLACEMENTS,
   addBannerPreload,
   extractLocalBanner,
+  optimizePostBanner,
   rewritePostDependencies,
   rewriteSharedDependencies,
   rewritePostImages,

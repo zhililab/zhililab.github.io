@@ -82,14 +82,15 @@ test('Kubernetes article uses the cached sequence diagram image', () => {
   assert.doesNotMatch(html, /sequenceDiagram/);
 });
 
-test('rendered post has one high-priority banner preload and no blocking CDN styles', () => {
+test('rendered post inlines its compact banner and has no blocking CDN styles', () => {
   const html = read(kubernetesArticlePath);
   const externalStyles = Array.from(
     html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/gi)
   ).map((match) => match[1]).filter((url) => /^https?:|^\/\//.test(url));
 
-  assert.equal((html.match(/data-post-banner-preload/g) || []).length, 1);
-  assert.match(html, /rel="preload" as="image"[^>]*fetchpriority="high"/);
+  assert.equal((html.match(/data-post-banner-inline/g) || []).length, 1);
+  assert.match(html, /data:image\/webp;base64,/);
+  assert.doesNotMatch(html, /data-post-banner-preload/);
   assert.deepEqual(externalStyles, []);
   assert.doesNotMatch(html, /NProgress/);
   assert.doesNotMatch(html, /busuanzi\.pure\.mini\.js/);
@@ -100,11 +101,11 @@ test('Claude article uses its compact SVG as the detail-page banner', () => {
 
   assert.match(
     html,
-    /data-post-banner-preload[^>]*|rel="preload" as="image"[^>]*claude-code-token-economy\.svg/
+    /data-post-banner-inline/
   );
   assert.match(
     html,
-    /id="banner"[\s\S]{0,500}claude-code-token-economy\.svg/
+    /id="banner"[\s\S]{0,500}data:image\/svg\+xml;base64,/
   );
   assert.doesNotMatch(
     html,

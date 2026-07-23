@@ -7,7 +7,8 @@ const {
   enhanceImages,
   enhanceTables,
   initMermaid,
-  initPet
+  initPet,
+  prefetchResponsiveImages
 } = require('../source/js/blog-reading-experience');
 
 function makeClassList(initial = []) {
@@ -229,4 +230,44 @@ test('loads visitor analytics only after page load and browser idle time', () =>
     appended[0].src,
     'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js'
   );
+});
+
+test('prefetches at most two responsive post images after page load', () => {
+  const listeners = [];
+  const idleCallbacks = [];
+  const created = [];
+  const images = Array.from({ length: 3 }, (_, index) => ({
+    srcset: `/assets/images/optimized/image-${index}-640.webp 640w`,
+    sizes: '100vw'
+  }));
+  const document = {
+    querySelectorAll(selector) {
+      assert.equal(
+        selector,
+        '.markdown-body img[srcset*="/assets/images/optimized/"]'
+      );
+      return images;
+    }
+  };
+  const window = {
+    Image: class {
+      constructor() {
+        created.push(this);
+      }
+    },
+    addEventListener(name, handler) {
+      listeners.push({ name, handler });
+    },
+    requestIdleCallback(handler) {
+      idleCallbacks.push(handler);
+    }
+  };
+
+  assert.equal(prefetchResponsiveImages(document, window), true);
+  listeners[0].handler();
+  idleCallbacks[0]();
+
+  assert.equal(created.length, 2);
+  assert.equal(created[0].srcset, images[0].srcset);
+  assert.equal(created[1].sizes, images[1].sizes);
 });
