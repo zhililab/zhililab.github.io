@@ -30,6 +30,26 @@ function enhanceImages(root) {
   });
 }
 
+function initMermaid(documentObject, windowObject, attempt = 0) {
+  const diagrams = documentObject.querySelectorAll(
+    '.mermaid:not([data-processed="true"])'
+  );
+  if (!diagrams.length) return false;
+
+  if (windowObject.mermaid && typeof windowObject.mermaid.init === 'function') {
+    windowObject.mermaid.init(undefined, diagrams);
+    return true;
+  }
+
+  if (attempt < 30 && typeof windowObject.setTimeout === 'function') {
+    windowObject.setTimeout(
+      () => initMermaid(documentObject, windowObject, attempt + 1),
+      200
+    );
+  }
+  return false;
+}
+
 function isDesktop(windowObject) {
   if (typeof windowObject.matchMedia === 'function') {
     return windowObject.matchMedia('(min-width: 992px)').matches;
@@ -57,6 +77,7 @@ function initPet(documentObject, windowObject) {
 function boot(documentObject, windowObject) {
   enhanceTables(documentObject);
   enhanceImages(documentObject);
+  initMermaid(documentObject, windowObject);
   initPet(documentObject, windowObject);
 }
 
@@ -64,6 +85,7 @@ const api = {
   boot,
   enhanceImages,
   enhanceTables,
+  initMermaid,
   initPet
 };
 

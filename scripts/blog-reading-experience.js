@@ -29,6 +29,13 @@ function removePostOnlyTypedScript(html) {
   );
 }
 
+function guardMermaidRefreshCallback(html) {
+  return html.replace(
+    /(Fluid\.utils\.createScript\(['"][^'"]*mermaid\.min\.js['"][\s\S]*?)Fluid\.events\.registerRefreshCallback\(/g,
+    '$1Fluid.events?.registerRefreshCallback?.('
+  );
+}
+
 function petMarkup() {
   return [
     `<button id="blog-pet" type="button" aria-label="和博客机器人打个招呼" aria-describedby="blog-pet-message" ${MARKER}>`,
@@ -57,11 +64,16 @@ function petMarkup() {
 }
 
 function enhancePostHtml(html, data) {
-  if (!isPost(data) || html.includes(`href="${CSS_PATH}"`)) {
+  if (!isPost(data)) {
     return html;
   }
 
-  let output = removePostOnlyTypedScript(html);
+  let output = guardMermaidRefreshCallback(html);
+  if (output.includes(`href="${CSS_PATH}"`)) {
+    return output;
+  }
+
+  output = removePostOnlyTypedScript(output);
   output = addBodyClass(output);
   output = output.replace(
     /<\/head>/i,
@@ -84,5 +96,6 @@ if (typeof hexo !== 'undefined') {
 
 module.exports = {
   enhancePostHtml,
+  guardMermaidRefreshCallback,
   register
 };

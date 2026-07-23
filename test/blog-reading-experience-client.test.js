@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const {
   enhanceImages,
   enhanceTables,
+  initMermaid,
   initPet
 } = require('../source/js/blog-reading-experience');
 
@@ -141,6 +142,27 @@ test('adds async decoding without replacing existing image loading behavior', ()
 
   assert.equal(image.decoding, 'async');
   assert.equal(image.loading, 'lazy');
+});
+
+test('renders pending Mermaid diagrams when the library is available', () => {
+  const diagrams = [{ dataset: {} }];
+  const calls = [];
+  const document = {
+    querySelectorAll(selector) {
+      assert.equal(selector, '.mermaid:not([data-processed="true"])');
+      return diagrams;
+    }
+  };
+  const window = {
+    mermaid: {
+      init(config, nodes) {
+        calls.push({ config, nodes });
+      }
+    }
+  };
+
+  assert.equal(initMermaid(document, window), true);
+  assert.deepEqual(calls, [{ config: undefined, nodes: diagrams }]);
 });
 
 test('does not initialize pet below desktop width', () => {

@@ -4,6 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   enhancePostHtml,
+  guardMermaidRefreshCallback,
   register
 } = require('../scripts/blog-reading-experience');
 
@@ -45,6 +46,26 @@ test('removes typed.js from post output only', () => {
   assert.match(
     enhancePostHtml(html, { page: { layout: 'index' } }),
     /typed\.min\.js/
+  );
+});
+
+test('guards Mermaid refresh registration from Fluid script load races', () => {
+  const html = [
+    '<html><head></head><body>',
+    '<script>',
+    "Fluid.utils.createScript('https://cdn.example/mermaid.min.js', function() {",
+    'Fluid.events.registerRefreshCallback(function() {});',
+    '});',
+    '</script>',
+    '</body></html>'
+  ].join('');
+  const output = enhancePostHtml(html, { page: { layout: 'post' } });
+
+  assert.match(output, /Fluid\.events\?\.registerRefreshCallback\?\.\(/);
+  assert.doesNotMatch(output, /Fluid\.events\.registerRefreshCallback\(/);
+  assert.match(
+    guardMermaidRefreshCallback(html),
+    /Fluid\.events\?\.registerRefreshCallback\?\.\(/
   );
 });
 
