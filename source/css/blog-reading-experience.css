@@ -8,6 +8,18 @@
   padding-left: clamp(1rem, 3vw, 3.5rem);
 }
 
+.blog-post-enhanced figure.highlight td.gutter,
+.blog-post-enhanced figure.highlight td.code {
+  vertical-align: top;
+}
+
+.blog-post-enhanced figure.highlight td.gutter pre,
+.blog-post-enhanced figure.highlight td.code > pre {
+  padding-top: 1.45rem;
+  padding-bottom: 1.45rem;
+  line-height: 1.6;
+}
+
 .blog-post-enhanced .table-scroll {
   width: 100%;
   max-width: 100%;

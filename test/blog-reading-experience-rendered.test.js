@@ -16,6 +16,14 @@ const articlePath = path.join(
   '2026-07-22-agentic-devops-practice-report',
   'index.html'
 );
+const kubernetesArticlePath = path.join(
+  publicRoot,
+  '2026',
+  '07',
+  '23',
+  '2026-07-23-kubernetes-pod-creation-workflow',
+  'index.html'
+);
 
 function read(file) {
   return fs.readFileSync(file, 'utf8');
@@ -41,6 +49,14 @@ test('rendered enhancement assets exist and remain compact', () => {
   assert.ok(fs.statSync(css).size > 0);
   assert.ok(fs.statSync(js).size > 0);
   assert.ok(fs.statSync(css).size + fs.statSync(js).size < 20 * 1024);
+});
+
+test('Kubernetes article loads Mermaid and keeps sequence source renderable', () => {
+  const html = read(kubernetesArticlePath);
+
+  assert.match(html, /<code class="[^"]*mermaid[^"]*">sequenceDiagram/);
+  assert.match(html, /mermaid\.min\.js/);
+  assert.match(html, /mermaid\.initialize/);
 });
 
 test('rendered home page does not contain the post pet', () => {

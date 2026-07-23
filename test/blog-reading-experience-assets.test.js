@@ -59,6 +59,23 @@ test('CSS contains print-safe table and pet behavior', () => {
   assert.match(css, /@media print[\s\S]*\.table-scroll[\s\S]*overflow:\s*visible/);
 });
 
+test('code gutters and code rows use the same vertical rhythm', () => {
+  const css = read('source/css/blog-reading-experience.css');
+  const alignmentRule = css.match(
+    /\.blog-post-enhanced figure\.highlight td\.gutter pre,[\s\S]*?td\.code > pre\s*\{([^}]*)\}/
+  );
+  const cellRule = css.match(
+    /\.blog-post-enhanced figure\.highlight td\.gutter,[\s\S]*?td\.code\s*\{([^}]*)\}/
+  );
+
+  assert.ok(alignmentRule, 'missing shared code gutter alignment rule');
+  assert.ok(cellRule, 'missing shared code cell alignment rule');
+  assert.match(alignmentRule[1], /padding-top:\s*1\.45rem/);
+  assert.match(alignmentRule[1], /padding-bottom:\s*1\.45rem/);
+  assert.match(alignmentRule[1], /line-height:\s*1\.6/);
+  assert.match(cellRule[1], /vertical-align:\s*top/);
+});
+
 test('pet animation keeps the clickable button stationary', () => {
   const css = read('source/css/blog-reading-experience.css');
   const buttonRule = css.match(/#blog-pet\s*\{([^}]*)\}/);

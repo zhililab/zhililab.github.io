@@ -9,6 +9,7 @@ categories:
 date: 2026-07-23 23:48:27
 index_img: /assets/images/cover/Kubernetes-logo.webp
 banner_img: /assets/images/cover/Kubernetes-logo.webp
+mermaid: true
 ---
 
 最近在工作中遇到了一次 Kubernetes Toolchain 挂载问题，涉及 Linux 文件系统、Kubernetes 集群、Volume 挂载、Mount Options、节点环境差异等多个层面。
