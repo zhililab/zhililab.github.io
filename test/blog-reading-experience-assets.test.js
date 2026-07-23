@@ -47,6 +47,26 @@ test('CSS contains print-safe table and pet behavior', () => {
   assert.match(css, /@media print[\s\S]*\.table-scroll[\s\S]*overflow:\s*visible/);
 });
 
+test('pet animation keeps the clickable button stationary', () => {
+  const css = read('source/css/blog-reading-experience.css');
+  const buttonRule = css.match(/#blog-pet\s*\{([^}]*)\}/);
+  const robotRule = css.match(/\.blog-pet__robot\s*\{([^}]*)\}/);
+
+  assert.ok(buttonRule, 'missing #blog-pet rule');
+  assert.ok(robotRule, 'missing .blog-pet__robot rule');
+  assert.doesNotMatch(buttonRule[1], /animation:/);
+  assert.match(robotRule[1], /animation:\s*blog-pet-idle/);
+});
+
+test('pet uses a compact size at the narrow desktop breakpoint', () => {
+  const css = read('source/css/blog-reading-experience.css');
+
+  assert.match(
+    css,
+    /@media \(min-width:\s*992px\) and \(max-width:\s*1199\.98px\)[\s\S]*#blog-pet[\s\S]*width:\s*3\.25rem/
+  );
+});
+
 test('added production assets stay below 30 KB uncompressed', () => {
   const files = [
     'scripts/blog-reading-experience.js',

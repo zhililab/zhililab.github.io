@@ -66,7 +66,6 @@
   background: transparent;
   border: 0;
   filter: drop-shadow(0 0.65rem 0.85rem rgba(19, 43, 91, 0.24));
-  animation: blog-pet-idle 4.8s ease-in-out infinite;
 }
 
 #blog-pet:focus-visible {
@@ -80,6 +79,7 @@
   width: 100%;
   height: 100%;
   overflow: visible;
+  animation: blog-pet-idle 4.8s ease-in-out infinite;
 }
 
 .blog-pet__arm--right {
@@ -160,6 +160,19 @@
   }
 }
 
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  #blog-pet {
+    right: 0.25rem;
+    bottom: 6.25rem;
+    width: 3.25rem;
+    height: 3.75rem;
+  }
+
+  #blog-pet .blog-pet__bubble {
+    bottom: 2.6rem;
+  }
+}
+
 @media (min-width: 1200px) {
   .blog-post-enhanced main > .container-fluid > .row > .col-lg-8 {
     flex: 0 0 83.333333%;
@@ -180,6 +193,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   #blog-pet,
+  #blog-pet .blog-pet__robot,
   #blog-pet .blog-pet__arm,
   #blog-pet .blog-pet__bubble {
     animation: none !important;
