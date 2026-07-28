@@ -3,11 +3,16 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
+  buildSharePayload,
+  buildTextFragmentUrl,
+  copyText,
   deferAnalytics,
   enhanceImages,
   enhanceTables,
   initMermaid,
   initPet,
+  initSelectionShare,
+  normalizeSelection,
   prefetchResponsiveImages
 } = require('../source/js/blog-reading-experience');
 
@@ -307,4 +312,202 @@ test('loads at most two deferred responsive post images after page load', () => 
   assert.equal(images[0].srcset, images[0].dataset.srcset);
   assert.equal(images[0].removedAttribute, 'data-blog-deferred-image');
   assert.equal(images[2].src, undefined);
+});
+
+test('builds a bounded Text Fragment share payload without query parameters', () => {
+  const text = '  Agentic DevOps  '.repeat(40);
+  const location = {
+    origin: 'http://www.zhililab.cn',
+    pathname: '/2026/07/22/article/',
+    search: '?tracking=1'
+  };
+  const payload = buildSharePayload(
+    { title: 'Agentic DevOps 调研报告' },
+    location,
+    text
+  );
+
+  assert.equal(payload.title, 'Agentic DevOps 调研报告');
+  assert.equal(normalizeSelection(text).length <= 280, true);
+  assert.equal(payload.text, `“${normalizeSelection(text)}”`);
+  assert.match(payload.url, /\/2026\/07\/22\/article\/#:~:text=/);
+  assert.doesNotMatch(payload.url, /\?/);
+  assert.equal(
+    payload.url,
+    buildTextFragmentUrl(location, normalizeSelection(text))
+  );
+});
+
+test('copies text with the Clipboard API when available', async () => {
+  const writes = [];
+
+  assert.equal(
+    await copyText(
+      'quoted text',
+      {},
+      { clipboard: { writeText: async (value) => writes.push(value) } }
+    ),
+    true
+  );
+  assert.deepEqual(writes, ['quoted text']);
+});
+
+function makeSelectionShareFixture({ insideArticle = true, share } = {}) {
+  const documentListeners = new Map();
+  const windowListeners = new Map();
+  const appended = [];
+  const clipboardWrites = [];
+
+  class Element {
+    constructor(tagName) {
+      this.tagName = tagName;
+      this.children = [];
+      this.listeners = new Map();
+      this.style = {};
+      this.dataset = {};
+      this.hidden = false;
+      this.attributes = {};
+      this.classList = makeClassList();
+    }
+    appendChild(child) {
+      child.parentNode = this;
+      this.children.push(child);
+      return child;
+    }
+    addEventListener(name, handler) {
+      this.listeners.set(name, handler);
+    }
+    setAttribute(name, value) {
+      this.attributes[name] = value;
+    }
+    contains(node) {
+      return node === this || this.children.includes(node);
+    }
+  }
+
+  const article = new Element('article');
+  article.contains = () => insideArticle;
+  const anchorElement = {
+    closest(selector) {
+      return selector === '.markdown-body' && insideArticle ? article : null;
+    }
+  };
+  const selection = {
+    anchorNode: { parentElement: anchorElement },
+    isCollapsed: false,
+    rangeCount: 1,
+    toString: () => '  状态收敛是 Agentic DevOps 的核心  ',
+    getRangeAt: () => ({
+      getBoundingClientRect: () => ({
+        left: 120,
+        right: 420,
+        top: 300,
+        bottom: 330,
+        width: 300,
+        height: 30
+      })
+    })
+  };
+  const document = {
+    title: 'Agentic DevOps 调研报告',
+    body: {
+      appendChild(node) {
+        appended.push(node);
+      }
+    },
+    createElement: (tagName) => new Element(tagName),
+    querySelector: (selector) => selector === '.markdown-body' ? article : null,
+    addEventListener(name, handler) {
+      documentListeners.set(name, handler);
+    }
+  };
+  const window = {
+    innerWidth: 1024,
+    innerHeight: 768,
+    scrollX: 0,
+    scrollY: 0,
+    location: {
+      origin: 'http://www.zhililab.cn',
+      pathname: '/2026/07/22/article/'
+    },
+    navigator: {
+      share,
+      clipboard: {
+        async writeText(value) {
+          clipboardWrites.push(value);
+        }
+      }
+    },
+    getSelection: () => selection,
+    addEventListener(name, handler) {
+      windowListeners.set(name, handler);
+    },
+    setTimeout(handler) {
+      handler();
+      return 1;
+    },
+    clearTimeout() {}
+  };
+
+  return {
+    article,
+    appended,
+    clipboardWrites,
+    document,
+    documentListeners,
+    selection,
+    window,
+    windowListeners
+  };
+}
+
+test('shows a selection toolbar and uses Web Share for article text', async () => {
+  const shares = [];
+  const fixture = makeSelectionShareFixture({
+    share: async (payload) => shares.push(payload)
+  });
+
+  assert.equal(initSelectionShare(fixture.document, fixture.window), true);
+  fixture.documentListeners.get('mouseup')();
+
+  const toolbar = fixture.appended[0];
+  assert.equal(toolbar.id, 'selection-share-toolbar');
+  assert.equal(toolbar.hidden, false);
+  assert.deepEqual(toolbar.children.map((button) => button.textContent), [
+    '分享',
+    '复制引用'
+  ]);
+
+  await toolbar.children[0].listeners.get('click')();
+  assert.equal(shares.length, 1);
+  assert.match(shares[0].url, /#:~:text=/);
+  assert.match(shares[0].text, /状态收敛/);
+});
+
+test('falls back to copying the quote when Web Share is unavailable', async () => {
+  const fixture = makeSelectionShareFixture();
+
+  initSelectionShare(fixture.document, fixture.window);
+  fixture.documentListeners.get('mouseup')();
+  const toolbar = fixture.appended[0];
+  await toolbar.children[0].listeners.get('click')();
+
+  assert.equal(fixture.clipboardWrites.length, 1);
+  assert.match(fixture.clipboardWrites[0], /状态收敛/);
+  assert.match(fixture.clipboardWrites[0], /Agentic DevOps 调研报告/);
+  assert.match(fixture.clipboardWrites[0], /#:~:text=/);
+});
+
+test('ignores selection outside the article and closes on Escape', () => {
+  const outside = makeSelectionShareFixture({ insideArticle: false });
+  initSelectionShare(outside.document, outside.window);
+  outside.documentListeners.get('mouseup')();
+  assert.equal(outside.appended[0].hidden, true);
+
+  const inside = makeSelectionShareFixture();
+  initSelectionShare(inside.document, inside.window);
+  inside.documentListeners.get('mouseup')();
+  assert.equal(inside.appended[0].hidden, false);
+  inside.documentListeners.get('keydown')({ key: 'Escape' });
+  assert.equal(inside.appended[0].hidden, true);
 });
