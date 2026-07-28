@@ -1,0 +1,38 @@
+services:
+  waline:
+    image: lizheming/waline:1.41.3
+    restart: unless-stopped
+    env_file: ${WALINE_ENV_FILE:-.env}
+    environment:
+      SQLITE_PATH: /app/data
+      SITE_NAME: ZHILI
+      SITE_URL: http://www.zhililab.cn
+      SERVER_URL: https://comments.zhililab.cn
+      SECURE_DOMAINS: www.zhililab.cn,zhililab.cn,comments.zhililab.cn
+      COMMENT_AUDIT: "true"
+      IPQPS: "60"
+      DISABLE_USERAGENT: "true"
+      DISABLE_REGION: "true"
+    volumes:
+      - ./data:/app/data
+    networks:
+      - comments
+
+  caddy:
+    image: caddy:2.10.0-alpine
+    restart: unless-stopped
+    depends_on:
+      - waline
+    ports:
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy-data:/data
+      - ./caddy-config:/config
+    networks:
+      - comments
+
+networks:
+  comments:
+    name: zhililab-comments

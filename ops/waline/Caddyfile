@@ -1,0 +1,4 @@
+comments.zhililab.cn {
+  encode zstd gzip
+  reverse_proxy waline:8360
+}
