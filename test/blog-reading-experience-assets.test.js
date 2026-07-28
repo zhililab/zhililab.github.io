@@ -96,6 +96,30 @@ test('pet uses a compact size at the narrow desktop breakpoint', () => {
   );
 });
 
+test('selection share toolbar is accessible, layered, and motion-safe', () => {
+  const css = read('source/css/blog-reading-experience.css');
+  const toolbarRule = css.match(
+    /\.blog-post-enhanced #selection-share-toolbar\s*\{([^}]*)\}/
+  );
+  const buttonRule = css.match(
+    /\.blog-post-enhanced #selection-share-toolbar button\s*\{([^}]*)\}/
+  );
+
+  assert.ok(toolbarRule, 'missing selection share toolbar rule');
+  assert.ok(buttonRule, 'missing selection share button rule');
+  assert.match(toolbarRule[1], /position:\s*fixed/);
+  assert.match(toolbarRule[1], /z-index:\s*110/);
+  assert.match(buttonRule[1], /min-height:\s*44px/);
+  assert.match(
+    css,
+    /prefers-reduced-motion:\s*reduce[\s\S]*#selection-share-toolbar[\s\S]*transition:\s*none/
+  );
+  assert.match(
+    css,
+    /@media print[\s\S]*#selection-share-toolbar[\s\S]*display:\s*none/
+  );
+});
+
 test('added production assets stay below 30 KB uncompressed', () => {
   const files = [
     'scripts/blog-reading-experience.js',

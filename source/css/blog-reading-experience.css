@@ -64,6 +64,53 @@
   background: var(--board-bg-color);
 }
 
+.blog-post-enhanced #selection-share-toolbar {
+  position: fixed;
+  z-index: 110;
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.3rem;
+  background: rgba(24, 33, 48, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.7rem;
+  box-shadow: 0 0.6rem 1.8rem rgba(10, 20, 36, 0.28);
+  transform: translateX(-50%);
+  transition:
+    opacity 140ms ease-out,
+    transform 140ms ease-out;
+}
+
+.blog-post-enhanced #selection-share-toolbar[hidden] {
+  display: none;
+}
+
+.blog-post-enhanced #selection-share-toolbar button {
+  min-height: 44px;
+  padding: 0.55rem 0.8rem;
+  color: #f7f9fc;
+  font: inherit;
+  font-size: 0.88rem;
+  line-height: 1;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 0.45rem;
+}
+
+.blog-post-enhanced #selection-share-toolbar button:hover,
+.blog-post-enhanced #selection-share-toolbar button:focus-visible {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.blog-post-enhanced #selection-share-toolbar button:focus-visible {
+  outline: 2px solid #63b3ff;
+  outline-offset: 1px;
+}
+
+.blog-post-enhanced #selection-share-toolbar[data-state='copied'] {
+  background: rgba(22, 101, 52, 0.96);
+}
+
 #blog-pet {
   position: fixed;
   right: 1.25rem;
@@ -204,6 +251,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .blog-post-enhanced #selection-share-toolbar,
   #blog-pet,
   #blog-pet .blog-pet__robot,
   #blog-pet .blog-pet__arm,
@@ -214,6 +262,7 @@
 }
 
 @media print {
+  #selection-share-toolbar,
   #blog-pet {
     display: none;
   }
