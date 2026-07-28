@@ -7,6 +7,9 @@ const {
   evaluateBudget,
   parseArguments
 } = require('../scripts/lib/performance-budget');
+const {
+  resolveBrowserExecutable
+} = require('../tools/measure-blog-performance');
 
 test('accepts one or more URLs and rejects missing targets', () => {
   assert.deepEqual(
@@ -45,4 +48,16 @@ test('reports every violated performance threshold', () => {
   assert.match(result.failures.join('\n'), /console/i);
   assert.match(result.failures.join('\n'), /request/i);
   assert.match(result.failures.join('\n'), /image/i);
+});
+
+test('uses Edge when Chrome is unavailable on macOS', () => {
+  const edge =
+    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge';
+  const resolved = resolveBrowserExecutable(
+    {},
+    'darwin',
+    (candidate) => candidate === edge
+  );
+
+  assert.equal(resolved, edge);
 });

@@ -1,15 +1,26 @@
 #!/usr/bin/env node
 'use strict';
 
+const fs = require('node:fs');
 const { chromium } = require('playwright-core');
 const {
   evaluateBudget,
   parseArguments
 } = require('../scripts/lib/performance-budget');
 
-const DEFAULT_CHROME = process.platform === 'darwin'
-  ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-  : undefined;
+function resolveBrowserExecutable(
+  environment = process.env,
+  platform = process.platform,
+  existsSync = fs.existsSync
+) {
+  if (environment.BLOG_CHROME_PATH) return environment.BLOG_CHROME_PATH;
+  if (platform !== 'darwin') return undefined;
+
+  return [
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge'
+  ].find((candidate) => existsSync(candidate));
+}
 
 async function measureUrl(browser, url) {
   const context = await browser.newContext({
@@ -147,7 +158,7 @@ async function measureUrl(browser, url) {
 async function main() {
   const { urls } = parseArguments(process.argv.slice(2));
   const browser = await chromium.launch({
-    executablePath: process.env.BLOG_CHROME_PATH || DEFAULT_CHROME,
+    executablePath: resolveBrowserExecutable(),
     headless: true,
     args: ['--disable-background-networking']
   });
@@ -173,4 +184,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { measureUrl };
+module.exports = { measureUrl, resolveBrowserExecutable };
