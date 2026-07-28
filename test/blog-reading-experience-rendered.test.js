@@ -139,3 +139,12 @@ test('rendered home page does not load Waline assets', () => {
   assert.doesNotMatch(html, /waline\.min\.(?:css|js)/);
   assert.doesNotMatch(html, /comments\.zhililab\.cn/);
 });
+
+test('generated Pages CNAME contains one canonical domain', () => {
+  const domains = read(path.join(publicRoot, 'CNAME'))
+    .split(/\r?\n/)
+    .map((domain) => domain.trim())
+    .filter(Boolean);
+
+  assert.deepEqual(domains, ['www.zhililab.cn']);
+});
