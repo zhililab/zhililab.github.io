@@ -36,3 +36,16 @@ test('deployment example contains no production secret', () => {
   assert.match(envExample, /^JWT_TOKEN=development-only-/m);
   assert.doesNotMatch(envExample, /^[A-Fa-f0-9]{64}$/m);
 });
+
+test('SQLite bootstrap downloads and verifies the official schema template', () => {
+  const bootstrap = read('ops/waline/init-sqlite.sh');
+
+  assert.match(bootstrap, /assets\/waline\.sqlite/);
+  assert.match(
+    bootstrap,
+    /ac08959a80b2756701742d97ad445fab24597428b3bc56e0c87541c4ea8b1b37/
+  );
+  assert.match(bootstrap, /sha256sum/);
+  assert.match(bootstrap, /waline\.sqlite/);
+  assert.doesNotMatch(bootstrap, /rm\s+-rf/);
+});
