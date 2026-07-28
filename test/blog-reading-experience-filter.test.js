@@ -3,6 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
+  enablePostComments,
   enhancePostHtml,
   guardMermaidRefreshCallback,
   register
@@ -69,7 +70,15 @@ test('guards Mermaid refresh registration from Fluid script load races', () => {
   );
 });
 
-test('registers one after_render:html filter', () => {
+test('enables comments by default while preserving an explicit opt-out', () => {
+  assert.equal(enablePostComments({ title: '默认文章' }).comments, true);
+  assert.equal(
+    enablePostComments({ title: '关闭评论', comments: false }).comments,
+    false
+  );
+});
+
+test('registers post defaults and one after_render:html filter', () => {
   const calls = [];
   const hexo = {
     extend: {
@@ -83,7 +92,9 @@ test('registers one after_render:html filter', () => {
 
   register(hexo);
 
-  assert.equal(calls.length, 1);
-  assert.equal(calls[0].name, 'after_render:html');
-  assert.equal(calls[0].handler, enhancePostHtml);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0].name, 'before_post_render');
+  assert.equal(calls[0].handler, enablePostComments);
+  assert.equal(calls[1].name, 'after_render:html');
+  assert.equal(calls[1].handler, enhancePostHtml);
 });

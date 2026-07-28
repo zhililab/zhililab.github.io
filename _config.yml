@@ -118,6 +118,28 @@ theme_config:
       specific: true
       options:
         theme: default
+    comments:
+      enable: true
+      type: waline
+  waline:
+    serverURL: https://comments.zhililab.cn
+    path: window.location.pathname
+    meta:
+      - nick
+      - mail
+      - link
+    requiredMeta:
+      - nick
+    lang: zh-cn
+    emoji: []
+    dark: 'html[data-user-color-scheme="dark"]'
+    wordLimit: 0
+    pageSize: 10
+    placeholder: 评论提交后需审核，审核通过后公开显示
+  lazyload:
+    enable: true
+    onlypost: false
+    offset_factor: 1
 
 ### <skapp theme
 # Sass

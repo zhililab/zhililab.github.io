@@ -121,3 +121,21 @@ test('rendered home page does not contain the post pet', () => {
   assert.doesNotMatch(html, /id="blog-pet"/);
   assert.doesNotMatch(html, /blog-post-enhanced/);
 });
+
+test('rendered article lazy-loads moderated Waline comments', () => {
+  const html = read(articlePath);
+
+  assert.match(html, /<article id="comments"[^>]*>/);
+  assert.match(html, /<div id="waline"><\/div>/);
+  assert.match(html, /https:\/\/comments\.zhililab\.cn/);
+  assert.match(html, /评论提交后需审核，审核通过后公开显示/);
+  assert.match(html, /Fluid\.utils\.loadComments\('#waline'/);
+});
+
+test('rendered home page does not load Waline assets', () => {
+  const html = read(path.join(publicRoot, 'index.html'));
+
+  assert.doesNotMatch(html, /id="waline"/);
+  assert.doesNotMatch(html, /waline\.min\.(?:css|js)/);
+  assert.doesNotMatch(html, /comments\.zhililab\.cn/);
+});

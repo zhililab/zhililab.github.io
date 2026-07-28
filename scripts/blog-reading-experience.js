@@ -14,6 +14,13 @@ function isPost(data) {
   );
 }
 
+function enablePostComments(data) {
+  if (data && data.comments !== false) {
+    data.comments = true;
+  }
+  return data;
+}
+
 function addBodyClass(html) {
   return html.replace(/<body(?:\s+class="([^"]*)")?([^>]*)>/i, (match, classes, rest) => {
     const classNames = new Set((classes || '').split(/\s+/).filter(Boolean));
@@ -87,6 +94,7 @@ function enhancePostHtml(html, data) {
 }
 
 function register(hexoInstance) {
+  hexoInstance.extend.filter.register('before_post_render', enablePostComments);
   hexoInstance.extend.filter.register('after_render:html', enhancePostHtml);
 }
 
@@ -95,6 +103,7 @@ if (typeof hexo !== 'undefined') {
 }
 
 module.exports = {
+  enablePostComments,
   enhancePostHtml,
   guardMermaidRefreshCallback,
   register
