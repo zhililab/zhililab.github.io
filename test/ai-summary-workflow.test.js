@@ -41,9 +41,19 @@ test('AI summary workflow generates draft summaries only for changed posts on de
     'GEMINI_API_KEY must appear only in the generator step'
   );
   assert.equal(
+    (workflow.match(/\$\{\{\s*secrets\.GEMINI_API_KEY\s*\}\}/g) || []).length,
+    1,
+    'the Gemini secret reference must appear only in the generator step'
+  );
+  assert.equal(
     (workflow.match(/GEMINI_MODEL:/g) || []).length,
     1,
     'GEMINI_MODEL must appear only in the generator step'
+  );
+  assert.equal(
+    (workflow.match(/\$\{\{\s*vars\.GEMINI_MODEL\s*\}\}/g) || []).length,
+    1,
+    'the Gemini model variable reference must appear only in the generator step'
   );
   assert.match(workflow, /actions\/setup-node@v\d+/);
   assert.match(workflow, /node-version:\s*['\"]?20['\"]?/);
