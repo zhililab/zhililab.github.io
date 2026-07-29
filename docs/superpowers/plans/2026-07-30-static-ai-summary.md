@@ -106,7 +106,11 @@ Expected: normalization and validation tests PASS.
 test('retries 429 once and forces draft status', async () => {
   const fetchImpl = sequenceFetch([
     response(429, {}),
-    response(200, geminiPayload({ general: '概览', bullets: ['一', '二', '三'], explainer: '解释' }))
+    response(200, geminiPayload({
+      general: '文章围绕平台工程中的统一抽象展开，并严格依据正文概括关键背景、主要论点、工程迁移方式与适用边界，帮助读者在阅读全文前建立准确的内容地图。'.repeat(2),
+      bullets: ['识别正文的核心问题和适用范围', '提炼文章给出的主要工程方法', '保留作者写明的限制与风险边界'],
+      explainer: '可以把文章讨论的方法理解为一张工程地图：先明确目标，再沿着正文给出的证据和步骤行动，同时保留人工判断与失败时的恢复路径。'
+    }))
   ]);
   const result = await requestGeminiSummary({ fetchImpl, apiKey: 'secret', model: 'gemini-3.6-flash', title: '标题', body: '正文', retries: 2 });
   assert.equal(fetchImpl.calls.length, 2);
