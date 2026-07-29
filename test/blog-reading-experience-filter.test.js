@@ -6,6 +6,7 @@ const {
   enablePostComments,
   enhancePostHtml,
   guardMermaidRefreshCallback,
+  injectAiSummary,
   register
 } = require('../scripts/blog-reading-experience');
 
@@ -78,7 +79,7 @@ test('enables comments by default while preserving an explicit opt-out', () => {
   );
 });
 
-test('registers post defaults and one after_render:html filter', () => {
+test('registers post defaults, AI summaries, and one final HTML filter', () => {
   const calls = [];
   const hexo = {
     extend: {
@@ -92,9 +93,11 @@ test('registers post defaults and one after_render:html filter', () => {
 
   register(hexo);
 
-  assert.equal(calls.length, 2);
+  assert.equal(calls.length, 3);
   assert.equal(calls[0].name, 'before_post_render');
   assert.equal(calls[0].handler, enablePostComments);
-  assert.equal(calls[1].name, 'after_render:html');
-  assert.equal(calls[1].handler, enhancePostHtml);
+  assert.equal(calls[1].name, 'after_post_render');
+  assert.equal(calls[1].handler, injectAiSummary);
+  assert.equal(calls[2].name, 'after_render:html');
+  assert.equal(calls[2].handler, enhancePostHtml);
 });
