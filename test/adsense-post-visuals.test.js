@@ -39,6 +39,10 @@ test('AdSense reflection uses one dedicated card and banner cover', async () => 
 
 test('enhanced post pictures preserve their full original composition', () => {
   assert.match(css, /\.blog-post-enhanced \.markdown-body p > picture/);
+  assert.match(
+    css,
+    /\.blog-post-enhanced \.markdown-body p > picture > a > img/
+  );
   assert.match(css, /object-fit:\s*contain/);
   assert.match(css, /width:\s*auto/);
   assert.match(css, /height:\s*auto/);
