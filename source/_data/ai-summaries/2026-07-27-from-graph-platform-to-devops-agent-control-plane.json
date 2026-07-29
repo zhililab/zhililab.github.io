@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "slug": "2026-07-27-from-graph-platform-to-devops-agent-control-plane",
+  "source_hash": "sha256:51caa1e677adf176af3d44135d8ce54147c81753085da4af2a1dfa52d8c3c018",
+  "provider": "google",
+  "model": "gemini-3.6-flash",
+  "generated_at": "2026-07-29T23:36:02.150Z",
+  "status": "draft",
+  "general": "本文通过梳理杨植麟的代表性工作（如图分析平台SAE、多跳问答数据集HotpotQA与预训练模型XLNet），总结出“超越局部优化、寻找统一抽象”的技术演进模式。作者将此思考方式迁移至工程实践，探讨了Kubernetes状态收敛、Central Build变更协调以及DevOps Agent控制平面的设计与治理。",
+  "bullets": [
+    "SAE平台通过将复杂图算法封装成统一分析平台，体现了统一抽象治理复杂系统的模式。",
+    "HotpotQA与XLNet论文分别示范了将多跳证据融入任务定义，以及回到目标与约束重新定义问题的方法。",
+    "作者将学术思考迁移至工程实践，提炼出Kubernetes状态收敛、Central Build变更协调及DevOps Agent控制闭环三个抽象。",
+    "文章总结了包含Why、Abstraction、System、Trade-off与Evolution五个维度的论文阅读与思考模板。"
+  ],
+  "explainer": "这篇文章通过回顾几项经典的技术研究（如社交网络图分析、多文档问答和语言模型），阐述了技术研发中的一种核心思路：遇到复杂难题时，与其对局部细节小修小补，不如设计一套统一的规则和管理框架（即“统一抽象”）。作者还将这种思维运用到软件系统搭建中，解释了如何让复杂的软件自动化和AI工具变得更条理化、可追踪和安全可控。"
+}
