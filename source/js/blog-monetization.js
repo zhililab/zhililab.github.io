@@ -1,3 +1,4 @@
+(function () {
 'use strict';
 
 const scriptPromises = new WeakMap();
@@ -99,17 +100,28 @@ function initControlledAd(documentObject, windowObject) {
     activate();
   };
 
-  windowObject.addEventListener(
-    'scroll',
-    checkViewportProximity,
-    { passive: true }
-  );
-  windowObject.addEventListener(
-    'resize',
-    checkViewportProximity,
-    { passive: true }
-  );
-  checkViewportProximity();
+  let fallbackStarted = false;
+  const startFallback = () => {
+    if (fallbackStarted) return;
+    fallbackStarted = true;
+    windowObject.addEventListener(
+      'scroll',
+      checkViewportProximity,
+      { passive: true }
+    );
+    windowObject.addEventListener(
+      'resize',
+      checkViewportProximity,
+      { passive: true }
+    );
+    checkViewportProximity();
+  };
+
+  if (documentObject.readyState === 'complete') {
+    startFallback();
+  } else {
+    windowObject.addEventListener('load', startFallback, { once: true });
+  }
   return true;
 }
 
@@ -132,3 +144,4 @@ if (typeof document !== 'undefined' && typeof window !== 'undefined') {
     initControlledAd(document, window);
   }
 }
+}());

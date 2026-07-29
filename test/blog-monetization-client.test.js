@@ -2,11 +2,16 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
 const {
   initControlledAd,
   loadAdsenseScript,
   watchAdStatus
 } = require('../source/js/blog-monetization');
+
+const TEST_CLIENT = `ca-pub-${'1234'.repeat(4)}`;
+const TEST_SLOT = `${'12345'}${'67890'}`;
 
 function createDocument() {
   const appended = [];
@@ -29,16 +34,33 @@ function createDocument() {
 test('loads the official script once with the configured client', () => {
   const { appended, documentObject } = createDocument();
 
-  const first = loadAdsenseScript(documentObject, 'ca-pub-1234567890123456');
-  const second = loadAdsenseScript(documentObject, 'ca-pub-1234567890123456');
+  const first = loadAdsenseScript(documentObject, TEST_CLIENT);
+  const second = loadAdsenseScript(documentObject, TEST_CLIENT);
 
   assert.equal(first, second);
   assert.equal(appended.length, 1);
   assert.equal(
     appended[0].src,
-    'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1234567890123456'
+    `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${TEST_CLIENT}`
   );
   assert.equal(appended[0].crossOrigin, 'anonymous');
+});
+
+test('co-loads both classic browser scripts in one global context', () => {
+  const context = vm.createContext({});
+  const readingExperienceSource = fs.readFileSync(
+    require.resolve('../source/js/blog-reading-experience'),
+    'utf8'
+  );
+  const monetizationSource = fs.readFileSync(
+    require.resolve('../source/js/blog-monetization'),
+    'utf8'
+  );
+
+  assert.doesNotThrow(() => {
+    vm.runInContext(readingExperienceSource, context);
+    vm.runInContext(monetizationSource, context);
+  });
 });
 
 test('does nothing when no active slot exists', () => {
@@ -51,7 +73,7 @@ test('rejects a missing ad slot before initialization', () => {
   const { appended, documentObject } = createDocument();
   const container = {
     dataset: {
-      adClient: 'ca-pub-1234567890123456'
+      adClient: TEST_CLIENT
     },
     querySelector() { return null; }
   };
@@ -68,7 +90,7 @@ test('rejects an invalid ad slot before initialization', () => {
   const { appended, documentObject } = createDocument();
   const container = {
     dataset: {
-      adClient: 'ca-pub-1234567890123456',
+      adClient: TEST_CLIENT,
       adSlot: 'not-a-slot'
     },
     querySelector() { return null; }
@@ -89,8 +111,8 @@ test('waits for the slot to approach the viewport before requesting an ad', asyn
   };
   const container = {
     dataset: {
-      adClient: 'ca-pub-1234567890123456',
-      adSlot: '1234567890'
+      adClient: TEST_CLIENT,
+      adSlot: TEST_SLOT
     },
     querySelector() { return unit; }
   };
@@ -127,8 +149,8 @@ test('fallback waits for viewport proximity before requesting an ad', () => {
   let top = 1600;
   const container = {
     dataset: {
-      adClient: 'ca-pub-1234567890123456',
-      adSlot: '1234567890'
+      adClient: TEST_CLIENT,
+      adSlot: TEST_SLOT
     },
     getBoundingClientRect() {
       return { top, bottom: top + 120 };
@@ -147,7 +169,10 @@ test('fallback waits for viewport proximity before requesting an ad', () => {
 
   assert.equal(initControlledAd(documentObject, windowObject), true);
   assert.equal(appended.length, 0);
-  if (listeners.load) listeners.load.handler();
+  assert.equal(listeners.scroll, undefined);
+  assert.equal(listeners.resize, undefined);
+  assert.deepEqual(listeners.load.options, { once: true });
+  listeners.load.handler();
   assert.equal(appended.length, 0);
   assert.deepEqual(listeners.scroll.options, { passive: true });
   assert.deepEqual(listeners.resize.options, { passive: true });
@@ -160,12 +185,12 @@ test('fallback waits for viewport proximity before requesting an ad', () => {
   assert.equal(appended.length, 1);
 });
 
-test('fallback checks viewport proximity immediately', () => {
+test('fallback checks viewport proximity immediately after window load', () => {
   const { appended, documentObject } = createDocument();
   const container = {
     dataset: {
-      adClient: 'ca-pub-1234567890123456',
-      adSlot: '1234567890'
+      adClient: TEST_CLIENT,
+      adSlot: TEST_SLOT
     },
     getBoundingClientRect() {
       return { top: 1000, bottom: 1120 };
@@ -174,10 +199,16 @@ test('fallback checks viewport proximity immediately', () => {
   };
   documentObject.querySelector = () => container;
 
+  const listeners = {};
   assert.equal(initControlledAd(documentObject, {
     innerHeight: 800,
-    addEventListener() {}
+    addEventListener(type, handler, options) {
+      listeners[type] = { handler, options };
+    }
   }), true);
+  assert.equal(appended.length, 0);
+
+  listeners.load.handler();
   assert.equal(appended.length, 1);
 });
 

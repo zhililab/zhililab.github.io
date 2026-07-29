@@ -18,7 +18,7 @@ ads: false
 
 访客可以通过 [Google 广告设置](https://adssettings.google.com/) 管理或关闭个性化广告。有关 Google 如何使用合作伙伴网站数据的信息，请参阅 [Google 合作伙伴网站或应用的数据使用说明](https://policies.google.com/technologies/partner-sites)。
 
-在需要征得同意的地区，本站使用 Google 提供的同意管理消息收集和记录广告相关选择。
+如果本站面向需要征得同意的地区启用广告，本站将在启用前使用 Google 提供的同意管理消息收集和记录广告相关选择。
 
 ## 评论服务
 

@@ -3,7 +3,9 @@
 const PRIVACY_PATH = '/privacy/';
 const PRIVACY_MARKER = 'data-blog-privacy-link';
 const CLIENT_PATTERN = /^ca-pub-\d{16}$/;
-const SLOT_PATTERN = /^\d{5,20}$/;
+const CLIENT_PLACEHOLDER_PATTERN = /^ca-pub-0{16}$/;
+const SLOT_PATTERN = /^\d{10}$/;
+const SLOT_PLACEHOLDER_PATTERN = /^0{10}$/;
 const AD_MARKER = 'data-blog-controlled-ad';
 const AD_CSS_PATH = '/css/blog-monetization.css';
 const AD_JS_PATH = '/js/blog-monetization.js';
@@ -16,7 +18,11 @@ function normalizeAdsenseConfig(value = {}) {
     enabled,
     client,
     slot,
-    ready: enabled && CLIENT_PATTERN.test(client) && SLOT_PATTERN.test(slot)
+    ready: enabled &&
+      CLIENT_PATTERN.test(client) &&
+      !CLIENT_PLACEHOLDER_PATTERN.test(client) &&
+      SLOT_PATTERN.test(slot) &&
+      !SLOT_PLACEHOLDER_PATTERN.test(slot)
   };
 }
 

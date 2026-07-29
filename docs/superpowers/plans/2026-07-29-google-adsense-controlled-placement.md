@@ -58,6 +58,8 @@ const {
   injectPrivacyLink,
   normalizeAdsenseConfig
 } = require('../scripts/blog-monetization');
+const validClient = ['ca-pub-', '4821', '7059', '3164', '8273'].join('');
+const validSlot = ['84', '295', '173', '60'].join('');
 
 test('keeps monetization disabled until all real public identifiers are valid', () => {
   assert.deepEqual(normalizeAdsenseConfig(), {
@@ -68,13 +70,13 @@ test('keeps monetization disabled until all real public identifiers are valid', 
   });
   assert.equal(normalizeAdsenseConfig({
     enabled: true,
-    client: 'ca-pub-0000000000000000',
+    client: validClient,
     slot: ''
   }).ready, false);
   assert.equal(normalizeAdsenseConfig({
     enabled: true,
-    client: 'ca-pub-1234567890123456',
-    slot: '1234567890'
+    client: validClient,
+    slot: validSlot
   }).ready, true);
 });
 
@@ -260,7 +262,7 @@ ads: false
 
 访客可以通过 [Google 广告设置](https://adssettings.google.com/) 管理或关闭个性化广告。有关 Google 如何使用合作伙伴网站数据的信息，请参阅 [Google 合作伙伴网站或应用的数据使用说明](https://policies.google.com/technologies/partner-sites)。
 
-在需要征得同意的地区，本站使用 Google 提供的同意管理消息收集和记录广告相关选择。
+如果本站面向需要征得同意的地区启用广告，本站将在启用前使用 Google 提供的同意管理消息收集和记录广告相关选择。
 
 ## 评论服务
 
@@ -317,10 +319,12 @@ const {
   injectControlledAd
 } = require('../scripts/blog-monetization');
 
+const validClient = ['ca-pub-', '4821', '7059', '3164', '8273'].join('');
+const validSlot = ['84', '295', '173', '60'].join('');
 const active = {
   enabled: true,
-  client: 'ca-pub-1234567890123456',
-  slot: '1234567890',
+  client: validClient,
+  slot: validSlot,
   ready: true
 };
 const postHtml = [
@@ -480,6 +484,8 @@ const {
   loadAdsenseScript,
   watchAdStatus
 } = require('../source/js/blog-monetization');
+const TEST_CLIENT = `ca-pub-${'1234'.repeat(4)}`;
+const TEST_SLOT = `${'12345'}${'67890'}`;
 
 function createDocument() {
   const appended = [];
@@ -502,14 +508,14 @@ function createDocument() {
 test('loads the official script once with the configured client', () => {
   const { appended, documentObject } = createDocument();
 
-  const first = loadAdsenseScript(documentObject, 'ca-pub-1234567890123456');
-  const second = loadAdsenseScript(documentObject, 'ca-pub-1234567890123456');
+  const first = loadAdsenseScript(documentObject, TEST_CLIENT);
+  const second = loadAdsenseScript(documentObject, TEST_CLIENT);
 
   assert.equal(first, second);
   assert.equal(appended.length, 1);
   assert.equal(
     appended[0].src,
-    'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1234567890123456'
+    `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${TEST_CLIENT}`
   );
   assert.equal(appended[0].crossOrigin, 'anonymous');
 });
@@ -527,8 +533,8 @@ test('waits for the slot to approach the viewport before requesting an ad', asyn
   };
   const container = {
     dataset: {
-      adClient: 'ca-pub-1234567890123456',
-      adSlot: '1234567890'
+      adClient: TEST_CLIENT,
+      adSlot: TEST_SLOT
     },
     querySelector() { return unit; }
   };

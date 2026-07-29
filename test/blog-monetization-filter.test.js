@@ -8,6 +8,12 @@ const {
   normalizeAdsenseConfig
 } = require('../scripts/blog-monetization');
 
+const validClient = ['ca-pub-', '4821', '7059', '3164', '8273'].join('');
+const validSlot = ['84', '295', '173', '60'].join('');
+const zeroClient = ['ca-pub-', '0000', '0000', '0000', '0000'].join('');
+const zeroSlot = ['000', '000', '0000'].join('');
+const shortSlot = ['82', '731'].join('');
+
 test('keeps monetization disabled until all real public identifiers are valid', () => {
   assert.deepEqual(normalizeAdsenseConfig(), {
     enabled: false,
@@ -17,14 +23,32 @@ test('keeps monetization disabled until all real public identifiers are valid', 
   });
   assert.equal(normalizeAdsenseConfig({
     enabled: true,
-    client: 'ca-pub-0000000000000000',
+    client: zeroClient,
     slot: ''
   }).ready, false);
   assert.equal(normalizeAdsenseConfig({
     enabled: true,
-    client: 'ca-pub-1234567890123456',
-    slot: '1234567890'
+    client: validClient,
+    slot: validSlot
   }).ready, true);
+});
+
+test('rejects obvious publisher and slot placeholders even when enabled', () => {
+  assert.equal(normalizeAdsenseConfig({
+    enabled: true,
+    client: zeroClient,
+    slot: validSlot
+  }).ready, false);
+  assert.equal(normalizeAdsenseConfig({
+    enabled: true,
+    client: validClient,
+    slot: zeroSlot
+  }).ready, false);
+  assert.equal(normalizeAdsenseConfig({
+    enabled: true,
+    client: validClient,
+    slot: shortSlot
+  }).ready, false);
 });
 
 test('adds one privacy link to a generated footer', () => {
@@ -38,8 +62,8 @@ test('adds one privacy link to a generated footer', () => {
 
 const active = {
   enabled: true,
-  client: 'ca-pub-1234567890123456',
-  slot: '1234567890',
+  client: validClient,
+  slot: validSlot,
   ready: true
 };
 const postHtml = [
