@@ -1,0 +1,84 @@
+'use strict';
+
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const {
+  injectPrivacyLink,
+  injectControlledAd,
+  normalizeAdsenseConfig
+} = require('../scripts/blog-monetization');
+
+test('keeps monetization disabled until all real public identifiers are valid', () => {
+  assert.deepEqual(normalizeAdsenseConfig(), {
+    enabled: false,
+    client: '',
+    slot: '',
+    ready: false
+  });
+  assert.equal(normalizeAdsenseConfig({
+    enabled: true,
+    client: 'ca-pub-0000000000000000',
+    slot: ''
+  }).ready, false);
+  assert.equal(normalizeAdsenseConfig({
+    enabled: true,
+    client: 'ca-pub-1234567890123456',
+    slot: '1234567890'
+  }).ready, true);
+});
+
+test('adds one privacy link to a generated footer', () => {
+  const html = '<html><body><footer><div class="footer-inner"></div></footer></body></html>';
+  const output = injectPrivacyLink(html);
+
+  assert.equal((output.match(/href="\/privacy\/"/g) || []).length, 1);
+  assert.match(output, />隐私与 Cookie 政策</);
+  assert.equal(injectPrivacyLink(output), output);
+});
+
+const active = {
+  enabled: true,
+  client: 'ca-pub-1234567890123456',
+  slot: '1234567890',
+  ready: true
+};
+const postHtml = [
+  '<html><head></head><body><main>',
+  '<article class="post-content"><div class="markdown-body">正文</div>',
+  '<article id="comments"></article></article>',
+  '</main><footer></footer></body></html>'
+].join('');
+
+test('injects one ad after post content and before comments', () => {
+  const output = injectControlledAd(postHtml, {
+    page: { layout: 'post' }
+  }, active);
+
+  assert.equal((output.match(/id="blog-controlled-ad"/g) || []).length, 1);
+  assert.ok(output.indexOf('正文') < output.indexOf('id="blog-controlled-ad"'));
+  assert.ok(output.indexOf('id="blog-controlled-ad"') < output.indexOf('id="comments"'));
+  assert.equal(injectControlledAd(output, {
+    page: { layout: 'post' }
+  }, active), output);
+});
+
+test('does not inject without active valid configuration', () => {
+  const output = injectControlledAd(postHtml, {
+    page: { layout: 'post' }
+  }, normalizeAdsenseConfig());
+
+  assert.doesNotMatch(output, /blog-controlled-ad|adsbygoogle|pagead2/);
+});
+
+test('does not inject on non-post pages or explicit opt-out posts', () => {
+  assert.doesNotMatch(
+    injectControlledAd(postHtml, { page: { layout: 'index' } }, active),
+    /blog-controlled-ad/
+  );
+  assert.doesNotMatch(
+    injectControlledAd(postHtml, {
+      page: { layout: 'post', ads: false }
+    }, active),
+    /blog-controlled-ad/
+  );
+});
