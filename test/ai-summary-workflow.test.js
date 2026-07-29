@@ -13,11 +13,19 @@ test('AI summary workflow generates draft summaries only for changed posts on de
   const generatorStep = workflow.match(
     /^\s{6}- name: Generate draft AI summaries\n(?:^\s{8,}.*\n)*/m
   );
+  const generateJob = workflow.match(
+    /^\s{2}generate:\n(?:^(?!\s{2}\S).*\n|^\s{4,}.*\n)*/m
+  );
+  const commitJob = workflow.match(
+    /^\s{2}commit:\n(?:^(?!\s{2}\S).*\n|^\s{4,}.*\n)*/m
+  );
 
   assert.match(workflow, /on:\s*\n\s*push:\s*\n\s*branches:\s*\n\s*-\s*dev-optimize/m);
   assert.match(workflow, /paths:\s*\n\s*-\s*['\"]?source\/_posts\/\*\*['\"]?/m);
-  assert.match(workflow, /permissions:\s*\n\s*contents:\s*write/m);
+  assert.match(workflow, /^permissions:\s*\n\s{2}contents:\s*read/m);
   assert.doesNotMatch(workflow, /^\s{4}env:/m);
+  assert.ok(generateJob, 'missing read-only generation job');
+  assert.ok(commitJob, 'missing write-only commit job');
   assert.ok(generatorStep, 'missing named generator step');
   assert.match(
     generatorStep[0],
@@ -40,17 +48,24 @@ test('AI summary workflow generates draft summaries only for changed posts on de
   assert.match(workflow, /actions\/setup-node@v\d+/);
   assert.match(workflow, /node-version:\s*['\"]?20['\"]?/);
   assert.match(workflow, /- name: Install dependencies\s*\n\s*run: npm ci/);
+  assert.match(generateJob[0], /actions\/checkout@v4[\s\S]*persist-credentials:\s*false/);
+  assert.doesNotMatch(generateJob[0], /contents:\s*write/);
+  assert.match(generateJob[0], /actions\/upload-artifact@v4/);
   assert.doesNotMatch(
     workflow,
     /- name: Install dependencies\s*\n\s*env:/
   );
   assert.match(generatorStep[0], /run: npm run summary:generate -- --scan/);
-  assert.match(workflow, /git add source\/_data\/ai-summaries/);
-  assert.match(workflow, /git config user\.name/);
-  assert.match(workflow, /git config user\.email/);
-  assert.match(workflow, /git diff --cached --quiet/);
-  assert.match(workflow, /chore: generate draft AI summaries \[skip ci\]/);
-  assert.match(workflow, /git push/);
+  assert.match(commitJob[0], /needs:\s*generate/);
+  assert.match(commitJob[0], /permissions:\s*\n\s{6}contents:\s*write/);
+  assert.match(commitJob[0], /actions\/download-artifact@v4/);
+  assert.doesNotMatch(commitJob[0], /npm ci/);
+  assert.match(commitJob[0], /git add source\/_data\/ai-summaries/);
+  assert.match(commitJob[0], /git config user\.name/);
+  assert.match(commitJob[0], /git config user\.email/);
+  assert.match(commitJob[0], /git diff --cached --quiet/);
+  assert.match(commitJob[0], /chore: generate draft AI summaries \[skip ci\]/);
+  assert.match(commitJob[0], /git push/);
   assert.doesNotMatch(workflow, /hexo deploy/i);
   assert.doesNotMatch(workflow, /npm run deploy/i);
 });

@@ -8,13 +8,15 @@ on:
       - 'source/_posts/**'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -26,6 +28,25 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
         run: npm run summary:generate -- --scan
+      - name: Upload draft summaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-summary-drafts
+          path: source/_data/ai-summaries
+          if-no-files-found: error
+
+  commit:
+    needs: generate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download draft summaries
+        uses: actions/download-artifact@v4
+        with:
+          name: ai-summary-drafts
+          path: source/_data/ai-summaries
       - name: Commit generated draft summaries
         run: |
           git config user.name 'github-actions[bot]'

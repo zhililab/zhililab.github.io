@@ -296,16 +296,20 @@ test('prompt and Gemini request constrain the exact structured summary shape', a
   });
 
   const body = JSON.parse(fetchImpl.calls[0][1].body);
-  const schema = body.generationConfig.responseSchema;
+  const textFormat = body.generationConfig.responseFormat.text;
+  const schema = textFormat.schema;
   assert.match(prompt, /general.*120 至 180 个字符/);
-  assert.equal(schema.type, 'OBJECT');
+  assert.equal(textFormat.mimeType, 'application/json');
+  assert.equal(body.generationConfig.responseSchema, undefined);
+  assert.equal(body.generationConfig.responseMimeType, undefined);
+  assert.equal(schema.type, 'object');
   assert.deepEqual(Object.keys(schema.properties), ['general', 'bullets', 'explainer']);
   assert.deepEqual(schema.required, ['general', 'bullets', 'explainer']);
   assert.equal(schema.additionalProperties, false);
-  assert.equal(schema.properties.bullets.type, 'ARRAY');
+  assert.equal(schema.properties.bullets.type, 'array');
   assert.equal(schema.properties.bullets.minItems, 3);
   assert.equal(schema.properties.bullets.maxItems, 5);
-  assert.deepEqual(schema.properties.bullets.items, { type: 'STRING' });
+  assert.deepEqual(schema.properties.bullets.items, { type: 'string' });
 });
 
 test('retries a 5xx response once and then succeeds', async () => {
