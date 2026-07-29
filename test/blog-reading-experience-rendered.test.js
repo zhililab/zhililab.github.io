@@ -161,6 +161,10 @@ test('generated site exposes the privacy policy from every footer', () => {
   assert.match(privacy, /Google/);
   assert.match(privacy, /Cookie/);
   assert.match(privacy, /Waline/);
+  assert.match(
+    privacy,
+    /href="https:\/\/www\.zhililab\.cn\/">www\.zhililab\.cn<\/a>/
+  );
   assert.doesNotMatch(privacy, /id="waline"/);
 });
 
