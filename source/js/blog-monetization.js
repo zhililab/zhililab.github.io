@@ -41,12 +41,19 @@ function initControlledAd(documentObject, windowObject) {
   const container = documentObject.querySelector('#blog-controlled-ad');
   if (!container || container.dataset.initialized === 'true') return false;
   const client = container.dataset.adClient;
-  if (!/^ca-pub-\d{16}$/.test(client || '')) return false;
+  const slot = container.dataset.adSlot;
+  if (
+    !/^ca-pub-\d{16}$/.test(client || '') ||
+    !/^\d{5,20}$/.test(slot || '')
+  ) return false;
 
   container.dataset.initialized = 'true';
   watchAdStatus(container, windowObject);
 
+  let activated = false;
   const activate = () => {
+    if (activated) return;
+    activated = true;
     container.dataset.state = 'loading';
     loadAdsenseScript(documentObject, client)
       .then(() => {
@@ -68,7 +75,41 @@ function initControlledAd(documentObject, windowObject) {
     return true;
   }
 
-  windowObject.addEventListener('load', activate, { once: true });
+  if (
+    typeof windowObject.addEventListener !== 'function' ||
+    typeof container.getBoundingClientRect !== 'function'
+  ) return true;
+
+  const checkViewportProximity = () => {
+    const viewportHeight = windowObject.innerHeight;
+    const bounds = container.getBoundingClientRect();
+    if (
+      !Number.isFinite(viewportHeight) ||
+      !bounds ||
+      !Number.isFinite(bounds.top) ||
+      !Number.isFinite(bounds.bottom) ||
+      bounds.top > viewportHeight + 320 ||
+      bounds.bottom < -320
+    ) return;
+
+    if (typeof windowObject.removeEventListener === 'function') {
+      windowObject.removeEventListener('scroll', checkViewportProximity);
+      windowObject.removeEventListener('resize', checkViewportProximity);
+    }
+    activate();
+  };
+
+  windowObject.addEventListener(
+    'scroll',
+    checkViewportProximity,
+    { passive: true }
+  );
+  windowObject.addEventListener(
+    'resize',
+    checkViewportProximity,
+    { passive: true }
+  );
+  checkViewportProximity();
   return true;
 }
 
