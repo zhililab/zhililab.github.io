@@ -8,6 +8,26 @@
   padding-left: clamp(1rem, 3vw, 3.5rem);
 }
 
+.blog-post-enhanced .markdown-body p > picture {
+  display: block;
+  max-width: 100%;
+  margin: 1.5rem auto;
+}
+
+.blog-post-enhanced .markdown-body p > picture > img,
+.blog-post-enhanced .markdown-body p > picture > a > img,
+.blog-post-enhanced .markdown-body p > img,
+.blog-post-enhanced .markdown-body figure > img,
+.blog-post-enhanced .markdown-body figure > a > img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: none;
+  margin: 1.5rem auto;
+  object-fit: contain;
+}
+
 .blog-post-enhanced figure.highlight td.gutter,
 .blog-post-enhanced figure.highlight td.code {
   vertical-align: top;
