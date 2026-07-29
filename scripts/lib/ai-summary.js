@@ -289,12 +289,15 @@ async function performGeminiRequest({
   const controller = createAbortController();
   const timeoutHandle = setTimeoutImpl(() => controller.abort(), requestTimeoutMs);
   try {
-    let response;
     try {
-      response = await fetchImpl(url, {
+      const response = await fetchImpl(url, {
         ...requestOptions,
         signal: controller.signal
       });
+      return {
+        response,
+        payload: response.ok ? await response.json() : null
+      };
     } catch (error) {
       const requestError = controller.signal.aborted
         ? new Error(`Gemini request timed out after ${requestTimeoutMs} ms`)
@@ -302,11 +305,6 @@ async function performGeminiRequest({
       requestError.aiSummaryRetryable = true;
       throw requestError;
     }
-
-    return {
-      response,
-      payload: response.ok ? await response.json() : null
-    };
   } finally {
     clearTimeoutImpl(timeoutHandle);
   }

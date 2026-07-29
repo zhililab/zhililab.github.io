@@ -419,6 +419,48 @@ test('bounds each Gemini request with injected timeout and abort controls', asyn
   assert.equal(aborted, true);
 });
 
+test('retries when the request times out while reading the response body', async () => {
+  const waits = [];
+  const timeoutCallbacks = [];
+  let attempt = 0;
+  const fetchImpl = async () => {
+    attempt += 1;
+    if (attempt === 1) {
+      return {
+        status: 200,
+        ok: true,
+        headers: { get: () => null },
+        async json() {
+          timeoutCallbacks.shift()();
+          const error = new Error('aborted while reading response');
+          error.name = 'AbortError';
+          throw error;
+        }
+      };
+    }
+    return response(200, geminiPayload(modelSummary()));
+  };
+
+  const result = await requestGeminiSummary({
+    fetchImpl,
+    apiKey: 'secret',
+    title: '标题',
+    body: '正文',
+    retries: 1,
+    retryBaseDelayMs: 500,
+    sleepImpl: async delay => waits.push(delay),
+    setTimeoutImpl(callback) {
+      timeoutCallbacks.push(callback);
+      return timeoutCallbacks.length;
+    },
+    clearTimeoutImpl() {}
+  });
+
+  assert.equal(attempt, 2);
+  assert.deepEqual(waits, [500]);
+  assert.equal(result.general, modelSummary().general);
+});
+
 test('failed generation leaves an existing output unchanged', async () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ai-summary-'));
   const postPath = path.join(tempRoot, 'platform-engineering-map.md');
