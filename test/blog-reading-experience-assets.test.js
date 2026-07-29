@@ -130,3 +130,15 @@ test('added production assets stay below 30 KB uncompressed', () => {
 
   assert.ok(bytes < 30 * 1024, `enhancement assets are ${bytes} bytes`);
 });
+
+test('AI summary client stays within its recorded source-asset budget', () => {
+  const files = [
+    'source/js/blog-reading-experience.js',
+    'source/css/blog-reading-experience.css'
+  ];
+  const bytes = files.reduce((sum, file) => sum + stat(file).size, 0);
+  const task3Delta = bytes - 17739;
+
+  assert.ok(bytes < 24 * 1024, `source enhancement assets are ${bytes} bytes`);
+  assert.ok(task3Delta <= 4 * 1024, `Task 3 added ${task3Delta} bytes`);
+});

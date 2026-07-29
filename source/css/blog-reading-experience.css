@@ -111,6 +111,87 @@
   background: rgba(22, 101, 52, 0.96);
 }
 
+.blog-post-enhanced .ai-summary {
+  margin: 1.5rem 0;
+  color: var(--text-color, #1f2937);
+  background: var(--board-bg-color, #f8fbff);
+  border: 1px solid var(--line-color, #b9cce6);
+  border-radius: 0.75rem;
+}
+
+.blog-post-enhanced .ai-summary > summary {
+  min-height: 44px;
+  padding: 0.85rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.blog-post-enhanced .ai-summary > summary:focus-visible,
+.blog-post-enhanced .ai-summary [role='tab']:focus-visible {
+  outline: 3px solid var(--link-hover-color, #1558b0);
+  outline-offset: -3px;
+}
+
+.blog-post-enhanced .ai-summary [role='tablist'] {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--line-color, #b9cce6);
+  border-bottom: 1px solid var(--line-color, #b9cce6);
+}
+
+.blog-post-enhanced .ai-summary [role='tab'] {
+  min-width: 0;
+  min-height: 44px;
+  padding: 0.6rem;
+  overflow-wrap: anywhere;
+  color: inherit;
+  font: inherit;
+  line-height: 1.35;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+}
+
+.blog-post-enhanced .ai-summary [role='tab'][aria-selected='true'] {
+  color: var(--link-hover-color, #1558b0);
+  font-weight: 600;
+  background: rgba(58, 122, 205, 0.1);
+  border-bottom-color: var(--link-hover-color, #1558b0);
+}
+
+.blog-post-enhanced .ai-summary [role='tabpanel'] {
+  padding: 1rem;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+
+.blog-post-enhanced .ai-summary [role='tabpanel'][hidden] {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .blog-post-enhanced .ai-summary {
+    color: var(--text-color, #edf4ff);
+    background: var(--board-bg-color, #172333);
+    border-color: var(--line-color, #58708e);
+  }
+
+  .blog-post-enhanced .ai-summary [role='tab'][aria-selected='true'] {
+    color: var(--link-hover-color, #8cc4ff);
+    background: rgba(140, 196, 255, 0.14);
+    border-bottom-color: var(--link-hover-color, #8cc4ff);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blog-post-enhanced .ai-summary,
+  .blog-post-enhanced .ai-summary * {
+    scroll-behavior: auto;
+    transition: none !important;
+  }
+}
+
 #blog-pet {
   position: fixed;
   right: 1.25rem;
