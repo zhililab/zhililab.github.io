@@ -148,3 +148,29 @@ test('generated Pages CNAME contains one canonical domain', () => {
 
   assert.deepEqual(domains, ['www.zhililab.cn']);
 });
+
+test('generated site exposes the privacy policy from every footer', () => {
+  const home = read(path.join(publicRoot, 'index.html'));
+  const article = read(articlePath);
+  const privacyPath = path.join(publicRoot, 'privacy', 'index.html');
+  const privacy = read(privacyPath);
+
+  assert.match(home, /href="\/privacy\/"[^>]*>隐私与 Cookie 政策</);
+  assert.match(article, /href="\/privacy\/"[^>]*>隐私与 Cookie 政策</);
+  assert.match(privacy, /隐私与 Cookie 政策/);
+  assert.match(privacy, /Google/);
+  assert.match(privacy, /Cookie/);
+  assert.match(privacy, /Waline/);
+  assert.doesNotMatch(privacy, /id="waline"/);
+});
+
+test('first-stage build makes zero AdSense requests and renders no empty slot', () => {
+  const article = read(articlePath);
+  const home = read(path.join(publicRoot, 'index.html'));
+
+  for (const html of [article, home]) {
+    assert.doesNotMatch(html, /blog-controlled-ad/);
+    assert.doesNotMatch(html, /adsbygoogle/);
+    assert.doesNotMatch(html, /pagead2\.googlesyndication\.com/);
+  }
+});
