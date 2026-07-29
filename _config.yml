@@ -247,3 +247,9 @@ deploy:
   repo: git@github.com:zhililab/zhililab.github.io.git
   branch: master
 
+# AdSense remains dormant until real public identifiers are configured.
+adsense:
+  enabled: false
+  client: ''
+  slot: ''
+

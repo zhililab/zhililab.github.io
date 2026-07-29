@@ -148,3 +148,42 @@ test('generated Pages CNAME contains one canonical domain', () => {
 
   assert.deepEqual(domains, ['www.zhililab.cn']);
 });
+
+test('generated site exposes the privacy policy from every footer', () => {
+  const home = read(path.join(publicRoot, 'index.html'));
+  const article = read(articlePath);
+  const privacyPath = path.join(publicRoot, 'privacy', 'index.html');
+  const privacy = read(privacyPath);
+
+  assert.match(home, /href="\/privacy\/"[^>]*>隐私与 Cookie 政策</);
+  assert.match(article, /href="\/privacy\/"[^>]*>隐私与 Cookie 政策</);
+  assert.match(privacy, /隐私与 Cookie 政策/);
+  assert.match(privacy, /Google/);
+  assert.match(privacy, /Cookie/);
+  assert.match(privacy, /Waline/);
+  assert.match(
+    privacy,
+    /href="https:\/\/www\.zhililab\.cn\/">www\.zhililab\.cn<\/a>/
+  );
+  assert.doesNotMatch(privacy, /id="waline"/);
+});
+
+test('first-stage build makes zero AdSense requests and renders no empty slot', () => {
+  const article = read(articlePath);
+  const home = read(path.join(publicRoot, 'index.html'));
+
+  for (const html of [article, home]) {
+    assert.doesNotMatch(html, /blog-controlled-ad/);
+    assert.doesNotMatch(html, /adsbygoogle/);
+    assert.doesNotMatch(html, /pagead2\.googlesyndication\.com/);
+  }
+});
+
+test('publishes the owner-provided AdSense authorization at the site root', () => {
+  const adsTxt = read(path.join(publicRoot, 'ads.txt'));
+
+  assert.equal(
+    adsTxt,
+    'google.com, pub-1413124948160145, DIRECT, f08c47fec0942fa0\n'
+  );
+});

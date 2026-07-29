@@ -1,0 +1,30 @@
+.blog-ad-shell {
+  width: 100%;
+  min-height: 7.5rem;
+  margin: 2.5rem 0 2rem;
+  padding-top: 1.25rem;
+  overflow: hidden;
+  border-top: 1px solid var(--line-color, rgba(127, 127, 127, 0.22));
+}
+
+.blog-ad-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--sec-text-color, #78818d);
+  font-size: 0.72rem;
+  line-height: 1;
+  text-align: center;
+  letter-spacing: 0.08em;
+}
+
+.blog-ad-shell[data-state='failed'],
+.blog-ad-shell[data-state='unfilled'] {
+  display: none;
+}
+
+@media (max-width: 575.98px) {
+  .blog-ad-shell {
+    min-height: 6.25rem;
+    margin: 2rem 0 1.75rem;
+  }
+}
