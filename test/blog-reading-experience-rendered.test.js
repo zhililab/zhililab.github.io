@@ -178,3 +178,12 @@ test('first-stage build makes zero AdSense requests and renders no empty slot', 
     assert.doesNotMatch(html, /pagead2\.googlesyndication\.com/);
   }
 });
+
+test('publishes the owner-provided AdSense authorization at the site root', () => {
+  const adsTxt = read(path.join(publicRoot, 'ads.txt'));
+
+  assert.equal(
+    adsTxt,
+    'google.com, pub-1413124948160145, DIRECT, f08c47fec0942fa0\n'
+  );
+});
