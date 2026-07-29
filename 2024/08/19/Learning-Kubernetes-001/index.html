@@ -1,0 +1,815 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/assets/images/favicon/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zhi Li">
+  <meta name="keywords" content="python, devops">
+  
+    <meta name="description" content="Kubernetes 的架构由多个关键组件组成，这些组件共同协作，确保容器化应用的部署、管理和扩展能够顺利进行。以下是官方文档中对 Kubernetes 核心组件的总结和梳理：  1. 控制平面组件（Control Plane Components）存在的意义（WHY）: Kubernetes 的控制平面持续且主动地管理每个对象的实际状态，匹配用户提供的期望状态。   kube-apiserver">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kubernetes 学习 —— 基础组件和概念梳理">
+<meta property="og:url" content="https://github.com/zhililab/2024/08/19/Learning-Kubernetes-001/index.html">
+<meta property="og:site_name" content="ZHILI">
+<meta property="og:description" content="Kubernetes 的架构由多个关键组件组成，这些组件共同协作，确保容器化应用的部署、管理和扩展能够顺利进行。以下是官方文档中对 Kubernetes 核心组件的总结和梳理：  1. 控制平面组件（Control Plane Components）存在的意义（WHY）: Kubernetes 的控制平面持续且主动地管理每个对象的实际状态，匹配用户提供的期望状态。   kube-apiserver">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/assets/images/cover/Kubernetes-logo.webp">
+<meta property="article:published_time" content="2024-08-18T16:06:00.000Z">
+<meta property="article:modified_time" content="2026-07-29T00:12:50.480Z">
+<meta property="article:author" content="[object Object]">
+<meta property="article:tag" content="Kubernetes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://github.com/assets/images/cover/Kubernetes-logo.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Kubernetes 学习 —— 基础组件和概念梳理 - ZHILI</title>
+
+  <link  rel="stylesheet" href="/vendor/blog/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="/vendor/blog/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="/vendor/blog/hint.min.css" />
+
+  <link  rel="stylesheet" href="/vendor/blog/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="/vendor/blog/fluid-icons.css">
+
+
+
+<link rel="stylesheet" href="/vendor/blog/site-icons.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"github.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0">  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
+</head>
+
+
+<body class="blog-post-enhanced">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Kubernetes 学习 —— 基础组件和概念梳理"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-08-19 00:06" pubdate>
+          2024年8月19日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          11 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Kubernetes 学习 —— 基础组件和概念梳理</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>Kubernetes 的架构由多个关键组件组成，这些组件共同协作，确保容器化应用的部署、管理和扩展能够顺利进行。以下是官方文档中对 Kubernetes 核心组件的总结和梳理：</p>
+<p><img src="https://img.picui.cn/free/2024/08/19/66c2384c71ee5.png" alt="1724004427650.png" loading="lazy" decoding="async"></p>
+<h3 id="1-控制平面组件（Control-Plane-Components）"><a href="#1-控制平面组件（Control-Plane-Components）" class="headerlink" title="1. 控制平面组件（Control Plane Components）"></a>1. 控制平面组件（Control Plane Components）</h3><p>存在的意义（WHY）: Kubernetes 的控制平面持续且主动地管理每个对象的实际状态，匹配用户提供的期望状态。 </p>
+<ul>
+<li>kube-apiserver<ul>
+<li>作为 Kubernetes 控制平面的核心组件，API 服务器负责处理 REST 操作，并提供集群状态数据的入口。所有资源操作（如 Pod、Service 的创建、更新、删除）都通过 kube-apiserver 进行。</li>
+</ul>
+</li>
+<li>etcd<ul>
+<li>一个强一致性和高可用的分布式键值存储，主要用于保存 Kubernetes 的所有集群数据，包括配置信息、状态信息等。etcd 是 Kubernetes 的核心数据库。</li>
+</ul>
+</li>
+<li>kube-scheduler<ul>
+<li>负责监控未分配到节点的 Pod，并将这些 Pod 分配到合适的节点上。调度器会根据资源需求、策略、数据位置等因素来决定 Pod 的调度位置。</li>
+</ul>
+</li>
+<li>kube-controller-manager<ul>
+<li>包含了多个控制器的集合，如节点控制器、复制控制器、端点控制器和服务控制器等。它们负责维护集群的期望状态与实际状态的一致性，例如在节点失效时重建 Pod。</li>
+</ul>
+</li>
+<li>cloud-controller-manager<ul>
+<li>在云环境中运行，负责与底层云平台的交互，如负载均衡器的管理、节点的添加和删除等。它将云供应商特定的控制逻辑与 Kubernetes 控制平面分离。</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-节点组件（Node-Components）"><a href="#2-节点组件（Node-Components）" class="headerlink" title="2. 节点组件（Node Components）"></a>2. 节点组件（Node Components）</h3><ul>
+<li>kubelet<ul>
+<li>运行在每个节点上，负责确保容器在 Pod 中运行良好。它通过 API 服务器获取 Pod 的定义，并负责容器的创建、启动、停止等操作。<blockquote>
+<p>简单来说，kubectl 用于管理运行中的集群，而 kubeadm 用于集群的初始设置和升级等基础架构方面的操作。</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li>kube-proxy<ul>
+<li>负责为 Kubernetes 服务提供网络代理服务，维护集群的网络规则，确保集群内的网络通信能够正确路由。它支持基于 IPVS 或 iptables 的流量转发。</li>
+</ul>
+</li>
+<li>Container Runtime<ul>
+<li>Kubernetes 支持的容器运行时（如 Docker、containerd），用于实际运行和管理容器。容器运行时负责拉取镜像、创建和运行容器等。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-附加组件（Addons）"><a href="#3-附加组件（Addons）" class="headerlink" title="3. 附加组件（Addons）"></a>3. 附加组件（Addons）</h3><ul>
+<li>DNS<ul>
+<li>Kubernetes 默认部署的 DNS 服务，负责为集群内的服务提供 DNS 名称解析。通常，Pod 可以通过服务名称直接访问其他 Pod。</li>
+</ul>
+</li>
+<li>Web UI（Dashboard）<ul>
+<li>提供 Kubernetes 的图形化用户界面，用户可以通过它来管理和查看集群的资源和状态。</li>
+</ul>
+</li>
+<li>容器资源监控<ul>
+<li>提供对容器和节点的资源使用情况的监控，常用的工具如 Prometheus、Grafana 等，用于可视化和报警。</li>
+</ul>
+</li>
+<li>日志记录<ul>
+<li>集群的日志收集和管理，确保应用程序和系统组件的日志能够被存储和查询。</li>
+</ul>
+</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>Kubernetes 通过控制平面组件来协调整个集群的状态，确保应用程序的部署、扩展和管理得以实现。每个节点上运行的节点组件则负责实际的工作负载管理和网络通信。这些组件协同工作，使 Kubernetes 能够有效地管理分布式的容器化应用程序。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Kubernetes/">#Kubernetes</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Kubernetes 学习 —— 基础组件和概念梳理</div>
+      <div>https://github.com/zhililab/2024/08/19/Learning-Kubernetes-001/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Zhi Li</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年8月19日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/08/22/Learning-Kubernetes-002/" title="Kubernetes 学习 —— node 🆚 pod">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Kubernetes 学习 —— node 🆚 pod</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/08/13/Learning-Docker-001/" title="Docker 学习 —— 基础指令对比学习">
+                        <span class="hidden-mobile">Docker 学习 —— 基础指令对比学习</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://lib.baomitu.com/waline/2.14.1/waline.min.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/waline/2.14.1/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://comments.zhililab.cn","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["nick"],"lang":"zh-cn","emoji":[],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10,"placeholder":"评论提交后需审核，审核通过后公开显示"},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+    <p class="blog-privacy-link" data-blog-privacy-link><a href="/privacy/">隐私与 Cookie 政策</a></p>
+</footer>
+
+  <!-- Scripts -->
+
+
+<script  src="/vendor/blog/jquery.min.js" ></script>
+<script  src="/vendor/blog/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+<script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=/vendor/blog/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<button id="blog-pet" type="button" aria-label="和博客机器人打个招呼" aria-describedby="blog-pet-message" data-blog-reading-experience>
+  <span class="blog-pet__bubble" id="blog-pet-message" role="status" aria-live="polite">今天也在持续进化</span>
+  <svg class="blog-pet__robot" viewBox="0 0 128 144" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="pet-body-gradient" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#78a7ff"/>
+        <stop offset="1" stop-color="#315ddc"/>
+      </linearGradient>
+    </defs>
+    <path class="blog-pet__antenna" d="M64 18v-8m-7 0h14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+    <rect x="22" y="20" width="84" height="62" rx="28" fill="url(#pet-body-gradient)" stroke="#17377d" stroke-width="5"/>
+    <rect x="34" y="36" width="60" height="30" rx="13" fill="#102b62"/>
+    <circle cx="51" cy="51" r="5" fill="#80ecff"/>
+    <circle cx="77" cy="51" r="5" fill="#80ecff"/>
+    <path d="M54 60h20" stroke="#80ecff" stroke-width="3" stroke-linecap="round"/>
+    <rect x="35" y="76" width="58" height="50" rx="20" fill="url(#pet-body-gradient)" stroke="#17377d" stroke-width="5"/>
+    <path d="M50 99h28" stroke="#d9e7ff" stroke-width="5" stroke-linecap="round"/>
+    <path class="blog-pet__arm blog-pet__arm--left" d="M36 88 18 104" fill="none" stroke="#315ddc" stroke-width="12" stroke-linecap="round"/>
+    <path class="blog-pet__arm blog-pet__arm--right" d="M92 88 112 72" fill="none" stroke="#315ddc" stroke-width="12" stroke-linecap="round"/>
+    <path d="M52 124v12m24-12v12" stroke="#17377d" stroke-width="10" stroke-linecap="round"/>
+  </svg>
+</button>
+<script src="/js/blog-reading-experience.js" defer data-blog-reading-experience></script>
+</body>
+</html>

@@ -1,0 +1,791 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/assets/images/favicon/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zhi Li">
+  <meta name="keywords" content="python, devops">
+  
+    <meta name="description" content="最近，我开始尝试为自己的博客接入 Google AdSense。 最直接的原因，是希望博客在持续积累内容的同时，也能带来一些被动收入。但这只是第一层目标。对我来说，更重要的是借这次实践，主动训练过去关注较少的一项能力：如何传播内容、触达用户，并长期运营一个属于自己的产品。 AI 让实现一个功能、开发一个应用变得越来越容易，但它并没有自动解决另外几个问题：谁会看到它？用户为什么愿意使用？如何建立信任">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为什么我要接入 Google AdSense：AI 时代，从会做产品到会获得用户">
+<meta property="og:url" content="https://github.com/zhililab/2026/07/29/2026-07-29-why-google-adsense/index.html">
+<meta property="og:site_name" content="ZHILI">
+<meta property="og:description" content="最近，我开始尝试为自己的博客接入 Google AdSense。 最直接的原因，是希望博客在持续积累内容的同时，也能带来一些被动收入。但这只是第一层目标。对我来说，更重要的是借这次实践，主动训练过去关注较少的一项能力：如何传播内容、触达用户，并长期运营一个属于自己的产品。 AI 让实现一个功能、开发一个应用变得越来越容易，但它并没有自动解决另外几个问题：谁会看到它？用户为什么愿意使用？如何建立信任">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/assets/images/posts/google-adsense-dns-records.png">
+<meta property="og:image" content="https://github.com/assets/images/posts/google-adsense-review-status.png">
+<meta property="article:published_time" content="2026-07-29T15:17:00.000Z">
+<meta property="article:modified_time" content="2026-07-29T15:22:30.550Z">
+<meta property="article:author" content="[object Object]">
+<meta property="article:tag" content="AI">
+<meta property="article:tag" content="Google AdSense">
+<meta property="article:tag" content="个人成长">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://github.com/assets/images/posts/google-adsense-dns-records.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>为什么我要接入 Google AdSense：AI 时代，从会做产品到会获得用户 - ZHILI</title>
+
+  <link  rel="stylesheet" href="/vendor/blog/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="/vendor/blog/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="/vendor/blog/hint.min.css" />
+
+  <link  rel="stylesheet" href="/vendor/blog/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="/vendor/blog/fluid-icons.css">
+
+
+
+<link rel="stylesheet" href="/vendor/blog/site-icons.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"github.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0">  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
+</head>
+
+
+<body class="blog-post-enhanced">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="为什么我要接入 Google AdSense：AI 时代，从会做产品到会获得用户"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-07-29 23:17" pubdate>
+          2026年7月29日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          14 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">为什么我要接入 Google AdSense：AI 时代，从会做产品到会获得用户</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>最近，我开始尝试为自己的博客接入 Google AdSense。</p>
+<p>最直接的原因，是希望博客在持续积累内容的同时，也能带来一些被动收入。但这只是第一层目标。对我来说，更重要的是借这次实践，主动训练过去关注较少的一项能力：<strong>如何传播内容、触达用户，并长期运营一个属于自己的产品。</strong></p>
+<p>AI 让实现一个功能、开发一个应用变得越来越容易，但它并没有自动解决另外几个问题：谁会看到它？用户为什么愿意使用？如何建立信任？怎样让一次访问变成持续关注？</p>
+<p>这些问题，可能比“能不能把功能做出来”更难。</p>
+<span id="more"></span>
+
+<h2 id="被动收入只是起点"><a href="#被动收入只是起点" class="headerlink" title="被动收入只是起点"></a>被动收入只是起点</h2><p>博客是我长期积累知识、记录实践和输出思考的地方。每篇文章都是一份可以反复被搜索、阅读和分享的内容资产。我希望它逐渐形成一个正向循环：创作带来访问，访问带来反馈，反馈帮助我改善内容；当流量和信任积累到一定程度，再产生合理的收入。</p>
+<p>但我并不认为接入 AdSense 就等于拥有了“躺赚”的被动收入。没有有价值的内容、稳定的访问和读者信任，广告代码本身不会创造价值。收入只是长期运营产生的滞后结果，而不是在网页中加入一段脚本后的即时奖励。</p>
+<h2 id="AI-时代，稀缺的不只是开发能力"><a href="#AI-时代，稀缺的不只是开发能力" class="headerlink" title="AI 时代，稀缺的不只是开发能力"></a>AI 时代，稀缺的不只是开发能力</h2><p>过去做技术工作时，我更习惯关注功能、性能和发布是否稳定。这些仍然重要，但当 AI 大幅降低实现成本后，我越来越意识到：</p>
+<blockquote>
+<p>能做出产品，只是起点；能让正确的用户看见它、理解它并愿意留下来，才是更完整的能力。</p>
+</blockquote>
+<p>获客和营销并不等于制造噱头。对个人开发者而言，它首先是清楚地表达价值，并主动把内容或产品带到需要它的人面前。没有接触真实用户，功能就很难获得有效反馈；一篇文章如果只停留在“发布完成”，也很难形成持续影响。</p>
+<p>这也是我选择 Google AdSense 的深层原因：它不是终点，而是一个足够小、又足够真实的商业化练习。</p>
+<h2 id="我选择先保护阅读体验"><a href="#我选择先保护阅读体验" class="headerlink" title="我选择先保护阅读体验"></a>我选择先保护阅读体验</h2><p>在设计广告方案时，我没有直接开启自动广告，而是选择了一个更克制的方案：每篇博文最多保留一个受控广告位，放在正文结束之后、评论区之前。</p>
+<p>首屏、正文段落、代码块和移动端浮层都不放广告。网站尚未通过审核时，也不加载广告脚本，不留下空白广告框。</p>
+<p>这种方式可能不是收入最高的方案，但它符合我对博客的判断：<strong>技术文章首先要保证连续、专注的阅读体验。</strong> 运营不是让某个数字最大化，而是在收入、体验、性能和信任之间建立适合自己的边界。</p>
+<h2 id="配置过程带给我的一个提醒"><a href="#配置过程带给我的一个提醒" class="headerlink" title="配置过程带给我的一个提醒"></a>配置过程带给我的一个提醒</h2><p>通用流程并不复杂：注册 AdSense、补充隐私说明、发布 <code>ads.txt</code>、验证网站，然后提交审核。</p>
+<p>实践中，<code>www.zhililab.cn/ads.txt</code> 已经可以访问，AdSense 却始终无法验证。排查后才发现，Google 会从根域名开始抓取文件，而当时 <code>zhililab.cn</code> 没有指向 GitHub Pages。补齐根域名 DNS、等待解析和 HTTPS 生效后，验证才通过。</p>
+<p><picture><source type="image/webp" data-srcset="/assets/images/optimized/posts/google-adsense-dns-records-640.webp 640w, /assets/images/optimized/posts/google-adsense-dns-records-960.webp 960w, /assets/images/optimized/posts/google-adsense-dns-records-1440.webp 1440w" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px"><img alt="alt text" loading="lazy" decoding="async" width="2550" height="1128" fetchpriority="low" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px" data-blog-deferred-image="true" data-src="/assets/images/posts/google-adsense-dns-records.png" data-srcset="/assets/images/optimized/posts/google-adsense-dns-records-640.webp 640w, /assets/images/optimized/posts/google-adsense-dns-records-960.webp 960w, /assets/images/optimized/posts/google-adsense-dns-records-1440.webp 1440w" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22/%3E"></picture><noscript><img src="/assets/images/posts/google-adsense-dns-records.png" alt="alt text" loading="lazy" decoding="async" width="2550" height="1128" fetchpriority="low" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px"></noscript></p>
+<p>这再次提醒我：<strong>代码写完，不代表产品工作已经完成。</strong> 平台规则、域名、证书、抓取链路和用户最终看到的页面，都是交付的一部分(目前网站 Google Adsense 已进入审核流程，预期最近可以正式上线)。</p>
+<p><picture><source type="image/webp" data-srcset="/assets/images/optimized/posts/google-adsense-review-status-640.webp 640w, /assets/images/optimized/posts/google-adsense-review-status-960.webp 960w, /assets/images/optimized/posts/google-adsense-review-status-1440.webp 1440w" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px"><img alt="alt text" loading="lazy" decoding="async" width="2942" height="1212" fetchpriority="low" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px" data-blog-deferred-image="true" data-src="/assets/images/posts/google-adsense-review-status.png" data-srcset="/assets/images/optimized/posts/google-adsense-review-status-640.webp 640w, /assets/images/optimized/posts/google-adsense-review-status-960.webp 960w, /assets/images/optimized/posts/google-adsense-review-status-1440.webp 1440w" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22/%3E"></picture><noscript><img src="/assets/images/posts/google-adsense-review-status.png" alt="alt text" loading="lazy" decoding="async" width="2942" height="1212" fetchpriority="low" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px"></noscript></p>
+<h2 id="当前只是一个开始"><a href="#当前只是一个开始" class="headerlink" title="当前只是一个开始"></a>当前只是一个开始</h2><p>目前，网站所有权和 <code>ads.txt</code> 已完成验证，AdSense 审核申请已经提交，仍在等待结果。网站尚未开始展示广告，也还没有产生广告收入。</p>
+<p>这篇文章不是为了证明 AdSense 有多容易，也不是展示一个成功的变现案例，而是记录我开始补齐另一类能力的过程。</p>
+<p>接下来，我更关注的是建立一个持续循环：</p>
+<blockquote>
+<p>持续创作 → 主动传播 → 触达用户 → 观察反馈 → 调整内容与产品</p>
+</blockquote>
+<p>Google AdSense 只是这个循环中的一个小节点。真正值得积累的，不是一段广告代码，而是理解内容如何被发现、用户为什么留下，以及如何在不牺牲体验的前提下持续运营。</p>
+<p>在 AI 时代，我希望自己不仅能快速做出产品，也能让产品走向真实用户，在一次次实践中形成自己的传播、获客和运营能力。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://adsense.google.com/intl/zh-CN_cn/start/how-adsense-works/">Google AdSense 的工作原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://support.google.com/adsense/answer/12171612?hl=zh-Hans">Google AdSense：ads.txt 指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://support.google.com/adsense/answer/7679060?hl=zh-Hans">Google AdSense：确保 ads.txt 文件可被抓取</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.github.com/zh/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site">GitHub Pages：管理网站的自定义域</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%80%9D%E8%80%83/" class="category-chain-item">思考</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/AI/">#AI</a>
+      
+        <a href="/tags/Google-AdSense/">#Google AdSense</a>
+      
+        <a href="/tags/%E4%B8%AA%E4%BA%BA%E6%88%90%E9%95%BF/">#个人成长</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>为什么我要接入 Google AdSense：AI 时代，从会做产品到会获得用户</div>
+      <div>https://github.com/zhililab/2026/07/29/2026-07-29-why-google-adsense/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Zhi Li</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年7月29日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/07/27/2026-07-27-from-graph-platform-to-devops-agent-control-plane/" title="他山之石（一）：从图计算平台到 AI Agent 平台，探索技术演进背后的统一抽象">
+                        <span class="hidden-mobile">他山之石（一）：从图计算平台到 AI Agent 平台，探索技术演进背后的统一抽象</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://lib.baomitu.com/waline/2.14.1/waline.min.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/waline/2.14.1/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://comments.zhililab.cn","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["nick"],"lang":"zh-cn","emoji":[],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10,"placeholder":"评论提交后需审核，审核通过后公开显示"},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+    <p class="blog-privacy-link" data-blog-privacy-link><a href="/privacy/">隐私与 Cookie 政策</a></p>
+</footer>
+
+  <!-- Scripts -->
+
+
+<script  src="/vendor/blog/jquery.min.js" ></script>
+<script  src="/vendor/blog/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+<script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=/vendor/blog/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<button id="blog-pet" type="button" aria-label="和博客机器人打个招呼" aria-describedby="blog-pet-message" data-blog-reading-experience>
+  <span class="blog-pet__bubble" id="blog-pet-message" role="status" aria-live="polite">今天也在持续进化</span>
+  <svg class="blog-pet__robot" viewBox="0 0 128 144" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="pet-body-gradient" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#78a7ff"/>
+        <stop offset="1" stop-color="#315ddc"/>
+      </linearGradient>
+    </defs>
+    <path class="blog-pet__antenna" d="M64 18v-8m-7 0h14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+    <rect x="22" y="20" width="84" height="62" rx="28" fill="url(#pet-body-gradient)" stroke="#17377d" stroke-width="5"/>
+    <rect x="34" y="36" width="60" height="30" rx="13" fill="#102b62"/>
+    <circle cx="51" cy="51" r="5" fill="#80ecff"/>
+    <circle cx="77" cy="51" r="5" fill="#80ecff"/>
+    <path d="M54 60h20" stroke="#80ecff" stroke-width="3" stroke-linecap="round"/>
+    <rect x="35" y="76" width="58" height="50" rx="20" fill="url(#pet-body-gradient)" stroke="#17377d" stroke-width="5"/>
+    <path d="M50 99h28" stroke="#d9e7ff" stroke-width="5" stroke-linecap="round"/>
+    <path class="blog-pet__arm blog-pet__arm--left" d="M36 88 18 104" fill="none" stroke="#315ddc" stroke-width="12" stroke-linecap="round"/>
+    <path class="blog-pet__arm blog-pet__arm--right" d="M92 88 112 72" fill="none" stroke="#315ddc" stroke-width="12" stroke-linecap="round"/>
+    <path d="M52 124v12m24-12v12" stroke="#17377d" stroke-width="10" stroke-linecap="round"/>
+  </svg>
+</button>
+<script src="/js/blog-reading-experience.js" defer data-blog-reading-experience></script>
+</body>
+</html>

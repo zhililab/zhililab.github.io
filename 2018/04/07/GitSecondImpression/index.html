@@ -1,0 +1,788 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/assets/images/favicon/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="[object Object]">
+  <meta name="keywords" content="python, devops">
+  
+    <meta name="description" content="Cover Photo by Ashley Harpp on beanstalk Guides  上次已经介绍了 git 的基本概念和知识，这里我们接着进行学习，本篇主要介绍 git 常用的命令 ，相信你看完之后可以使用 git 创建自己的仓库（或者克隆别人的仓库）、文件上传、提交更改、进行协作… Let&#96;s begin 😎  目录【Git 使用入门（1）】什么是 Git【Git 使用入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git 使用入门（2）">
+<meta property="og:url" content="https://github.com/zhililab/2018/04/07/GitSecondImpression/index.html">
+<meta property="og:site_name" content="ZHILI">
+<meta property="og:description" content="Cover Photo by Ashley Harpp on beanstalk Guides  上次已经介绍了 git 的基本概念和知识，这里我们接着进行学习，本篇主要介绍 git 常用的命令 ，相信你看完之后可以使用 git 创建自己的仓库（或者克隆别人的仓库）、文件上传、提交更改、进行协作… Let&#96;s begin 😎  目录【Git 使用入门（1）】什么是 Git【Git 使用入">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/assets/images/cover/GitFirstImpression_cover.png">
+<meta property="article:published_time" content="2018-04-07T08:23:08.000Z">
+<meta property="article:modified_time" content="2026-07-29T00:12:50.479Z">
+<meta property="article:author" content="[object Object]">
+<meta property="article:tag" content="Git">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://github.com/assets/images/cover/GitFirstImpression_cover.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Git 使用入门（2） - ZHILI</title>
+
+  <link  rel="stylesheet" href="/vendor/blog/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="/vendor/blog/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="/vendor/blog/hint.min.css" />
+
+  <link  rel="stylesheet" href="/vendor/blog/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="/vendor/blog/fluid-icons.css">
+
+
+
+<link rel="stylesheet" href="/vendor/blog/site-icons.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"github.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0">  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
+</head>
+
+
+<body class="blog-post-enhanced">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Git 使用入门（2）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2018-04-07 16:23" pubdate>
+          2018年4月7日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          747 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          7 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Git 使用入门（2）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>Cover Photo by Ashley Harpp on beanstalk Guides</p>
+<blockquote>
+<p>上次已经介绍了 git 的基本概念和知识，这里我们接着进行学习，本篇主要介绍 git 常用的命令 ，相信你看完之后可以使用 git 创建自己的仓库（或者克隆别人的仓库）、文件上传、提交更改、进行协作… Let&#96;s begin 😎</p>
+</blockquote>
+<h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><p>【Git 使用入门（1）】<a target="_blank" rel="noopener" href="https://zhililab.github.io/2018/03/19/GitFirstImpression/">什么是 Git</a><br>【Git 使用入门（2）】<a target="_blank" rel="noopener" href="https://zhililab.github.io/2018/04/07/GitSecondImpression/">Git 常用命令</a></p>
+<h3 id="初始化配置"><a href="#初始化配置" class="headerlink" title="初始化配置"></a>初始化配置</h3><p>正式开始使用之前，需要配置好 git 的基本信息，例如：用户名、e-mail 地址、颜色等等。</p>
+<p><strong>$ git config –global [user.name][user.email][color.ui][color.status][color.diff]…</strong></p>
+<h3 id="开始使用"><a href="#开始使用" class="headerlink" title="开始使用"></a>开始使用</h3><p>我们可以新创建一个仓库或者克隆别人的仓库到本地，命令如下：</p>
+<p>1.新建仓库</p>
+<p><strong>$ git init [myprojectname]</strong></p>
+<p><img src="http://f.cl.ly/items/432K2L2y462Z3p2s2a2H/Snipaste_2018-04-07_17-25-07.png" alt="enter image description here" loading="lazy" decoding="async"></p>
+<p>2.克隆仓库</p>
+<p><strong>$ git clone [url]</strong></p>
+<p><img src="http://f.cl.ly/items/3C0V31211K0K2T1q0V1M/Snipaste_2018-04-07_17-37-16.png" alt="enter image description here" loading="lazy" decoding="async"></p>
+<h3 id="协作"><a href="#协作" class="headerlink" title="协作"></a>协作</h3><p>1.查看当前版本状态（是否修改）</p>
+<ul>
+<li><strong>$ git status</strong></li>
+</ul>
+<p><img src="https://cl.ly/3e1T0v3Q2n3l/Snipaste_2018-04-08_08-48-39.png" alt="git status" loading="lazy" decoding="async"></p>
+<p>2.列出分支</p>
+<ul>
+<li><strong>$ git branch</strong>（列出所有本地分支）</li>
+</ul>
+<p><img src="https://cl.ly/2u0u0t0x2o1R/Image%202018-04-08%20at%208.55.57%20AM.png" alt="列出所有本地分支" loading="lazy" decoding="async"></p>
+<ul>
+<li><strong>$ git branch -r</strong>（列出所有远程分支）</li>
+</ul>
+<p><img src="http://f.cl.ly/items/3y0j3L2P1x3N3w3b0y3K/Image%202018-04-08%20at%209.17.39%20AM.png" alt="列出所有远程分支" loading="lazy" decoding="async"></p>
+<ul>
+<li><strong>$ git branch -a</strong>（列出所有本地和远程分支）</li>
+</ul>
+<p><img src="http://f.cl.ly/items/1R460K1H3U290a3q0707/Image%202018-04-08%20at%209.18.41%20AM.png" alt="列出所有本地和远程分支" loading="lazy" decoding="async"></p>
+<p>3.切换到指定分支</p>
+<ul>
+<li><strong>$ git checkout [x_brach]</strong></li>
+</ul>
+<p><img src="http://f.cl.ly/items/0z1X3k3a052p3h1k1j1M/Image%202018-04-08%20at%209.48.08%20AM.png" alt="切换到指定分支" loading="lazy" decoding="async"></p>
+<p>4.新建一个分支，并切换到该分支</p>
+<ul>
+<li><strong>$ git checkout -b [new_branch]</strong></li>
+</ul>
+<p><img src="http://f.cl.ly/items/3B3O3X1G0X1e2R3T083N/Image%202018-04-08%20at%208.59.41%20AM.png" alt="新建一个分支，并切换到该分支" loading="lazy" decoding="async"></p>
+<h3 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h3><p>1.查看当前版本状态（是否修改）</p>
+<ul>
+<li><strong>$ git status</strong></li>
+</ul>
+<p><img src="https://cl.ly/3e1T0v3Q2n3l/Snipaste_2018-04-08_08-48-39.png" alt="查看当前版本状态" loading="lazy" decoding="async"></p>
+<p>2.显示提交日志</p>
+<ul>
+<li><strong>$ git log</strong></li>
+</ul>
+<p><img src="http://f.cl.ly/items/0p0k2P3U11302n3E0P1v/Snipaste_2018-04-08_09-03-18.png" alt="显示提交日志" loading="lazy" decoding="async"></p>
+<p>3.显示提交日志及相关变动文件</p>
+<ul>
+<li><strong>$ git log –stat</strong></li>
+</ul>
+<p><img src="https://cl.ly/041p0g0g2f37/Image%202018-04-08%20at%209.11.38%20AM.png" alt="显示提交日志及相关变动文件" loading="lazy" decoding="async"></p>
+<p>熟话说的好，Practice Makes Perfect ~ 快速下载 git，练练基本的 git 用法吧 🤸‍</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ul>
+<li><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2015/12/git-cheat-sheet.html">常用 Git 命令清单</a></li>
+<li><a target="_blank" rel="noopener" href="https://gist.github.com/guweigang/9848271">git命令大全</a></li>
+<li><a target="_blank" rel="noopener" href="https://git-scm.com/video/what-is-git">Git Basics Episode 2</a></li>
+</ul>
+<hr>
+<p>预告：下次将会介绍一些好用的 git 客户端 😝</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Git/">#Git</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Git 使用入门（2）</div>
+      <div>https://github.com/zhililab/2018/04/07/GitSecondImpression/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>[object Object]</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2018年4月7日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2018/04/08/CTI/" title="威胁情报漫谈">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">威胁情报漫谈</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2018/04/06/Reading-Books-March-2018/" title="书单：2018年3月">
+                        <span class="hidden-mobile">书单：2018年3月</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+    <p class="blog-privacy-link" data-blog-privacy-link><a href="/privacy/">隐私与 Cookie 政策</a></p>
+</footer>
+
+  <!-- Scripts -->
+
+
+<script  src="/vendor/blog/jquery.min.js" ></script>
+<script  src="/vendor/blog/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+<script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=/vendor/blog/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<button id="blog-pet" type="button" aria-label="和博客机器人打个招呼" aria-describedby="blog-pet-message" data-blog-reading-experience>
+  <span class="blog-pet__bubble" id="blog-pet-message" role="status" aria-live="polite">今天也在持续进化</span>
+  <svg class="blog-pet__robot" viewBox="0 0 128 144" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="pet-body-gradient" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#78a7ff"/>
+        <stop offset="1" stop-color="#315ddc"/>
+      </linearGradient>
+    </defs>
+    <path class="blog-pet__antenna" d="M64 18v-8m-7 0h14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+    <rect x="22" y="20" width="84" height="62" rx="28" fill="url(#pet-body-gradient)" stroke="#17377d" stroke-width="5"/>
+    <rect x="34" y="36" width="60" height="30" rx="13" fill="#102b62"/>
+    <circle cx="51" cy="51" r="5" fill="#80ecff"/>
+    <circle cx="77" cy="51" r="5" fill="#80ecff"/>
+    <path d="M54 60h20" stroke="#80ecff" stroke-width="3" stroke-linecap="round"/>
+    <rect x="35" y="76" width="58" height="50" rx="20" fill="url(#pet-body-gradient)" stroke="#17377d" stroke-width="5"/>
+    <path d="M50 99h28" stroke="#d9e7ff" stroke-width="5" stroke-linecap="round"/>
+    <path class="blog-pet__arm blog-pet__arm--left" d="M36 88 18 104" fill="none" stroke="#315ddc" stroke-width="12" stroke-linecap="round"/>
+    <path class="blog-pet__arm blog-pet__arm--right" d="M92 88 112 72" fill="none" stroke="#315ddc" stroke-width="12" stroke-linecap="round"/>
+    <path d="M52 124v12m24-12v12" stroke="#17377d" stroke-width="10" stroke-linecap="round"/>
+  </svg>
+</button>
+<script src="/js/blog-reading-experience.js" defer data-blog-reading-experience></script>
+</body>
+</html>

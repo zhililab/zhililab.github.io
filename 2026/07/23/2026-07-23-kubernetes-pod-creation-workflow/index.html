@@ -1,0 +1,1452 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/assets/images/favicon/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Zhi Li">
+  <meta name="keywords" content="python, devops">
+  
+    <meta name="description" content="最近在工作中遇到了一次 Kubernetes Toolchain 挂载问题，涉及 Linux 文件系统、Kubernetes 集群、Volume 挂载、Mount Options、节点环境差异等多个层面。 最开始，这只是一个具体的故障排查问题：  为什么同一套 Toolchain，在不同节点或不同 Pod 中表现不一致？为什么 Volume 已经声明成功，容器内仍然会出现权限、性能或挂载行为异常？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从一次 K8s Toolchain 挂载故障，重新理解 Pod 从创建到 Ready 的全过程">
+<meta property="og:url" content="https://github.com/zhililab/2026/07/23/2026-07-23-kubernetes-pod-creation-workflow/index.html">
+<meta property="og:site_name" content="ZHILI">
+<meta property="og:description" content="最近在工作中遇到了一次 Kubernetes Toolchain 挂载问题，涉及 Linux 文件系统、Kubernetes 集群、Volume 挂载、Mount Options、节点环境差异等多个层面。 最开始，这只是一个具体的故障排查问题：  为什么同一套 Toolchain，在不同节点或不同 Pod 中表现不一致？为什么 Volume 已经声明成功，容器内仍然会出现权限、性能或挂载行为异常？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://github.com/assets/images/cover/Kubernetes-logo.webp">
+<meta property="article:published_time" content="2026-07-23T15:48:27.000Z">
+<meta property="article:modified_time" content="2026-07-29T00:12:50.478Z">
+<meta property="article:author" content="[object Object]">
+<meta property="article:tag" content="Kubernetes">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://github.com/assets/images/cover/Kubernetes-logo.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>从一次 K8s Toolchain 挂载故障，重新理解 Pod 从创建到 Ready 的全过程 - ZHILI</title>
+
+  <link  rel="stylesheet" href="/vendor/blog/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="/vendor/blog/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="/vendor/blog/hint.min.css" />
+
+  <link  rel="stylesheet" href="/vendor/blog/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="/vendor/blog/fluid-icons.css">
+
+
+
+<link rel="stylesheet" href="/vendor/blog/site-icons.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"github.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0">  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
+</head>
+
+
+<body class="blog-post-enhanced">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" data-post-banner-inline class="banner" parallax=true
+     style="background: url('data:image/webp;base64,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') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="从一次 K8s Toolchain 挂载故障，重新理解 Pod 从创建到 Ready 的全过程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-07-23 23:48" pubdate>
+          2026年7月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          14k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          114 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">从一次 K8s Toolchain 挂载故障，重新理解 Pod 从创建到 Ready 的全过程</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>最近在工作中遇到了一次 Kubernetes Toolchain 挂载问题，涉及 Linux 文件系统、Kubernetes 集群、Volume 挂载、Mount Options、节点环境差异等多个层面。</p>
+<p>最开始，这只是一个具体的故障排查问题：</p>
+<blockquote>
+<p>为什么同一套 Toolchain，在不同节点或不同 Pod 中表现不一致？<br><br>为什么 Volume 已经声明成功，容器内仍然会出现权限、性能或挂载行为异常？<br><br>问题究竟发生在 Kubernetes、Linux Mount、CSI，还是应用运行环境？</p>
+</blockquote>
+<p>但随着问题逐步展开，我发现仅仅理解 PVC、VolumeMount 或 Mount Options 并不足以解释整个故障链路。</p>
+<p>要真正理解这类问题，需要重新回答一个更基础的问题：</p>
+<blockquote>
+<p><strong>一个 Pod 从提交 YAML 开始，到最终变为 Ready，底层到底经历了什么？</strong></p>
+</blockquote>
+<p>借这次机会，我重新梳理了 Kubernetes Pod 从创建、调度、运行，到最终接收 Service 流量的完整过程，也进一步建立了对 Kubernetes Control Loop、状态收敛与故障路径的理解。</p>
+<h2 id="一、我最近常用的复盘方式"><a href="#一、我最近常用的复盘方式" class="headerlink" title="一、我最近常用的复盘方式"></a>一、我最近常用的复盘方式</h2><p>最近我经常使用下面这套方式学习技术问题，也分享给大家作为参考。</p>
+<h3 id="1-先口述自己的理解（ChatGPT-口述）"><a href="#1-先口述自己的理解（ChatGPT-口述）" class="headerlink" title="1. 先口述自己的理解（ChatGPT 口述）"></a>1. 先口述自己的理解（ChatGPT 口述）</h3><p>先不急着查资料，而是直接向 ChatGPT 口述：</p>
+<ul>
+<li>我对某个技术问题的理解；</li>
+<li>我认为的执行流程；</li>
+<li>我阅读源码后得到的结论；</li>
+<li>我对故障原因的初步判断。</li>
+</ul>
+<p>这个过程的价值不在于立即得到答案，而在于：</p>
+<blockquote>
+<p><strong>把脑中的隐性认知显性化。</strong></p>
+</blockquote>
+<p>很多时候，我们以为自己“理解了”，实际上只是记住了几个组件名称，并没有真正建立因果关系。所以人们常说当你能够给一个 beginner 讲明白，你才真正理解了。</p>
+<h3 id="2-根据反馈逐步验证"><a href="#2-根据反馈逐步验证" class="headerlink" title="2. 根据反馈逐步验证"></a>2. 根据反馈逐步验证</h3><p>根据 ChatGPT 提供的疑点、反例和源码入口，再自己验证：</p>
+<ul>
+<li>每一步由哪个组件负责；</li>
+<li>状态写在哪里；</li>
+<li>谁在 Watch；</li>
+<li>谁在 Reconcile；</li>
+<li>哪个状态是原因，哪个状态只是结果；</li>
+<li>故障发生时应该看 Events、Logs、Metrics，还是节点环境。</li>
+</ul>
+<h3 id="3-最后形成完整模型"><a href="#3-最后形成完整模型" class="headerlink" title="3. 最后形成完整模型"></a>3. 最后形成完整模型</h3><p>最终输出的不只是零散笔记，而是：</p>
+<ul>
+<li>一张完整流程图；</li>
+<li>一条可解释的状态链路；</li>
+<li>一组源码入口；</li>
+<li>一套故障排查路径；</li>
+<li>一份可复用的 Runbook 或 SOP。</li>
+</ul>
+<p>ChatGPT 对我当时状态的评价是：</p>
+<blockquote>
+<p><strong>你现在的问题已经不是“会不会使用 Kubernetes”，而是正在从“使用 Kubernetes”向“理解 Kubernetes”过渡。</strong></p>
+<p>当前最大的瓶颈并不是知识量，而是还没有完全建立 Kubernetes 控制面的因果关系，也就是 Control Loop。</p>
+</blockquote>
+<p>我认为这个判断非常准确。</p>
+<h2 id="二、最初没有回答清楚的几个问题"><a href="#二、最初没有回答清楚的几个问题" class="headerlink" title="二、最初没有回答清楚的几个问题"></a>二、最初没有回答清楚的几个问题</h2><p>在复盘 Pod 创建流程时，我发现自己没有真正口述清楚下面几个问题：</p>
+<ol>
+<li>谁负责调度 Pod？</li>
+<li>API Server 如何让其他组件感知状态变化？</li>
+<li>Pod 的 <code>Ready=True</code> 到底从哪里来？</li>
+<li>kubelet 的核心职责是什么？</li>
+<li>Controller 的本质是什么？</li>
+<li>Service 为什么只把流量转发给 Ready Pod？</li>
+<li>Volume 挂载发生在什么阶段？</li>
+<li><code>ContainerCreating</code> 为什么可能持续很久？</li>
+</ol>
+<p>这些问题看似分散，实际上都指向 Kubernetes 最核心的设计：</p>
+<blockquote>
+<p><strong>Control Loop，控制循环。</strong></p>
+</blockquote>
+<h2 id="三、真正的-Kubernetes-思维：不是流程，而是状态收敛"><a href="#三、真正的-Kubernetes-思维：不是流程，而是状态收敛" class="headerlink" title="三、真正的 Kubernetes 思维：不是流程，而是状态收敛"></a>三、真正的 Kubernetes 思维：不是流程，而是状态收敛</h2><p>过去阅读 Kubernetes 官方文档或学习单个组件时，我经常下意识地把系统理解成下面这种串行流程：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text">组件 A<br>  ↓<br>组件 B<br>  ↓<br>组件 C<br></code></pre></td></tr></table></figure>
+
+<p>这是一种典型的“流程图思维”。</p>
+<p>它适合解释一次性的调用链，但并不能准确描述 Kubernetes。</p>
+<p>Kubernetes 更接近下面这种模型：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs text">            Desired State<br>                 │<br>                 ▼<br>           kube-apiserver<br>                 │<br>                 ▼<br>                etcd<br>                 │<br>      ───────── Watch ─────────<br>     │             │            │<br>     ▼             ▼            ▼<br>Scheduler      Controller     kubelet<br>     │             │            │<br>     └──────── Reconcile ───────┘<br>                 │<br>                 ▼<br>            Actual State<br></code></pre></td></tr></table></figure>
+
+<p>这里最重要的不是“谁调用了谁”，而是：</p>
+<ol>
+<li>用户声明期望状态；</li>
+<li>API Server 保存状态；</li>
+<li>各组件通过 Watch 感知对象变化；</li>
+<li>各自执行 Reconcile；</li>
+<li>不断推动实际状态接近期望状态；</li>
+<li>再把新的实际状态写回 API Server。</li>
+</ol>
+<p>严格来说，并不是“完全没人通知别人”。</p>
+<p>更准确的描述是：</p>
+<blockquote>
+<p>Kubernetes 组件之间通常不通过强耦合的点对点调用推动流程，而是由 API Server 提供统一状态入口，并通过 List&#x2F;Watch 机制向各组件持续传递对象变化。</p>
+</blockquote>
+<p>各组件共同遵循以下模式：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text">Watch API Server<br>        ↓<br>发现状态变化<br>        ↓<br>比较 Desired State 与 Actual State<br>        ↓<br>执行 Reconcile<br>        ↓<br>更新状态<br>        ↓<br>继续 Watch<br></code></pre></td></tr></table></figure>
+
+<p>这就是 Kubernetes 最重要的设计思想之一。</p>
+<p>AI 辅助学习对我最大的帮助，也不是简单解释某个 API，而是帮助我把分散的组件知识重新组织成一套状态驱动的系统模型。</p>
+<h2 id="四、Pod-从创建到-Ready-的完整过程"><a href="#四、Pod-从创建到-Ready-的完整过程" class="headerlink" title="四、Pod 从创建到 Ready 的完整过程"></a>四、Pod 从创建到 Ready 的完整过程</h2><p>下面重新梳理一个 Pod 从提交 YAML，到最终接收 Service 流量的全过程。</p>
+<h3 id="4-1-全流程总览"><a href="#4-1-全流程总览" class="headerlink" title="4.1 全流程总览"></a>4.1 全流程总览</h3><table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>主要负责组件</th>
+<th>核心动作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>① 提交请求</td>
+<td>kubectl &#x2F; Client</td>
+<td>将 Pod YAML 转换为 API 请求</td>
+</tr>
+<tr>
+<td>② 身份认证</td>
+<td>kube-apiserver</td>
+<td>Authentication</td>
+</tr>
+<tr>
+<td>③ 权限校验</td>
+<td>kube-apiserver</td>
+<td>Authorization &#x2F; RBAC</td>
+</tr>
+<tr>
+<td>④ 准入控制</td>
+<td>kube-apiserver</td>
+<td>Defaulting、LimitRange、ResourceQuota、Admission Webhook</td>
+</tr>
+<tr>
+<td>⑤ 持久化对象</td>
+<td>kube-apiserver &#x2F; etcd</td>
+<td>将 Pod Spec 写入 etcd</td>
+</tr>
+<tr>
+<td>⑥ 发现未调度 Pod</td>
+<td>kube-scheduler</td>
+<td>Watch <code>spec.nodeName</code> 为空的 Pod</td>
+</tr>
+<tr>
+<td>⑦ 调度决策</td>
+<td>kube-scheduler</td>
+<td>Filter、Score、Reserve、Permit、Bind</td>
+</tr>
+<tr>
+<td>⑧ 写入绑定结果</td>
+<td>kube-scheduler &#x2F; API Server</td>
+<td>将 Pod 绑定到目标 Node</td>
+</tr>
+<tr>
+<td>⑨ 节点侧接管</td>
+<td>kubelet</td>
+<td>Watch 分配给本节点的 Pod</td>
+</tr>
+<tr>
+<td>⑩ 同步 Pod</td>
+<td>kubelet</td>
+<td>执行 SyncPod，协调 Sandbox、Volume、Container</td>
+</tr>
+<tr>
+<td>⑪ 准备存储</td>
+<td>kubelet &#x2F; CSI &#x2F; Linux Mount</td>
+<td>Attach、Mount、权限与挂载参数处理</td>
+</tr>
+<tr>
+<td>⑫ 准备网络</td>
+<td>kubelet &#x2F; CRI &#x2F; CNI</td>
+<td>创建 Pod Sandbox 和网络命名空间</td>
+</tr>
+<tr>
+<td>⑬ 拉取镜像</td>
+<td>kubelet &#x2F; Container Runtime</td>
+<td>Pull Image</td>
+</tr>
+<tr>
+<td>⑭ 创建容器</td>
+<td>Container Runtime</td>
+<td>CreateContainer</td>
+</tr>
+<tr>
+<td>⑮ 启动容器</td>
+<td>Container Runtime</td>
+<td>StartContainer</td>
+</tr>
+<tr>
+<td>⑯ 健康检查</td>
+<td>kubelet</td>
+<td>Startup、Liveness、Readiness Probe</td>
+</tr>
+<tr>
+<td>⑰ 更新 Pod Status</td>
+<td>kubelet</td>
+<td>写入 ContainerStatus 和 Pod Conditions</td>
+</tr>
+<tr>
+<td>⑱ Pod Ready</td>
+<td>kubelet &#x2F; API Server</td>
+<td>满足条件后更新 <code>Ready=True</code></td>
+</tr>
+<tr>
+<td>⑲ 更新 EndpointSlice</td>
+<td>EndpointSlice Controller</td>
+<td>将 Ready Pod 加入 Service 后端</td>
+</tr>
+<tr>
+<td>⑳ 转发流量</td>
+<td>kube-proxy &#x2F; CNI 数据面</td>
+<td>Service 开始把流量转发到 Pod</td>
+</tr>
+</tbody></table>
+<h3 id="4-2-API-Server：系统状态入口"><a href="#4-2-API-Server：系统状态入口" class="headerlink" title="4.2 API Server：系统状态入口"></a>4.2 API Server：系统状态入口</h3><p>当执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">kubectl apply -f pod.yaml<br></code></pre></td></tr></table></figure>
+
+<p>kubectl 会向 kube-apiserver 发送请求。</p>
+<p>API Server 会依次执行：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs text">Authentication<br>      ↓<br>Authorization<br>      ↓<br>Admission Control<br>      ↓<br>Schema Validation<br>      ↓<br>写入 etcd<br></code></pre></td></tr></table></figure>
+
+<p>这里需要注意：</p>
+<blockquote>
+<p>API Server 并不会亲自创建容器，也不会亲自调度 Pod。</p>
+</blockquote>
+<p>它的主要职责是：</p>
+<ul>
+<li>提供统一 API；</li>
+<li>验证请求；</li>
+<li>执行准入策略；</li>
+<li>保存集群状态；</li>
+<li>提供 List&#x2F;Watch；</li>
+<li>作为各控制器之间的状态协调中心。</li>
+</ul>
+<p>Pod 对象刚写入 etcd 时，通常还没有绑定节点：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">spec:</span><br>  <span class="hljs-attr">nodeName:</span> <span class="hljs-string">&quot;&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>此时它只是一个“待实现的期望状态”。</p>
+<h3 id="4-3-Scheduler：负责选择节点，不负责启动容器"><a href="#4-3-Scheduler：负责选择节点，不负责启动容器" class="headerlink" title="4.3 Scheduler：负责选择节点，不负责启动容器"></a>4.3 Scheduler：负责选择节点，不负责启动容器</h3><p>kube-scheduler 会 Watch 尚未绑定节点的 Pod。</p>
+<p>其核心调度过程可以抽象为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs text">Pending Pod<br>    ↓<br>PreFilter<br>    ↓<br>Filter<br>    ↓<br>Score<br>    ↓<br>Reserve<br>    ↓<br>Permit<br>    ↓<br>Bind<br></code></pre></td></tr></table></figure>
+
+<p>其中最常见的是：</p>
+<h4 id="Filter"><a href="#Filter" class="headerlink" title="Filter"></a>Filter</h4><p>过滤掉不满足条件的节点，例如：</p>
+<ul>
+<li>CPU 或 Memory 不足；</li>
+<li>NodeSelector 不匹配；</li>
+<li>NodeAffinity 不满足；</li>
+<li>存在无法容忍的 Taint；</li>
+<li>PVC &#x2F; Volume 拓扑不匹配；</li>
+<li>PodAffinity &#x2F; PodAntiAffinity 不满足；</li>
+<li>HostPort 冲突。</li>
+</ul>
+<h4 id="Score"><a href="#Score" class="headerlink" title="Score"></a>Score</h4><p>对剩余节点打分，例如：</p>
+<ul>
+<li>资源是否均衡；</li>
+<li>节点亲和性得分；</li>
+<li>Pod 分布是否合理；</li>
+<li>镜像是否已经存在；</li>
+<li>拓扑分布是否满足预期。</li>
+</ul>
+<p>最终 Scheduler 会选择一个节点，并通过 Binding 将结果写回 API Server。</p>
+<p>关键点是：</p>
+<blockquote>
+<p>Scheduler 只负责决定“Pod 应该运行在哪个 Node”，并不负责真正创建容器。</p>
+</blockquote>
+<h3 id="4-4-kubelet：把-Pod-Spec-变成节点上的真实进程"><a href="#4-4-kubelet：把-Pod-Spec-变成节点上的真实进程" class="headerlink" title="4.4 kubelet：把 Pod Spec 变成节点上的真实进程"></a>4.4 kubelet：把 Pod Spec 变成节点上的真实进程</h3><p>Pod 被绑定到某个 Node 后，该 Node 上的 kubelet 会通过 Watch 感知这个 Pod。</p>
+<p>kubelet 的核心任务是：</p>
+<blockquote>
+<p>持续比较 Pod Spec 与节点实际运行状态，并通过 SyncPod 推动两者收敛。</p>
+</blockquote>
+<p>可以简单理解为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs text">Watch assigned Pod<br>        ↓<br>Pod Worker<br>        ↓<br>SyncPod()<br>        ↓<br>检查 Volume<br>        ↓<br>创建 Pod Sandbox<br>        ↓<br>配置 Network<br>        ↓<br>拉取 Image<br>        ↓<br>创建 Container<br>        ↓<br>启动 Container<br>        ↓<br>执行 Probe<br>        ↓<br>更新 Pod Status<br></code></pre></td></tr></table></figure>
+
+<p>kubelet 并不是只执行一次启动动作。</p>
+<p>它会持续同步：</p>
+<ul>
+<li>容器是否应该存在；</li>
+<li>容器是否异常退出；</li>
+<li>Volume 是否挂载成功；</li>
+<li>Probe 是否通过；</li>
+<li>Pod 是否被删除；</li>
+<li>Pod 是否需要重建；</li>
+<li>实际状态是否与 Spec 一致。</li>
+</ul>
+<p>这也是为什么：</p>
+<blockquote>
+<p><strong>SyncPod 是理解 kubelet 的核心入口。</strong></p>
+</blockquote>
+<h3 id="4-5-CRI、CNI、CSI：Pod-真正运行的底层接口"><a href="#4-5-CRI、CNI、CSI：Pod-真正运行的底层接口" class="headerlink" title="4.5 CRI、CNI、CSI：Pod 真正运行的底层接口"></a>4.5 CRI、CNI、CSI：Pod 真正运行的底层接口</h3><p>Pod 从“已调度”变成“可运行”，通常离不开三类关键接口。</p>
+<h4 id="4-5-1-CRI：Container-Runtime-Interface"><a href="#4-5-1-CRI：Container-Runtime-Interface" class="headerlink" title="4.5.1 CRI：Container Runtime Interface"></a>4.5.1 CRI：Container Runtime Interface</h4><p>CRI 负责 kubelet 与容器运行时之间的交互。</p>
+<p>典型调用包括：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text">RunPodSandbox()<br>CreateContainer()<br>StartContainer()<br>StopContainer()<br>RemoveContainer()<br></code></pre></td></tr></table></figure>
+
+<p>常见运行时包括：</p>
+<ul>
+<li>containerd；</li>
+<li>CRI-O。</li>
+</ul>
+<h4 id="4-5-2-CNI：Container-Network-Interface"><a href="#4-5-2-CNI：Container-Network-Interface" class="headerlink" title="4.5.2 CNI：Container Network Interface"></a>4.5.2 CNI：Container Network Interface</h4><p>CNI 负责为 Pod 准备网络，例如：</p>
+<ul>
+<li>创建网络接口；</li>
+<li>分配 Pod IP；</li>
+<li>配置路由；</li>
+<li>配置网络命名空间；</li>
+<li>建立 veth；</li>
+<li>应用 NetworkPolicy 相关能力。</li>
+</ul>
+<p>因此，当 Pod 长时间处于 <code>ContainerCreating</code> 时，问题不一定是镜像拉取，也可能是 CNI 网络配置失败（例如，网络插件未加载、网络命名空间未创建等）。</p>
+<h4 id="4-5-3-CSI：Container-Storage-Interface"><a href="#4-5-3-CSI：Container-Storage-Interface" class="headerlink" title="4.5.3 CSI：Container Storage Interface"></a>4.5.3 CSI：Container Storage Interface</h4><p>CSI 负责 Kubernetes 与存储系统之间的交互，例如：</p>
+<ul>
+<li>Attach Volume；</li>
+<li>Stage Volume；</li>
+<li>Publish Volume；</li>
+<li>Mount Volume；</li>
+<li>Unmount Volume。</li>
+</ul>
+<p>对于 Toolchain、共享目录、NAS 或高性能文件系统，问题还可能继续向下延伸到 Linux 层：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs text">PVC / PV<br>   ↓<br>CSI Driver<br>   ↓<br>NodePublishVolume<br>   ↓<br>mount syscall<br>   ↓<br>Filesystem<br>   ↓<br>Mount Options<br>   ↓<br>容器内实际访问行为<br></code></pre></td></tr></table></figure>
+
+<p>这也是这次 Toolchain 挂载问题给我的启发：</p>
+<blockquote>
+<p>Kubernetes Volume 配置正确，并不代表最终文件系统行为一定正确。</p>
+</blockquote>
+<p>还需要继续验证：</p>
+<ul>
+<li>mount options；</li>
+<li>read-only &#x2F; read-write；</li>
+<li>NFS 参数；</li>
+<li>UID &#x2F; GID；</li>
+<li>root squash；</li>
+<li>SELinux；</li>
+<li>propagation；</li>
+<li>inode；</li>
+<li>page cache；</li>
+<li>I&#x2F;O 延迟；</li>
+<li>节点内核版本；</li>
+<li>容器运行时差异。</li>
+</ul>
+<p>延伸本次 Toolchain 挂载缓存问题：Pod 重建本身不会 自动刷新 Linux 内核级的 NFS 属性缓存。但是，Pod 重建触发的 CSI Unstage&#x2F;Stage 流程会强制刷新缓存（前提是 CSI 驱动正确实现了卸载再挂载）。</p>
+<p>为了方便理解，这里大致写了 POD Create&#x2F;Delete CSI 相关调用流程：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs markdown">Pod Delete → Kubelet 调用:<br><span class="hljs-bullet">  1.</span> CSI NodeUnpublishVolume  ← 解除 bind mount（容器视角）<br><span class="hljs-bullet">  2.</span> CSI NodeUnstageVolume    ← 执行 umount（节点视角）<br><br>Pod Create → Kubelet 调用:<br><span class="hljs-bullet">  3.</span> CSI NodeStageVolume      ← 执行 mount -t nfs ...<br><span class="hljs-bullet">  4.</span> CSI NodePublishVolume    ← 创建 bind mount<br></code></pre></td></tr></table></figure>
+
+<p>说明：</p>
+<ol>
+<li>如果 Step 2 成功执行了 umount → 内核释放 superblock → Step 3 的 mount 建立全新会话 → 缓存彻底刷新 ✅</li>
+<li>如果 Step 2 因 “device busy” 失败 → 旧 mount 仍存活 → Step 3 可能复用旧 superblock 或直接报错 → 缓存未刷新 ❌</li>
+</ol>
+<h3 id="4-6-Pod-Ready-到底是怎么来的"><a href="#4-6-Pod-Ready-到底是怎么来的" class="headerlink" title="4.6 Pod Ready 到底是怎么来的"></a>4.6 Pod Ready 到底是怎么来的</h3><p>Pod 启动成功，不等于 Pod Ready。</p>
+<p>kubelet 会持续维护 Pod Conditions，例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs text">PodScheduled<br>Initialized<br>ContainersReady<br>Ready<br></code></pre></td></tr></table></figure>
+
+<p>一个 Pod 常见的状态变化是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text">PodScheduled=True<br>        ↓<br>Initialized=True<br>        ↓<br>ContainersReady=True<br>        ↓<br>Ready=True<br></code></pre></td></tr></table></figure>
+
+<p>其中 <code>Ready=True</code> 并不是简单等于“进程存在”。</p>
+<p>它通常取决于：</p>
+<ul>
+<li>所有必要容器已经启动；</li>
+<li>Readiness Probe 通过；</li>
+<li>Init Container 已完成；</li>
+<li>自定义 Readiness Gates 满足；</li>
+<li>Pod 没有处于终止阶段。</li>
+</ul>
+<p>因此：</p>
+<blockquote>
+<p><code>Running</code> 只表示 Pod 已进入运行阶段，<code>Ready</code> 才表示它具备对外提供服务的条件。</p>
+</blockquote>
+<p>这也是排障时经常需要区分的两个概念。</p>
+<h3 id="4-7-Service-为什么知道-Pod-Ready"><a href="#4-7-Service-为什么知道-Pod-Ready" class="headerlink" title="4.7 Service 为什么知道 Pod Ready"></a>4.7 Service 为什么知道 Pod Ready</h3><p>Pod Ready 状态写回 API Server 后，EndpointSlice Controller 会根据：</p>
+<ul>
+<li>Service Selector；</li>
+<li>Pod Label；</li>
+<li>Pod IP；</li>
+<li>Pod Ready Condition；</li>
+</ul>
+<p>更新对应的 EndpointSlice。</p>
+<p>可以抽象为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text">Pod Ready=True<br>      ↓<br>EndpointSlice Controller Reconcile<br>      ↓<br>更新 EndpointSlice<br>      ↓<br>Service 后端出现该 Pod IP<br>      ↓<br>kube-proxy / eBPF 数据面更新<br>      ↓<br>流量开始进入 Pod<br></code></pre></td></tr></table></figure>
+
+<p>因此，当出现：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs text">Pod 正常运行<br>但 Service 没有流量<br></code></pre></td></tr></table></figure>
+
+<p>不能只检查容器日志，还需要继续检查：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs text">Readiness Probe<br>      ↓<br>Pod Conditions<br>      ↓<br>Service Selector<br>      ↓<br>EndpointSlice<br>      ↓<br>kube-proxy / CNI 数据面<br></code></pre></td></tr></table></figure>
+
+<h2 id="五、Pod-创建全过程时序图"><a href="#五、Pod-创建全过程时序图" class="headerlink" title="五、Pod 创建全过程时序图"></a>五、Pod 创建全过程时序图</h2><p><picture><source type="image/webp" data-srcset="/assets/images/optimized/posts/kubernetes-pod-creation-sequence-diagram-640.webp 640w, /assets/images/optimized/posts/kubernetes-pod-creation-sequence-diagram-960.webp 960w, /assets/images/optimized/posts/kubernetes-pod-creation-sequence-diagram-1440.webp 1440w" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px"><img alt="Kubernetes Pod 从创建到 Ready 的完整时序图" loading="lazy" decoding="async" width="4558" height="3602" fetchpriority="low" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px" data-blog-deferred-image="true" data-src="/assets/images/posts/kubernetes-pod-creation-sequence-diagram.png" data-srcset="/assets/images/optimized/posts/kubernetes-pod-creation-sequence-diagram-640.webp 640w, /assets/images/optimized/posts/kubernetes-pod-creation-sequence-diagram-960.webp 960w, /assets/images/optimized/posts/kubernetes-pod-creation-sequence-diagram-1440.webp 1440w" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22/%3E"></picture><noscript><img src="/assets/images/posts/kubernetes-pod-creation-sequence-diagram.png" alt="Kubernetes Pod 从创建到 Ready 的完整时序图" loading="lazy" decoding="async" width="4558" height="3602" fetchpriority="low" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px"></noscript></p>
+<p>推荐结合源码分析工具继续阅读：</p>
+<ul>
+<li>DeepWiki Code Map：<br><br><a target="_blank" rel="noopener" href="https://deepwiki.com/search/k8s-pod_7b5ad608-0148-4469-81fc-318d15e53365?mode=codemap">https://deepwiki.com/search/k8s-pod_7b5ad608-0148-4469-81fc-318d15e53365?mode=codemap</a></li>
+</ul>
+<p><picture><source type="image/webp" data-srcset="/assets/images/optimized/posts/kubernetes-pod-creation-workflow-640.webp 640w, /assets/images/optimized/posts/kubernetes-pod-creation-workflow-960.webp 960w, /assets/images/optimized/posts/kubernetes-pod-creation-workflow-1280.webp 1280w" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px"><img alt="Kubernetes Pod 创建与运行源码图谱" loading="lazy" decoding="async" width="1280" height="691" fetchpriority="low" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px" data-blog-deferred-image="true" data-src="/assets/images/posts/kubernetes-pod-creation-workflow.png" data-srcset="/assets/images/optimized/posts/kubernetes-pod-creation-workflow-640.webp 640w, /assets/images/optimized/posts/kubernetes-pod-creation-workflow-960.webp 960w, /assets/images/optimized/posts/kubernetes-pod-creation-workflow-1280.webp 1280w" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22/%3E"></picture><noscript><img src="/assets/images/posts/kubernetes-pod-creation-workflow.png" alt="Kubernetes Pod 创建与运行源码图谱" loading="lazy" decoding="async" width="1280" height="691" fetchpriority="low" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px"></noscript></p>
+<h2 id="六、这次复盘暴露出的主要盲点"><a href="#六、这次复盘暴露出的主要盲点" class="headerlink" title="六、这次复盘暴露出的主要盲点"></a>六、这次复盘暴露出的主要盲点</h2><p>按照重要程度排序：</p>
+<table>
+<thead>
+<tr>
+<th>优先级</th>
+<th>盲点</th>
+<th>为什么重要</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>⭐⭐⭐⭐⭐</td>
+<td>List&#x2F;Watch 机制</td>
+<td>Kubernetes 组件感知状态变化的基础</td>
+</tr>
+<tr>
+<td>⭐⭐⭐⭐⭐</td>
+<td>Reconcile</td>
+<td>Controller 的本质，也是 Kubernetes 的核心运行模型</td>
+</tr>
+<tr>
+<td>⭐⭐⭐⭐⭐</td>
+<td>kubelet SyncPod</td>
+<td>Pod 从声明状态走向真实运行状态的关键</td>
+</tr>
+<tr>
+<td>⭐⭐⭐⭐</td>
+<td>Scheduler Filter &#x2F; Score</td>
+<td>理解 Pod Pending、调度失败和资源策略的基础</td>
+</tr>
+<tr>
+<td>⭐⭐⭐⭐</td>
+<td>CRI &#x2F; CNI &#x2F; CSI</td>
+<td>Pod 真正启动、联网和挂载存储的底层路径</td>
+</tr>
+<tr>
+<td>⭐⭐⭐⭐</td>
+<td>Linux Mount &#x2F; Filesystem</td>
+<td>Kubernetes 存储问题最终经常落在操作系统层</td>
+</tr>
+<tr>
+<td>⭐⭐⭐</td>
+<td>Probe 与 Pod Conditions</td>
+<td>理解 <code>Running</code>、<code>ContainersReady</code>、<code>Ready</code> 的区别</td>
+</tr>
+<tr>
+<td>⭐⭐⭐</td>
+<td>EndpointSlice</td>
+<td>理解 Service 为什么有流量或没有流量</td>
+</tr>
+<tr>
+<td>⭐⭐⭐</td>
+<td>Events 的生成链路</td>
+<td>快速判断问题发生在哪个控制器或节点阶段</td>
+</tr>
+<tr>
+<td>⭐⭐</td>
+<td>Status 与 Spec 的边界</td>
+<td>区分期望状态、实际状态和控制器职责</td>
+</tr>
+</tbody></table>
+<h2 id="七、从-DevOps-x2F-SRE-角度学习-Kubernetes"><a href="#七、从-DevOps-x2F-SRE-角度学习-Kubernetes" class="headerlink" title="七、从 DevOps &#x2F; SRE 角度学习 Kubernetes"></a>七、从 DevOps &#x2F; SRE 角度学习 Kubernetes</h2><p>很多人学习 Kubernetes，包括我自己，最初关注的往往是分散的对象：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs text">Pod<br>Deployment<br>Service<br>Ingress<br>ConfigMap<br>Secret<br></code></pre></td></tr></table></figure>
+
+<p>这是学习 Kubernetes API 对象的常见路线。</p>
+<p>但从 DevOps、SRE 或平台工程师角度，更重要的问题是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs text">为什么 Pod Pending？<br>为什么 Pod 一直 ContainerCreating？<br>为什么出现 ImagePullBackOff？<br>为什么 Ready=False？<br>为什么 CrashLoopBackOff？<br>为什么 Service 没有流量？<br>为什么 Node 变成 NotReady？<br>为什么 Scheduler 不调度？<br>为什么 Volume Mount 失败？<br>为什么同一镜像在不同节点行为不同？<br></code></pre></td></tr></table></figure>
+
+<p>因此，学习重点不应该只停留在：</p>
+<blockquote>
+<p>Kubernetes 有哪些对象。</p>
+</blockquote>
+<p>而应该升级为：</p>
+<blockquote>
+<p><strong>Kubernetes 的状态为什么没有收敛，阻塞发生在哪一层。</strong></p>
+</blockquote>
+<p>这次 Toolchain 挂载问题也说明了这一点。</p>
+<p>表面问题可能是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">Toolchain 无法正常访问<br></code></pre></td></tr></table></figure>
+
+<p>但实际故障链路可能是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs text">Pod Spec<br>  ↓<br>PVC / PV<br>  ↓<br>CSI<br>  ↓<br>Node Mount<br>  ↓<br>Linux Filesystem<br>  ↓<br>Mount Options<br>  ↓<br>UID / GID / Permission<br>  ↓<br>应用访问行为<br></code></pre></td></tr></table></figure>
+
+<p>对线上 precheck、dailybuild、central build 等平台任务而言，这类排障经验非常有价值。</p>
+<p>因为它最终可以沉淀为：</p>
+<ul>
+<li>故障树；</li>
+<li>Runbook；</li>
+<li>SOP；</li>
+<li>自动诊断脚本；</li>
+<li>监控指标；</li>
+<li>告警规则；</li>
+</ul>
+<p>这比单纯解决一次故障更有长期价值。</p>
+<h2 id="八、建议建立-Kubernetes-故障路径模型"><a href="#八、建议建立-Kubernetes-故障路径模型" class="headerlink" title="八、建议建立 Kubernetes 故障路径模型"></a>八、建议建立 Kubernetes 故障路径模型</h2><h3 id="8-1-Pod-Pending"><a href="#8-1-Pod-Pending" class="headerlink" title="8.1 Pod Pending"></a>8.1 Pod Pending</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs text">Pod Pending<br>    ↓<br>查看 Pod Events<br>    ↓<br>Scheduler 是否产生 FailedScheduling<br>    ↓<br>Node Resources<br>    ↓<br>NodeSelector / Affinity<br>    ↓<br>Taint / Toleration<br>    ↓<br>PVC / Volume Topology<br>    ↓<br>Quota / LimitRange<br>    ↓<br>找到调度阻塞条件<br></code></pre></td></tr></table></figure>
+
+<p>常用命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">kubectl describe pod &lt;pod-name&gt; -n &lt;namespace&gt;<br>kubectl get events -n &lt;namespace&gt; --sort-by=.lastTimestamp<br>kubectl get nodes -o wide<br>kubectl describe node &lt;node-name&gt;<br></code></pre></td></tr></table></figure>
+
+<h3 id="8-2-ContainerCreating"><a href="#8-2-ContainerCreating" class="headerlink" title="8.2 ContainerCreating"></a>8.2 ContainerCreating</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs text">ContainerCreating<br>        ↓<br>查看 Events<br>        ↓<br>Image Pull<br>        ↓<br>CNI<br>        ↓<br>CSI / Volume Mount<br>        ↓<br>Secret / ConfigMap<br>        ↓<br>Sandbox 创建<br>        ↓<br>Node Runtime / Kernel<br></code></pre></td></tr></table></figure>
+
+<p>重点检查：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">kubectl describe pod &lt;pod-name&gt; -n &lt;namespace&gt;<br>journalctl -u kubelet<br>crictl pods<br>crictl ps -a<br>mount<br>findmnt<br>dmesg<br></code></pre></td></tr></table></figure>
+
+<h3 id="8-3-Ready-x3D-False"><a href="#8-3-Ready-x3D-False" class="headerlink" title="8.3 Ready&#x3D;False"></a>8.3 Ready&#x3D;False</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs text">Ready=False<br>     ↓<br>查看 Pod Conditions<br>     ↓<br>Readiness Probe<br>     ↓<br>Container Logs<br>     ↓<br>Application Port<br>     ↓<br>Dependency Service<br>     ↓<br>EndpointSlice<br>     ↓<br>Service Data Plane<br></code></pre></td></tr></table></figure>
+
+<p>常用命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">kubectl get pod &lt;pod-name&gt; -n &lt;namespace&gt; -o yaml<br>kubectl logs &lt;pod-name&gt; -n &lt;namespace&gt; --all-containers<br>kubectl get endpointslice -n &lt;namespace&gt;<br>kubectl describe service &lt;service-name&gt; -n &lt;namespace&gt;<br></code></pre></td></tr></table></figure>
+
+<h3 id="8-4-Volume-Mount-异常"><a href="#8-4-Volume-Mount-异常" class="headerlink" title="8.4 Volume Mount 异常"></a>8.4 Volume Mount 异常</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs text">Volume Mount Error<br>        ↓<br>Pod Events<br>        ↓<br>PVC / PV Status<br>        ↓<br>StorageClass<br>        ↓<br>CSI Controller<br>        ↓<br>CSI Node Plugin<br>        ↓<br>Node Mount Point<br>        ↓<br>Linux Mount Options<br>        ↓<br>Filesystem / Permission / Performance<br></code></pre></td></tr></table></figure>
+
+<p>对于 Toolchain 这类共享目录，还需要关注：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs text">Correctness<br>  ├─ 是否挂载成功<br>  ├─ 路径是否一致<br>  ├─ 权限是否正确<br>  └─ 文件是否完整<br><br>Performance<br>  ├─ metadata latency<br>  ├─ random read<br>  ├─ page cache<br>  ├─ mount options<br>  └─ concurrent access<br><br>Consistency<br>  ├─ cache consistency<br>  ├─ file lock<br>  ├─ stale handle<br>  └─ node differences<br><br>Operability<br>  ├─ 日志<br>  ├─ 指标<br>  ├─ 告警<br>  └─ 故障恢复<br></code></pre></td></tr></table></figure>
+
+<h2 id="九、后续-Learning-Path"><a href="#九、后续-Learning-Path" class="headerlink" title="九、后续 Learning Path"></a>九、后续 Learning Path</h2><h3 id="第一层：知道发生了什么"><a href="#第一层：知道发生了什么" class="headerlink" title="第一层：知道发生了什么"></a>第一层：知道发生了什么</h3><p>目前这一层已经基本完成。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs text">kubectl<br>   ↓<br>API Server<br>   ↓<br>Scheduler<br>   ↓<br>kubelet<br>   ↓<br>containerd<br>   ↓<br>Ready<br>   ↓<br>EndpointSlice<br>   ↓<br>Service Traffic<br></code></pre></td></tr></table></figure>
+
+<p>目标是能够完整解释：</p>
+<ul>
+<li>每一步由谁负责；</li>
+<li>状态写在哪里；</li>
+<li>下一个组件为什么会开始工作；</li>
+<li>某一步失败时会表现为什么状态。</li>
+</ul>
+<h3 id="第二层：知道源码在哪里"><a href="#第二层：知道源码在哪里" class="headerlink" title="第二层：知道源码在哪里"></a>第二层：知道源码在哪里</h3><h4 id="Scheduler"><a href="#Scheduler" class="headerlink" title="Scheduler"></a>Scheduler</h4><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs text">ScheduleOne()<br>    ↓<br>SchedulePod()<br>    ↓<br>PreFilter<br>    ↓<br>Filter<br>    ↓<br>Score<br>    ↓<br>Reserve<br>    ↓<br>Permit<br>    ↓<br>Bind()<br></code></pre></td></tr></table></figure>
+
+<p>重点理解：</p>
+<ul>
+<li>调度队列；</li>
+<li>Scheduling Framework；</li>
+<li>Filter Plugin；</li>
+<li>Score Plugin；</li>
+<li>Binding Cycle；</li>
+<li>调度失败后的重试。</li>
+</ul>
+<h4 id="kubelet"><a href="#kubelet" class="headerlink" title="kubelet"></a>kubelet</h4><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs text">syncLoop()<br>    ↓<br>HandlePodAdditions()<br>    ↓<br>Pod Worker<br>    ↓<br>SyncPod()<br>    ↓<br>Container Runtime / Volume / Probe<br></code></pre></td></tr></table></figure>
+
+<p>重点理解：</p>
+<ul>
+<li>Pod Manager；</li>
+<li>PLEG；</li>
+<li>Pod Worker；</li>
+<li>Runtime Manager；</li>
+<li>Volume Manager；</li>
+<li>Status Manager；</li>
+<li>Probe Manager。</li>
+</ul>
+<h4 id="Container-Runtime"><a href="#Container-Runtime" class="headerlink" title="Container Runtime"></a>Container Runtime</h4><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text">RunPodSandbox()<br>    ↓<br>CNI Setup<br>    ↓<br>CreateContainer()<br>    ↓<br>StartContainer()<br></code></pre></td></tr></table></figure>
+
+<p>重点理解：</p>
+<ul>
+<li>Sandbox；</li>
+<li>Pause Container；</li>
+<li>CRI；</li>
+<li>Container Lifecycle；</li>
+<li>Runtime Status。</li>
+</ul>
+<h4 id="CSI"><a href="#CSI" class="headerlink" title="CSI"></a>CSI</h4><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text">ControllerPublishVolume<br>        ↓<br>NodeStageVolume<br>        ↓<br>NodePublishVolume<br>        ↓<br>mount()<br></code></pre></td></tr></table></figure>
+
+<p>重点理解：</p>
+<ul>
+<li>Controller Plugin 与 Node Plugin；</li>
+<li>Attach 与 Mount；</li>
+<li>Volume lifecycle；</li>
+<li>Mount Options；</li>
+<li>Node 侧故障定位。</li>
+</ul>
+<h3 id="第三层：知道线上怎么排查"><a href="#第三层：知道线上怎么排查" class="headerlink" title="第三层：知道线上怎么排查"></a>第三层：知道线上怎么排查</h3><p>这一层的目标不是记住命令，而是形成固定的排障顺序：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs text">现象<br> ↓<br>状态<br> ↓<br>事件<br> ↓<br>负责组件<br> ↓<br>控制循环<br> ↓<br>底层依赖<br> ↓<br>根因<br></code></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text">Pod Pending<br>    ↓<br>FailedScheduling Event<br>    ↓<br>Scheduler<br>    ↓<br>Filter Plugin<br>    ↓<br>Resource / Affinity / Taint / PVC<br>    ↓<br>根因定位<br></code></pre></td></tr></table></figure>
+
+<p>或者：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text">Ready=False<br>    ↓<br>Pod Condition<br>    ↓<br>Readiness Probe<br>    ↓<br>Application Dependency<br>    ↓<br>EndpointSlice<br>    ↓<br>Service Traffic<br></code></pre></td></tr></table></figure>
+
+<p>这才是真正的平台工程师思维。</p>
+<h3 id="第四层：把排障经验产品化-Skills"><a href="#第四层：把排障经验产品化-Skills" class="headerlink" title="第四层：把排障经验产品化 (Skills)"></a>第四层：把排障经验产品化 (Skills)</h3><p>对于 DevOps 平台而言，学习的终点不应该只是“我会排查”。</p>
+<p>更高一层是：</p>
+<blockquote>
+<p>如何让下一个人不需要重复排查。</p>
+</blockquote>
+<p>可以逐步沉淀为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs text">个人经验<br>   ↓<br>排障文档<br>   ↓<br>Runbook<br>   ↓<br>自动化脚本<br>   ↓<br>可观测 Dashboard<br>   ↓<br>自动诊断<br>   ↓<br>自动修复<br>   ↓<br>平台能力<br></code></pre></td></tr></table></figure>
+
+<p>以 Toolchain 挂载问题为例，可以进一步形成：</p>
+<ul>
+<li>节点挂载一致性检查；</li>
+<li>Mount Options 基线检查；</li>
+<li>CSI 健康检查；</li>
+<li>Toolchain 文件完整性检查；</li>
+<li>I&#x2F;O 延迟基线；</li>
+<li>Pod 启动阶段耗时分析；</li>
+<li>节点差异自动对比；</li>
+<li>故障时自动采集 kubelet、mount、CSI 日志。</li>
+</ul>
+<p>这会把一次故障排查，转化为长期的平台资产。</p>
+<h2 id="十、建立新的学习模型"><a href="#十、建立新的学习模型" class="headerlink" title="十、建立新的学习模型"></a>十、建立新的学习模型</h2><p>根据这几个月围绕 Jenkins、Kubernetes、Central Build、Merge Train、Agent 和平台工程的持续学习，我后续不应该只停留在“源码阅读”。</p>
+<p>更适合我的学习模型应该是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs text">                    DevOps / Platform Engineer / SRE<br>                                   │<br>       ┌───────────────────────────┼───────────────────────────┐<br>       │                           │                           │<br>  Architecture                Control Loop              Troubleshooting<br>为什么这样设计              状态如何变化与收敛             线上如何定位故障<br>       │                           │                           │<br>       ├───────────────┬───────────┴───────────┬───────────────┤<br>       │               │                       │               │<br>  API Server       Scheduler                kubelet        containerd<br>       │               │                       │               │<br>       └───────────────┴───────────────┬───────┴───────────────┘<br>                                       │<br>                             Source Code + Observability<br>                                       │<br>                               Runbook + Automation<br>                                       │<br>                               Platform Capability<br></code></pre></td></tr></table></figure>
+
+<p>这套模型可以概括为五个问题：</p>
+<ol>
+<li><strong>Architecture</strong>：为什么这样设计？</li>
+<li><strong>State</strong>：期望状态和实际状态分别是什么？</li>
+<li><strong>Control Loop</strong>：哪个组件负责推动状态收敛？</li>
+<li><strong>Troubleshooting</strong>：状态为什么没有收敛？</li>
+<li><strong>Platformization</strong>：如何把解决方案沉淀为平台能力？</li>
+</ol>
+<h2 id="十一、从-Kubernetes-迁移到平台工程"><a href="#十一、从-Kubernetes-迁移到平台工程" class="headerlink" title="十一、从 Kubernetes 迁移到平台工程"></a>十一、从 Kubernetes 迁移到平台工程</h2><p>这也是为什么最近研究 Agent、Control Plane、Central Build、Merge Train、Kubernetes DRA 时，会逐渐发现它们具有相似的设计模式。</p>
+<p>它们本质上都可以抽象为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs text">声明期望状态<br>    ↓<br>记录系统状态<br>    ↓<br>控制器持续观察<br>    ↓<br>执行调度与编排<br>    ↓<br>状态不断收敛<br>    ↓<br>异常重试与恢复<br>    ↓<br>可观测与审计<br></code></pre></td></tr></table></figure>
+
+<p>也就是：</p>
+<blockquote>
+<p><strong>Desired State → Control Loop → Reconcile → Observability → Recovery</strong></p>
+</blockquote>
+<p>例如 Central Build &#x2F; Merge Train 也可以这样理解：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs text">Desired State<br>  PR 希望进入可合并状态<br>        ↓<br>Control Plane<br>  TrainSet / Queue / CI Job<br>        ↓<br>Reconcile<br>  Rebase / Build / Validate / Finalize<br>        ↓<br>Observed State<br>  queued / building / success / failed / stale<br>        ↓<br>Recovery<br>  retry / realign / discard / cleanup<br></code></pre></td></tr></table></figure>
+
+<p>DevOps Agent Control Plane 也同样如此：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text">Desired Task<br>    ↓<br>Planner / Orchestrator<br>    ↓<br>Tool Execution<br>    ↓<br>State Tracking<br>    ↓<br>Evaluation<br>    ↓<br>Retry / Human Approval / Recovery<br></code></pre></td></tr></table></figure>
+
+<p>更多细节可以参考：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/overview">Kubernetes 架构</a></li>
+<li><a href="https://github.com/zhililab/DevOps-Agent-Control-Plane">DevOps Agent Control Plane</a></li>
+</ul>
+<p>当真正建立这套思维框架后，理解 Kubernetes 只是其中一个结果。</p>
+<p>更重要的是，它会逐渐形成一种可迁移的系统设计能力：</p>
+<ul>
+<li>如何设计状态机；</li>
+<li>如何实现幂等；</li>
+<li>如何处理重试；</li>
+<li>如何避免强耦合；</li>
+<li>如何建立可观测性；</li>
+<li>如何设计故障恢复；</li>
+<li>如何把人工流程转化为控制循环。</li>
+</ul>
+<p>这才是从 DevOps 工程师走向平台工程师和复杂系统架构设计者的关键一步。</p>
+<h2 id="十二、后续-Action-Items"><a href="#十二、后续-Action-Items" class="headerlink" title="十二、后续 Action Items"></a>十二、后续 Action Items</h2><h3 id="1-Kubernetes-架构"><a href="#1-Kubernetes-架构" class="headerlink" title="1. Kubernetes 架构"></a>1. Kubernetes 架构</h3><p>目标：</p>
+<ul>
+<li>理解 API Server、Scheduler、Controller Manager、kubelet、containerd 的职责边界；</li>
+<li>理解控制面与数据面的关系；</li>
+<li>理解组件之间为什么通过 API Server 协作。</li>
+</ul>
+<p>产出：</p>
+<ul>
+<li>Kubernetes 架构图；</li>
+<li>组件职责表；</li>
+<li>关键对象状态流转图。</li>
+</ul>
+<h3 id="2-Kubernetes-Control-Loop"><a href="#2-Kubernetes-Control-Loop" class="headerlink" title="2. Kubernetes Control Loop"></a>2. Kubernetes Control Loop</h3><p>目标：</p>
+<ul>
+<li>理解 List&#x2F;Watch；</li>
+<li>理解 Controller；</li>
+<li>理解 Reconcile；</li>
+<li>理解 Spec、Status、Condition；</li>
+<li>理解最终一致性。</li>
+</ul>
+<p>产出：</p>
+<ul>
+<li>Deployment Controller 状态收敛分析；</li>
+<li>Scheduler 调度循环分析；</li>
+<li>kubelet SyncPod 分析。</li>
+</ul>
+<h3 id="3-Kubernetes-故障路径"><a href="#3-Kubernetes-故障路径" class="headerlink" title="3. Kubernetes 故障路径"></a>3. Kubernetes 故障路径</h3><p>目标：</p>
+<ul>
+<li>建立 Pending、ContainerCreating、CrashLoopBackOff、Ready&#x3D;False、NodeNotReady、Mount Failed 等故障树；</li>
+<li>明确每类故障应该优先检查哪个组件。</li>
+</ul>
+<p>产出：</p>
+<ul>
+<li>Kubernetes Troubleshooting Runbook；</li>
+<li>precheck &#x2F; dailybuild 常见故障 SOP；</li>
+<li>自动采集诊断脚本。</li>
+</ul>
+<h3 id="4-Kubernetes-可观测性"><a href="#4-Kubernetes-可观测性" class="headerlink" title="4. Kubernetes 可观测性"></a>4. Kubernetes 可观测性</h3><p>目标：</p>
+<ul>
+<li>理解 Events、Logs、Metrics、Traces 的边界；</li>
+<li>建立 Pod 启动阶段耗时观测；</li>
+<li>建立 Scheduler、kubelet、CSI、CNI 关键指标。</li>
+</ul>
+<p>产出：</p>
+<ul>
+<li>Pod 生命周期 Dashboard；</li>
+<li>Node 健康 Dashboard；</li>
+<li>Volume Mount 监控；</li>
+<li>调度失败告警；</li>
+<li>precheck 运行环境健康检查。</li>
+</ul>
+<h3 id="5-Toolchain-挂载专项"><a href="#5-Toolchain-挂载专项" class="headerlink" title="5. Toolchain 挂载专项"></a>5. Toolchain 挂载专项</h3><p>目标：</p>
+<ul>
+<li>梳理 Kubernetes Volume 到 Linux Mount 的完整链路；</li>
+<li>对比不同节点的 Mount Options、Kernel、Runtime、Filesystem 行为；</li>
+<li>建立 Toolchain 挂载基线。</li>
+</ul>
+<p>产出：</p>
+<ul>
+<li>Mount Options 标准；</li>
+<li>节点一致性检查脚本；</li>
+<li>Toolchain I&#x2F;O 性能基线；</li>
+<li>CSI &#x2F; NAS 故障 Runbook；</li>
+<li>可复现的最小验证环境。</li>
+</ul>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>这次 K8s Toolchain 挂载问题让我重新意识到：</p>
+<blockquote>
+<p>一个优秀的故障排查，不应该只回答“这次为什么坏了”，还应该回答“系统为什么会以这种方式坏掉”。</p>
+</blockquote>
+<p>从 Pod、Scheduler、kubelet、CSI，到 Linux Mount 和文件系统，表面上是不同技术领域，背后其实仍然是同一条主线：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text">期望状态<br>   ↓<br>状态变化<br>   ↓<br>控制循环<br>   ↓<br>实际执行<br>   ↓<br>状态反馈<br>   ↓<br>持续收敛<br></code></pre></td></tr></table></figure>
+
+<p>后续我的学习也会继续沿着这条主线推进：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs text">理解架构<br>   ↓<br>理解状态<br>   ↓<br>理解控制循环<br>   ↓<br>理解故障路径<br>   ↓<br>建立可观测性<br>   ↓<br>沉淀自动化<br>   ↓<br>形成平台能力<br></code></pre></td></tr></table></figure>
+
+<p>最终目标不只是更熟悉 Kubernetes，而是逐渐建立一套能够迁移到 CI&#x2F;CD、Merge Train、Central Build、Agent Control Plane 和未来 DevOps 平台设计中的系统级思维框架。<br> AI 大模型时代，系统设计能力将被放大，更多复杂系统将被设计和实现，这将为 DevOps 工程师&#x2F;平台工程师提供更多的机会和挑战。</p>
+<blockquote>
+<p>Talk is cheap, show me the code it not enough. Show me your design thinking and architecture and tell me why.</p>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Kubernetes/">#Kubernetes</a>
+      
+        <a href="/tags/Linux/">#Linux</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>从一次 K8s Toolchain 挂载故障，重新理解 Pod 从创建到 Ready 的全过程</div>
+      <div>https://github.com/zhililab/2026/07/23/2026-07-23-kubernetes-pod-creation-workflow/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Zhi Li</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年7月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/07/27/2026-07-27-from-graph-platform-to-devops-agent-control-plane/" title="他山之石（一）：从图计算平台到 AI Agent 平台，探索技术演进背后的统一抽象">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">他山之石（一）：从图计算平台到 AI Agent 平台，探索技术演进背后的统一抽象</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/07/22/2026-07-22-agentic-devops-practice-report/" title="Agentic DevOps 调研报告">
+                        <span class="hidden-mobile">Agentic DevOps 调研报告</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://lib.baomitu.com/waline/2.14.1/waline.min.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/waline/2.14.1/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://comments.zhililab.cn","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["nick"],"lang":"zh-cn","emoji":[],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10,"placeholder":"评论提交后需审核，审核通过后公开显示"},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+    <p class="blog-privacy-link" data-blog-privacy-link><a href="/privacy/">隐私与 Cookie 政策</a></p>
+</footer>
+
+  <!-- Scripts -->
+
+
+<script  src="/vendor/blog/jquery.min.js" ></script>
+<script  src="/vendor/blog/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+<script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=/vendor/blog/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<button id="blog-pet" type="button" aria-label="和博客机器人打个招呼" aria-describedby="blog-pet-message" data-blog-reading-experience>
+  <span class="blog-pet__bubble" id="blog-pet-message" role="status" aria-live="polite">今天也在持续进化</span>
+  <svg class="blog-pet__robot" viewBox="0 0 128 144" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="pet-body-gradient" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#78a7ff"/>
+        <stop offset="1" stop-color="#315ddc"/>
+      </linearGradient>
+    </defs>
+    <path class="blog-pet__antenna" d="M64 18v-8m-7 0h14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+    <rect x="22" y="20" width="84" height="62" rx="28" fill="url(#pet-body-gradient)" stroke="#17377d" stroke-width="5"/>
+    <rect x="34" y="36" width="60" height="30" rx="13" fill="#102b62"/>
+    <circle cx="51" cy="51" r="5" fill="#80ecff"/>
+    <circle cx="77" cy="51" r="5" fill="#80ecff"/>
+    <path d="M54 60h20" stroke="#80ecff" stroke-width="3" stroke-linecap="round"/>
+    <rect x="35" y="76" width="58" height="50" rx="20" fill="url(#pet-body-gradient)" stroke="#17377d" stroke-width="5"/>
+    <path d="M50 99h28" stroke="#d9e7ff" stroke-width="5" stroke-linecap="round"/>
+    <path class="blog-pet__arm blog-pet__arm--left" d="M36 88 18 104" fill="none" stroke="#315ddc" stroke-width="12" stroke-linecap="round"/>
+    <path class="blog-pet__arm blog-pet__arm--right" d="M92 88 112 72" fill="none" stroke="#315ddc" stroke-width="12" stroke-linecap="round"/>
+    <path d="M52 124v12m24-12v12" stroke="#17377d" stroke-width="10" stroke-linecap="round"/>
+  </svg>
+</button>
+<script src="/js/blog-reading-experience.js" defer data-blog-reading-experience></script>
+</body>
+</html>

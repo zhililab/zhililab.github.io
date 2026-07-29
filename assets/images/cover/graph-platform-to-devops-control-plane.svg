@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="818" viewBox="0 0 1920 818" role="img" aria-labelledby="title desc">
+  <title id="title">Graph Platform to DevOps Agent Control Plane</title>
+  <desc id="desc">A restrained technical illustration showing graph nodes flowing through a control plane into evidence and human approval.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071425"/><stop offset="1" stop-color="#123b50"/></linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#54d6c9"/><stop offset="1" stop-color="#7ca9ff"/></linearGradient>
+  </defs>
+  <rect width="1920" height="818" fill="url(#bg)"/>
+  <g fill="none" stroke="url(#line)" stroke-width="3" opacity=".72">
+    <path d="M170 217 L370 130 L520 277 L690 174 L840 312"/><path d="M170 217 L323 418 L520 277 L656 482 L840 312"/><path d="M323 418 L490 582 L656 482 L830 644"/>
+    <path d="M934 409 H1134" stroke-width="5"/><path d="M1104 384 L1134 409 L1104 434"/>
+    <path d="M1330 409 H1535" stroke-width="5"/><path d="M1505 384 L1535 409 L1505 434"/>
+  </g>
+  <g fill="#54d6c9"><circle cx="170" cy="217" r="16"/><circle cx="370" cy="130" r="16"/><circle cx="520" cy="277" r="22"/><circle cx="690" cy="174" r="16"/><circle cx="840" cy="312" r="16"/><circle cx="323" cy="418" r="16"/><circle cx="490" cy="582" r="16"/><circle cx="656" cy="482" r="22"/><circle cx="830" cy="644" r="16"/></g>
+  <rect x="1134" y="304" width="196" height="210" rx="24" fill="#102c42" stroke="#7ca9ff" stroke-width="3"/>
+  <path d="M1180 370h104M1180 410h104M1180 450h62" stroke="#54d6c9" stroke-width="10" stroke-linecap="round"/>
+  <rect x="1535" y="304" width="202" height="210" rx="24" fill="#102c42" stroke="#54d6c9" stroke-width="3"/>
+  <path d="M1582 404l32 32 72-82" fill="none" stroke="#54d6c9" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="110" y="735" fill="#f4fbff" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif" font-size="54" font-weight="700">从图分析平台到 DevOps Agent Control Plane</text>
+  <text x="1140" y="565" fill="#b8d5e8" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif" font-size="28">STATE · EVIDENCE · CONTROL</text>
+</svg>

@@ -1,0 +1,1023 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/assets/images/favicon/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="[object Object]">
+  <meta name="keywords" content="python, devops">
+  
+    <meta name="description" content="介绍：日常学习与技术交流的个人博客">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ZHILI">
+<meta property="og:url" content="https://github.com/zhililab/page/2/index.html">
+<meta property="og:site_name" content="ZHILI">
+<meta property="og:description" content="介绍：日常学习与技术交流的个人博客">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="[object Object]">
+<meta property="article:tag" content="python, devops">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>ZHILI</title>
+
+  <link  rel="stylesheet" href="/vendor/blog/bootstrap.min.css" />
+
+
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="/vendor/blog/fluid-icons.css">
+
+
+
+<link rel="stylesheet" href="/vendor/blog/site-icons.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"github.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="A Cool Space for My Mind"></span>
+          
+        </div>
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div id="board"
+          style="margin-top: 0">
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/08/13/Learning-Docker-001/" target="_self">
+          <img src="/assets/images/cover/Docker_Cover.png" srcset="/img/loading.gif" lazyload alt="Docker 学习 —— 基础指令对比学习">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/08/13/Learning-Docker-001/" target="_self">
+          Docker 学习 —— 基础指令对比学习
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt " href="/2024/08/13/Learning-Docker-001/" target="_self">
+        <div>
+          Docker 基础指令对比与关键概念在 Docker 中，理解和区分不同的指令和概念对于构建高效的容器化应用至关重要，最近面试就有被问到 entrypoint 和 cmd 二者区别。Docker 种还有很多类似概念和指令，特借此机会梳理对比一些常见的 Docker 指令，如 ENTRYPOINT vs CMD，以及其他类似的操作，帮助自己更好地掌握 Docker 的使用和深入学习。 ENTRYPO
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-13 23:17" pubdate>
+              2024-08-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Docker/">#Docker</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/08/08/Terraform-Core-Concepts/" target="_self">
+          <img src="/assets/images/cover/Terraform_Cover.png" srcset="/img/loading.gif" lazyload alt="Terraform —— 核心概念">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/08/08/Terraform-Core-Concepts/" target="_self">
+          Terraform —— 核心概念
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt " href="/2024/08/08/Terraform-Core-Concepts/" target="_self">
+        <div>
+          在现代 DevOps 和云计算的背景下，基础设施即代码（Infrastructure as Code, IaC）已经成为管理和部署基础设施的标准方式。Terraform 作为一种广受欢迎的 IaC 工具，因其多云支持和灵活性受到了广泛的青睐，更有很多 DevOps 岗位招聘的 JD 更是明确要求了解&#x2F;熟悉 Terraform。本文将会梳理 Terraform 的基本概念，通过学习、实践掌
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-08 20:30" pubdate>
+              2024-08-08
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/DevOps/">#DevOps</a>
+            
+              <a href="/tags/Terraform/">#Terraform</a>
+            
+              <a href="/tags/IaC/">#IaC</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/08/07/Learing-Golang-001/" target="_self">
+          <img src="/assets/images/cover/golang_cover.png" srcset="/img/loading.gif" lazyload alt="Go 语言学习 —— strings 细说">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/08/07/Learing-Golang-001/" target="_self">
+          Go 语言学习 —— strings 细说
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt " href="/2024/08/07/Learing-Golang-001/" target="_self">
+        <div>
+          Go 语言 strings 包与 C++、Python 字符串处理对比在现代编程中，字符串处理是一个基础而重要的任务。不同编程语言提供了各自的字符串处理函数和方法，今天我们将详细介绍 Go 语言的 strings 包，并对比 C++ 和 Python 中的字符串处理方法。通过这篇文章，你将能够更好地理解这些语言在字符串处理上的异同，从而选择最适合你项目需求的工具。 Go 语言的 strings 包
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-07 14:30" pubdate>
+              2024-08-07
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Go/">#Go</a>
+            
+              <a href="/tags/Programming/">#Programming</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/08/07/Learning-Golang-001/" target="_self">
+          <img src="/assets/images/cover/golang_cover.png" srcset="/img/loading.gif" lazyload alt="Go 语言学习 —— strings 细说">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/08/07/Learning-Golang-001/" target="_self">
+          Go 语言学习 —— strings 细说
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt " href="/2024/08/07/Learning-Golang-001/" target="_self">
+        <div>
+          Go 语言 strings 包与 C++、Python 字符串处理对比在现代编程中，字符串处理是一个基础而重要的任务。不同编程语言提供了各自的字符串处理函数和方法，今天我们将详细介绍 Go 语言的 strings 包，并对比 C++ 和 Python 中的字符串处理方法。通过这篇文章，你将能够更好地理解这些语言在字符串处理上的异同，从而选择最适合你项目需求的工具。 Go 语言的 strings 包
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-07 14:30" pubdate>
+              2024-08-07
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Go/">#Go</a>
+            
+              <a href="/tags/Programming/">#Programming</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/08/07/AutoWare-Intro/" target="_self">
+          <img src="/assets/images/cover/Autoware_Cover.jpg" srcset="/img/loading.gif" lazyload alt="AutoWare 初探">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/08/07/AutoWare-Intro/" target="_self">
+          AutoWare 初探
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt " href="/2024/08/07/AutoWare-Intro/" target="_self">
+        <div>
+          探索 Autoware：开源自动驾驶软件平台前言随着自动驾驶技术的快速发展，开源软件在推动这一领域的创新和进步中扮演着重要角色。Autoware 是一个由 Autoware Foundation 开发和维护的开源自动驾驶软件平台，它集成了各种先进的技术和工具，为研究人员和开发者提供了一个强大的开发框架。本文将详细介绍 Autoware 的功能、架构、技术栈以及如何参与该项目。 Autoware 的
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-08-07 09:23" pubdate>
+              2024-08-07
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/OS/">#OS</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2024/07/17/Learning-Golang-002/" target="_self">
+          <img src="/assets/images/cover/golang_cover.png" srcset="/img/loading.gif" lazyload alt="Go 语言学习 —— 字典查找判断">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2024/07/17/Learning-Golang-002/" target="_self">
+          Go 语言学习 —— 字典查找判断
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt " href="/2024/07/17/Learning-Golang-002/" target="_self">
+        <div>
+          这两天学习 go 语言字典特性 ，突然想到之前 C++ 和 Python 的字典各有特点，特此写一篇短文总结，对比学习一下三种编程语言字典处理。 C++ 和 Python 中字典查找和条件判断的简洁方式，在 C++ 和 Python 中，虽然没有像 Go 语言那样的短变量声明语法，但两者都有自己处理字典查找和条件判断的简洁方式。  在 C++ 中，使用 std::map 或 std::unorde
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-07-17 22:30" pubdate>
+              2024-07-17
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Go/">#Go</a>
+            
+              <a href="/tags/Programming/">#Programming</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2023/06/18/CM-Conan/" target="_self">
+          <img src="/assets/images/cover/jfrog_conan2_conver.jpg" srcset="/img/loading.gif" lazyload alt="Conan 包管理">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2023/06/18/CM-Conan/" target="_self">
+          Conan 包管理
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt " href="/2023/06/18/CM-Conan/" target="_self">
+        <div>
+          Conan是一个用于C++项目的包管理器，它可以帮助您管理项目所需的依赖项和库。它可以提高构建速度和可靠性，并使您的项目更易于维护。在本文中，我们将探讨Conan的使用、Conan recipe以及踩坑经验。 1. Conan是什么以及为什么要使用它？Conan是一个开源的C++包管理器，它可以帮助您管理项目所需的依赖项和库。Conan可以自动下载和构建依赖项，并将它们编译成二进制文件，这可以提高
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-06-18 09:23" pubdate>
+              2023-06-18
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Conan/">#Conan</a>
+            
+              <a href="/tags/CM/">#CM</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2023/05/29/XMind-Copilot/" target="_self">
+          <img src="/assets/images/cover/xmind_copilot_cover.png" srcset="/img/loading.gif" lazyload alt="XMind Copilot">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2023/05/29/XMind-Copilot/" target="_self">
+          XMind Copilot
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt " href="/2023/05/29/XMind-Copilot/" target="_self">
+        <div>
+          XMind Copilot XMind 发布基于 GPT 3.5&#x2F;4 的AI辅助的 XMind Copilot，主打一个 AI+ 智能体验。下面我们看看都有哪些功能 1.输入关键词&#x2F;句  2.点击“给我思维导图按钮”生成思维导图，继续点击“生成全文”   3.生成的 Markdown 全文可以直接导入 XMind  导入后，效果如下所示，非常方便快捷 👏  体验入口：http
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-05-29 20:23" pubdate>
+              2023-05-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/XMind/">#XMind</a>
+            
+              <a href="/tags/ChatGPT/">#ChatGPT</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2023/05/28/%E7%BD%91%E7%AB%99%E6%9B%B4%E6%96%B0%E5%B0%8F%E8%AE%B0/" target="_self">
+          <img src="/assets/images/cover/website_update_cover.png" srcset="/img/loading.gif" lazyload alt="网站更新小记">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2023/05/28/%E7%BD%91%E7%AB%99%E6%9B%B4%E6%96%B0%E5%B0%8F%E8%AE%B0/" target="_self">
+          网站更新小记
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt " href="/2023/05/28/%E7%BD%91%E7%AB%99%E6%9B%B4%E6%96%B0%E5%B0%8F%E8%AE%B0/" target="_self">
+        <div>
+          Hi Guys,  好久不见！为了更好沉淀自己，我要回归 blog 日常更新了。 小站最近主要变化：  切换新 hexo 主题 改变工作流 md 文件托管在 dev  html 静态网页部署在 master  增加 hexo admin 管理功能    下面分别细说下 主题更新原来的主题 hexo-theme-skapp 扁平风格一直很喜欢，但使用的插件版本过低，且没有lazy 加载功能，网站性能
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-05-28 11:27" pubdate>
+              2023-05-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Hexo/">#Hexo</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <a class="extend prev" rel="prev" href="/"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/#board">3</a><a class="page-number" href="/page/4/#board">4</a><a class="extend next" rel="next" href="/page/3/#board"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+    <p class="blog-privacy-link" data-blog-privacy-link><a href="/privacy/">隐私与 Cookie 政策</a></p>
+</footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="/vendor/blog/jquery.min.js" ></script>
+<script  src="/vendor/blog/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
