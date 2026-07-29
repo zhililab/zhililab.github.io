@@ -9,16 +9,11 @@ const {
   parsePost,
   validateSummary
 } = require('./lib/ai-summary');
+const { isAiSummaryRequired } = require('./lib/ai-summary-eligibility');
 
 const ROOT = path.join(__dirname, '..');
 const POSTS_DIR = path.join(ROOT, 'source', '_posts');
 const OUTPUT_DIR = path.join(ROOT, 'source', '_data', 'ai-summaries');
-const CUTOFF = new Date('2026-07-30T00:00:00+08:00');
-const BACKFILLS = new Set([
-  '2026-07-22-agentic-devops-practice-report',
-  '2026-07-23-kubernetes-pod-creation-workflow',
-  '2026-07-27-from-graph-platform-to-devops-agent-control-plane'
-]);
 
 function readPostInfo(postPath) {
   try {
@@ -38,25 +33,32 @@ function requiredPosts() {
     const postPath = path.join(POSTS_DIR, name);
     const slug = path.basename(name, path.extname(name));
     const filenameDate = name.match(/^(\d{4}-\d{2}-\d{2})-/);
-    const namedAsRequired = BACKFILLS.has(slug) || (
-      filenameDate &&
-      new Date(`${filenameDate[1]}T23:59:59+08:00`) > CUTOFF
-    );
+    const namedAsRequired = isAiSummaryRequired({
+      slug,
+      date: filenameDate ? `${filenameDate[1]}T00:00:00+08:00` : undefined
+    });
     const markdown = fs.readFileSync(postPath, 'utf8');
-    if (!namedAsRequired && !markdown.replace(/^\uFEFF/, '').startsWith('---')) {
+    const hasFrontmatter = markdown.replace(/^\uFEFF/, '').startsWith('---');
+    if (!namedAsRequired && !hasFrontmatter) {
       continue;
     }
     try {
       const post = readPostInfo(postPath);
-      if (namedAsRequired || post.date > CUTOFF) posts.push(post);
+      if (isAiSummaryRequired({
+        slug: post.slug,
+        date: post.date,
+        aiSummary: post.optedOut ? false : undefined
+      })) {
+        posts.push(post);
+      }
     } catch (error) {
-      if (namedAsRequired) failures.push(error.message);
+      if (namedAsRequired || hasFrontmatter) failures.push(error.message);
     }
   }
   if (failures.length) {
     throw new Error(`Malformed posts:\n${failures.map(message => `- ${message}`).join('\n')}`);
   }
-  return posts.filter(post => !post.optedOut);
+  return posts;
 }
 
 function summaryFile(slug) {

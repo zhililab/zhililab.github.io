@@ -22,7 +22,7 @@ function validApprovedSummary(overrides = {}) {
     model: 'gemini-3.6-flash',
     generated_at: '2026-07-30T00:00:00.000Z',
     status: 'approved',
-    general: '本文从统一抽象切入平台工程实践，说明团队如何根据正文中的背景、证据与边界，把分散的交付活动收敛为可审查、可恢复的工程流程。',
+    general: '本文从统一抽象切入平台工程实践，说明团队如何根据正文中的背景、证据与边界，把分散的交付活动收敛为可审查、可恢复的工程流程。'.repeat(2),
     bullets: [
       '先识别正文要解决的问题与适用范围',
       '再理解文章给出的工程方法与取舍',
@@ -64,8 +64,14 @@ test('renders approved content as an accessible collapsed component', () => {
   const html = renderAiSummary(validApprovedSummary());
 
   assert.match(html, /<details[^>]*class="ai-summary"/);
+  assert.match(html, /<summary>✦ 阅读 AI 生成摘要<\/summary>/);
   assert.match(html, /role="tablist"/);
-  assert.match(html, /AI 生成 · 已由作者审核/);
+  assert.equal((html.match(/role="tab"/g) || []).length, 3);
+  assert.match(html, />通俗解释<\/button>/);
+  assert.match(
+    html,
+    /AI 生成 · 已由作者审核 · 仅供快速预览，请以原文为准/
+  );
   assert.match(html, /role="tabpanel"[^>]*aria-label="概览"/);
   assert.match(html, /role="tabpanel"[^>]*hidden/);
 });
@@ -85,9 +91,7 @@ test('prepends an approved current summary to a required post', () => {
   withSummaries(summariesDir => {
     writeSummary(summariesDir, validApprovedSummary());
     const filter = createAiSummaryFilter({
-      summariesDir,
-      cutoffDate: '2026-07-30',
-      backfillSlugs: []
+      summariesDir
     });
     const data = post();
 
@@ -100,7 +104,7 @@ test('prepends an approved current summary to a required post', () => {
 test('rejects a draft summary for a required post', () => {
   withSummaries(summariesDir => {
     writeSummary(summariesDir, validApprovedSummary({ status: 'draft' }));
-    const filter = createAiSummaryFilter({ summariesDir, cutoffDate: '2026-07-30', backfillSlugs: [] });
+    const filter = createAiSummaryFilter({ summariesDir });
 
     assert.throws(() => filter(post()), /approved/i);
   });
@@ -109,7 +113,7 @@ test('rejects a draft summary for a required post', () => {
 test('rejects a stale summary for a required post', () => {
   withSummaries(summariesDir => {
     writeSummary(summariesDir, validApprovedSummary({ source_hash: computeSourceHash('旧正文') }));
-    const filter = createAiSummaryFilter({ summariesDir, cutoffDate: '2026-07-30', backfillSlugs: [] });
+    const filter = createAiSummaryFilter({ summariesDir });
 
     assert.throws(() => filter(post()), /current|hash/i);
   });
@@ -118,14 +122,14 @@ test('rejects a stale summary for a required post', () => {
 test('rejects malformed JSON for a required post', () => {
   withSummaries(summariesDir => {
     fs.writeFileSync(path.join(summariesDir, 'new-post.json'), '{not json');
-    const filter = createAiSummaryFilter({ summariesDir, cutoffDate: '2026-07-30', backfillSlugs: [] });
+    const filter = createAiSummaryFilter({ summariesDir });
 
     assert.throws(() => filter(post()), /invalid|JSON/i);
   });
 });
 
 test('leaves an explicit AI-summary opt-out unchanged', () => {
-  const filter = createAiSummaryFilter({ summariesDir: os.tmpdir(), cutoffDate: '2026-07-30', backfillSlugs: [] });
+  const filter = createAiSummaryFilter({ summariesDir: os.tmpdir() });
   const data = post({ ai_summary: false });
 
   assert.equal(filter(data), data);
@@ -133,7 +137,7 @@ test('leaves an explicit AI-summary opt-out unchanged', () => {
 });
 
 test('leaves unrelated historical posts unchanged', () => {
-  const filter = createAiSummaryFilter({ summariesDir: os.tmpdir(), cutoffDate: '2026-07-30', backfillSlugs: ['backfill-post'] });
+  const filter = createAiSummaryFilter({ summariesDir: os.tmpdir() });
   const data = post({ slug: 'historical-post', date: '2026-07-29' });
 
   assert.equal(filter(data), data);
@@ -141,13 +145,35 @@ test('leaves unrelated historical posts unchanged', () => {
 });
 
 test('requires a summary for an explicitly selected backfill post', () => {
-  const filter = createAiSummaryFilter({ summariesDir: os.tmpdir(), cutoffDate: '2026-07-30', backfillSlugs: ['backfill-post'] });
+  const filter = createAiSummaryFilter({ summariesDir: os.tmpdir() });
 
-  assert.throws(() => filter(post({ slug: 'backfill-post', date: '2026-07-01' })), /missing/i);
+  assert.throws(
+    () => filter(post({
+      slug: '2026-07-22-agentic-devops-practice-report',
+      date: '2026-07-22'
+    })),
+    /missing/i
+  );
 });
 
 test('requires a summary for a new post after the cutoff date', () => {
-  const filter = createAiSummaryFilter({ summariesDir: os.tmpdir(), cutoffDate: '2026-07-30', backfillSlugs: [] });
+  const filter = createAiSummaryFilter({ summariesDir: os.tmpdir() });
 
   assert.throws(() => filter(post({ date: '2026-07-31' })), /missing/i);
+});
+
+test('renderer consumes the shared Shanghai cutoff policy at every boundary', () => {
+  const filter = createAiSummaryFilter({ summariesDir: os.tmpdir() });
+
+  for (const date of [
+    '2026-07-30T00:00:00+08:00',
+    '2026-07-30T00:01:00+08:00',
+    '2026-07-31T00:00:00+08:00'
+  ]) {
+    assert.throws(
+      () => filter(post({ slug: `required-${date}`, date })),
+      /missing/i,
+      `${date} must require a summary`
+    );
+  }
 });

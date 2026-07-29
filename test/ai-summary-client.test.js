@@ -39,7 +39,7 @@ function makeElement(attributes = {}) {
 }
 
 function createSummaryFixture() {
-  const tabs = ['概览', '要点', '行动'].map((label, index) => makeElement({
+  const tabs = ['概览', '要点', '通俗解释'].map((label, index) => makeElement({
     role: 'tab',
     'aria-selected': index === 0 ? 'true' : 'false',
     tabindex: index === 0 ? '0' : '-1',

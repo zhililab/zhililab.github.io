@@ -9,6 +9,7 @@ const path = require('node:path');
 
 const {
   AiSummaryValidationError,
+  buildSummaryPrompt,
   computeSourceHash,
   extractFrontmatterAndBody,
   generateSummaryForPost,
@@ -26,7 +27,7 @@ function validSummary(overrides = {}) {
     model: 'gemini-3.6-flash',
     generated_at: '2026-07-30T08:00:00.000Z',
     status: 'draft',
-    general: '本文从统一抽象切入平台工程实践，说明团队如何根据正文中的背景、证据与边界，把分散的交付活动收敛为可审查、可恢复的工程流程。',
+    general: '本文从统一抽象切入平台工程实践，说明团队如何根据正文中的背景、证据与边界，把分散的交付活动收敛为可审查、可恢复的工程流程。'.repeat(2),
     bullets: [
       '识别正文提出的核心问题和适用范围',
       '提炼文章给出的主要工程方法和证据',
@@ -37,10 +38,18 @@ function validSummary(overrides = {}) {
   };
 }
 
-function response(status, payload) {
+function response(status, payload, headers = {}) {
+  const normalizedHeaders = Object.fromEntries(
+    Object.entries(headers).map(([name, value]) => [name.toLowerCase(), value])
+  );
   return {
     status,
     ok: status >= 200 && status < 300,
+    headers: {
+      get(name) {
+        return normalizedHeaders[name.toLowerCase()] ?? null;
+      }
+    },
     async json() {
       return payload;
     }
@@ -92,6 +101,10 @@ function createCliFixture(posts) {
   fs.copyFileSync(
     path.join(__dirname, '..', 'scripts', 'lib', 'ai-summary.js'),
     path.join(libraryDir, 'ai-summary.js')
+  );
+  fs.copyFileSync(
+    path.join(__dirname, '..', 'scripts', 'lib', 'ai-summary-eligibility.js'),
+    path.join(libraryDir, 'ai-summary-eligibility.js')
   );
   Object.entries(posts).forEach(([name, markdown]) => {
     fs.writeFileSync(path.join(postsDir, name), markdown);
@@ -157,6 +170,19 @@ test('validator rejects draft HTML and accepts three plain bullets', () => {
   assert.equal(validateSummary(validSummary()).bullets.length, 3);
 });
 
+test('validator enforces the inclusive 120-180 character general range', () => {
+  assert.equal(validateSummary(validSummary({ general: '摘'.repeat(120) })).general.length, 120);
+  assert.equal(validateSummary(validSummary({ general: '摘'.repeat(180) })).general.length, 180);
+  assert.throws(
+    () => validateSummary(validSummary({ general: '摘'.repeat(119) })),
+    /general must contain 120-180 characters/
+  );
+  assert.throws(
+    () => validateSummary(validSummary({ general: '摘'.repeat(181) })),
+    /general must contain 120-180 characters/
+  );
+});
+
 test('validator conservatively rejects common Markdown markup', () => {
   const examples = [
     '# 标题',
@@ -191,7 +217,7 @@ test('validator conservatively rejects common Markdown markup', () => {
 
 test('validator allows ordinary Chinese punctuation in plain text', () => {
   const summary = validSummary({
-    general: '本文说明“统一抽象”如何落地：先回答问题（为什么？），再比较方案 A／B；范围、风险与结论都以正文为准。'.repeat(2)
+    general: '本文说明“统一抽象”如何落地：先回答问题（为什么？），再比较方案 A／B；范围、风险与结论都以正文为准。'.repeat(3)
   });
 
   assert.equal(validateSummary(summary), summary);
@@ -244,7 +270,8 @@ test('retries 429 once and returns a validated model summary', async () => {
     model: 'gemini-3.6-flash',
     title: '标题',
     body: '正文',
-    retries: 2
+    retries: 2,
+    sleepImpl: async () => {}
   });
 
   assert.equal(fetchImpl.calls.length, 2);
@@ -252,6 +279,33 @@ test('retries 429 once and returns a validated model summary', async () => {
   assert.match(fetchImpl.calls[0][0], /gemini-3\.6-flash:generateContent$/);
   assert.equal(fetchImpl.calls[0][1].headers['x-goog-api-key'], 'secret');
   assert.match(JSON.parse(fetchImpl.calls[0][1].body).contents[0].parts[0].text, /正文/);
+});
+
+test('prompt and Gemini request constrain the exact structured summary shape', async () => {
+  const fetchImpl = sequenceFetch([
+    response(200, geminiPayload(modelSummary()))
+  ]);
+  const prompt = buildSummaryPrompt({ title: '标题', body: '正文' });
+
+  await requestGeminiSummary({
+    fetchImpl,
+    apiKey: 'secret',
+    model: 'gemini-3.6-flash',
+    title: '标题',
+    body: '正文'
+  });
+
+  const body = JSON.parse(fetchImpl.calls[0][1].body);
+  const schema = body.generationConfig.responseSchema;
+  assert.match(prompt, /general.*120 至 180 个字符/);
+  assert.equal(schema.type, 'OBJECT');
+  assert.deepEqual(Object.keys(schema.properties), ['general', 'bullets', 'explainer']);
+  assert.deepEqual(schema.required, ['general', 'bullets', 'explainer']);
+  assert.equal(schema.additionalProperties, false);
+  assert.equal(schema.properties.bullets.type, 'ARRAY');
+  assert.equal(schema.properties.bullets.minItems, 3);
+  assert.equal(schema.properties.bullets.maxItems, 5);
+  assert.deepEqual(schema.properties.bullets.items, { type: 'STRING' });
 });
 
 test('retries a 5xx response once and then succeeds', async () => {
@@ -266,11 +320,103 @@ test('retries a 5xx response once and then succeeds', async () => {
     model: 'gemini-3.6-flash',
     title: '标题',
     body: '正文',
-    retries: 2
+    retries: 2,
+    sleepImpl: async () => {}
   });
 
   assert.equal(fetchImpl.calls.length, 2);
   assert.equal(result.general, modelSummary().general);
+});
+
+test('uses exponential backoff and honors Retry-After without real waiting', async () => {
+  const waits = [];
+  const fetchImpl = sequenceFetch([
+    response(429, {}, { 'Retry-After': '2' }),
+    response(503, {}),
+    response(200, geminiPayload(modelSummary()))
+  ]);
+
+  await requestGeminiSummary({
+    fetchImpl,
+    apiKey: 'secret',
+    title: '标题',
+    body: '正文',
+    retries: 2,
+    retryBaseDelayMs: 500,
+    maxRetryDelayMs: 3_000,
+    sleepImpl: async delay => waits.push(delay)
+  });
+
+  assert.deepEqual(waits, [2_000, 1_000]);
+});
+
+test('uses injected time and caps an HTTP-date Retry-After value', async () => {
+  const waits = [];
+  const fetchImpl = sequenceFetch([
+    response(429, {}, { 'Retry-After': 'Wed, 30 Jul 2026 00:02:00 GMT' }),
+    response(200, geminiPayload(modelSummary()))
+  ]);
+
+  await requestGeminiSummary({
+    fetchImpl,
+    apiKey: 'secret',
+    title: '标题',
+    body: '正文',
+    retries: 1,
+    retryBaseDelayMs: 500,
+    maxRetryDelayMs: 5_000,
+    now: () => Date.parse('2026-07-30T00:00:00.000Z'),
+    sleepImpl: async delay => waits.push(delay)
+  });
+
+  assert.deepEqual(waits, [5_000]);
+});
+
+test('bounds each Gemini request with injected timeout and abort controls', async () => {
+  const timers = [];
+  const cleared = [];
+  let aborted = false;
+  const createAbortController = () => ({
+    signal: {
+      get aborted() {
+        return aborted;
+      }
+    },
+    abort() {
+      aborted = true;
+    }
+  });
+  const fetchImpl = async (url, options) => {
+    assert.equal(options.signal.aborted, true);
+    const error = new Error('aborted');
+    error.name = 'AbortError';
+    throw error;
+  };
+
+  await assert.rejects(
+    () => requestGeminiSummary({
+      fetchImpl,
+      apiKey: 'secret',
+      title: '标题',
+      body: '正文',
+      retries: 0,
+      requestTimeoutMs: 1_234,
+      createAbortController,
+      setTimeoutImpl(callback, delay) {
+        timers.push(delay);
+        callback();
+        return 7;
+      },
+      clearTimeoutImpl(handle) {
+        cleared.push(handle);
+      }
+    }),
+    /timed out after 1234 ms/
+  );
+
+  assert.deepEqual(timers, [1_234]);
+  assert.deepEqual(cleared, [7]);
+  assert.equal(aborted, true);
 });
 
 test('failed generation leaves an existing output unchanged', async () => {
@@ -375,6 +521,7 @@ test('scan and check CLI modes report every malformed post before API use', () =
   const fixtureRoot = createCliFixture({
     '2026-08-01-missing-frontmatter.md': 'title: 无分隔符\ndate: 2026-08-01\n绝不能出现在日志中的正文。',
     '2026-08-02-invalid-metadata.md': '---\ntitle: \ndate: not-a-date\n---\n另一段绝不能出现在日志中的正文。',
+    'malformed-frontmatter.md': '---\ntitle: 非日期文件也必须校验\ndate: not-a-date\n---\n不能被扫描器忽略的正文。',
     'legacy-note.md': '旧文章没有 frontmatter，但不在摘要迁移范围内。'
   });
 
@@ -383,6 +530,7 @@ test('scan and check CLI modes report every malformed post before API use', () =
     assert.equal(result.status, 1, `${mode} should fail`);
     assert.match(result.stderr, /2026-08-01-missing-frontmatter\.md/);
     assert.match(result.stderr, /2026-08-02-invalid-metadata\.md/);
+    assert.match(result.stderr, /malformed-frontmatter\.md/);
     assert.doesNotMatch(result.stderr, /legacy-note\.md/);
     assert.match(result.stderr, /frontmatter|metadata|title|date/i);
     assert.doesNotMatch(
@@ -390,4 +538,19 @@ test('scan and check CLI modes report every malformed post before API use', () =
       new RegExp(`${secret}|绝不能出现在日志中的正文`)
     );
   }
+});
+
+test('check CLI consumes the shared Shanghai cutoff at every boundary', () => {
+  const fixtureRoot = createCliFixture({
+    'exact-cutoff.md': '---\ntitle: 精确截点\ndate: 2026-07-30 00:00:00\n---\n正文内容。',
+    'early-july-30.md': '---\ntitle: 七月三十日凌晨\ndate: 2026-07-30 00:01:00\n---\n正文内容。',
+    'july-31.md': '---\ntitle: 七月三十一日\ndate: 2026-07-31 00:00:00\n---\n正文内容。'
+  });
+
+  const result = runCli(fixtureRoot, ['--check']);
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /exact-cutoff: missing, invalid, or stale summary/);
+  assert.match(result.stderr, /early-july-30: missing, invalid, or stale summary/);
+  assert.match(result.stderr, /july-31: missing, invalid, or stale summary/);
 });

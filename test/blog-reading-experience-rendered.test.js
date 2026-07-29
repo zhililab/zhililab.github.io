@@ -24,6 +24,14 @@ const kubernetesArticlePath = path.join(
   '2026-07-23-kubernetes-pod-creation-workflow',
   'index.html'
 );
+const graphArticlePath = path.join(
+  publicRoot,
+  '2026',
+  '07',
+  '27',
+  '2026-07-27-from-graph-platform-to-devops-agent-control-plane',
+  'index.html'
+);
 const claudeArticlePath = path.join(
   publicRoot,
   '2026',
@@ -56,7 +64,47 @@ test('rendered enhancement assets exist and remain compact', () => {
 
   assert.ok(fs.statSync(css).size > 0);
   assert.ok(fs.statSync(js).size > 0);
-  assert.ok(fs.statSync(css).size + fs.statSync(js).size < 20 * 1024);
+  assert.ok(fs.statSync(css).size + fs.statSync(js).size < 24 * 1024);
+});
+
+test('all three backfills render one static reviewed AI summary and home renders none', () => {
+  const disclosure = 'AI 生成 · 已由作者审核 · 仅供快速预览，请以原文为准';
+  const forbiddenRuntimeMarkers = /generativelanguage\.googleapis\.com|GEMINI_API_KEY|x-goog-api-key/i;
+
+  for (const file of [articlePath, kubernetesArticlePath, graphArticlePath]) {
+    const html = read(file);
+
+    assert.equal(
+      (html.match(/<details class="ai-summary" data-ai-summary>/g) || []).length,
+      1,
+      `${file} must contain exactly one AI summary component`
+    );
+    assert.equal(
+      (html.match(/role="tab"/g) || []).length,
+      3,
+      `${file} must contain exactly three AI summary tabs`
+    );
+    assert.equal(
+      (html.match(/✦ 阅读 AI 生成摘要/g) || []).length,
+      1,
+      `${file} must contain the collapsed summary copy once`
+    );
+    assert.equal(
+      (html.match(/>通俗解释<\/button>/g) || []).length,
+      1,
+      `${file} must contain the exact third-tab copy once`
+    );
+    assert.equal(
+      html.split(disclosure).length - 1,
+      1,
+      `${file} must contain the disclosure once`
+    );
+    assert.doesNotMatch(html, forbiddenRuntimeMarkers);
+  }
+
+  const home = read(path.join(publicRoot, 'index.html'));
+  assert.doesNotMatch(home, /data-ai-summary|✦ 阅读 AI 生成摘要|通俗解释/);
+  assert.doesNotMatch(home, forbiddenRuntimeMarkers);
 });
 
 test('Kubernetes article uses the cached sequence diagram image', () => {

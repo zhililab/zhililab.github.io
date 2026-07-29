@@ -6,6 +6,7 @@ const {
   computeSourceHash,
   validateSummary
 } = require('./ai-summary');
+const { isAiSummaryRequired } = require('./ai-summary-eligibility');
 
 function escapeHtml(text) {
   return String(text)
@@ -25,12 +26,12 @@ function renderAiSummary(summary) {
 
   return [
     '<details class="ai-summary" data-ai-summary>',
-    '  <summary>AI 生成 · 已由作者审核</summary>',
-    '  <p class="ai-summary__disclosure">以下内容由 AI 生成，并已由作者审核；请以正文为准。</p>',
+    '  <summary>✦ 阅读 AI 生成摘要</summary>',
+    '  <p class="ai-summary__disclosure">AI 生成 · 已由作者审核 · 仅供快速预览，请以原文为准</p>',
     `  <div class="ai-summary__tabs" role="tablist" aria-label="${escapeHtml('文章摘要')}" aria-orientation="horizontal">`,
     `    <button type="button" role="tab" id="${prefix}-tab-overview" aria-controls="${prefix}-panel-overview" aria-selected="true" tabindex="0">概览</button>`,
     `    <button type="button" role="tab" id="${prefix}-tab-points" aria-controls="${prefix}-panel-points" aria-selected="false" tabindex="-1">要点</button>`,
-    `    <button type="button" role="tab" id="${prefix}-tab-explainer" aria-controls="${prefix}-panel-explainer" aria-selected="false" tabindex="-1">解读</button>`,
+    `    <button type="button" role="tab" id="${prefix}-tab-explainer" aria-controls="${prefix}-panel-explainer" aria-selected="false" tabindex="-1">通俗解释</button>`,
     '  </div>',
     `  <section role="tabpanel" id="${prefix}-panel-overview" aria-labelledby="${prefix}-tab-overview" aria-label="${escapeHtml('概览')}">`,
     `    <p>${general}</p>`,
@@ -40,7 +41,7 @@ function renderAiSummary(summary) {
     bullets,
     '    </ul>',
     '  </section>',
-    `  <section role="tabpanel" id="${prefix}-panel-explainer" aria-labelledby="${prefix}-tab-explainer" aria-label="${escapeHtml('解读')}" hidden>`,
+    `  <section role="tabpanel" id="${prefix}-panel-explainer" aria-labelledby="${prefix}-tab-explainer" aria-label="${escapeHtml('通俗解释')}" hidden>`,
     `    <p>${explainer}</p>`,
     '  </section>',
     '</details>'
@@ -61,25 +62,20 @@ function isPost(data) {
   return Boolean(data && ((data.page && data.page.layout === 'post') || data.layout === 'post'));
 }
 
-function isAfterCutoff(date, cutoffDate) {
-  if (!date || !cutoffDate) return false;
-  const value = new Date(date);
-  const cutoff = new Date(`${cutoffDate}T00:00:00.000Z`);
-  return !Number.isNaN(value.valueOf()) && !Number.isNaN(cutoff.valueOf()) && value > cutoff;
-}
-
 function summaryPath(summariesDir, slug) {
   return path.join(summariesDir, `${slug}.json`);
 }
 
-function createAiSummaryFilter({ summariesDir, cutoffDate, backfillSlugs }) {
-  const requiredBackfills = new Set(backfillSlugs || []);
-
+function createAiSummaryFilter({ summariesDir }) {
   return data => {
-    if (!isPost(data) || data.ai_summary === false) return data;
+    if (!isPost(data)) return data;
 
     const slug = data.slug;
-    const required = requiredBackfills.has(slug) || isAfterCutoff(data.date, cutoffDate);
+    const required = isAiSummaryRequired({
+      slug,
+      date: data.date,
+      aiSummary: data.ai_summary
+    });
     if (!required) return data;
 
     const filePath = summaryPath(summariesDir, slug);

@@ -184,7 +184,7 @@ function assertExactKeys(value, allowedKeys, label) {
 
 function validateModelContent(content) {
   assertExactKeys(content, MODEL_KEYS, 'model summary');
-  assertPlainText(content.general, 'general', 40, 400);
+  assertPlainText(content.general, 'general', 120, 180);
   assertPlainText(content.explainer, 'explainer', 20, 500);
   if (!Array.isArray(content.bullets) || content.bullets.length < 3 || content.bullets.length > 5) {
     throw new AiSummaryValidationError('bullets must contain 3-5 items');
@@ -242,7 +242,7 @@ function buildSummaryPrompt({ title, body }) {
     '不得补充正文之外的事实、数字、引用、链接或因果关系。',
     '保留原文中的限制条件和不确定表述。',
     '返回 JSON，且只包含 general、bullets、explainer 三个字段。',
-    'general 是单段概览；bullets 是 3 至 5 条要点；explainer 面向非专业读者。',
+    'general 必须是 120 至 180 个字符的单段概览；bullets 是 3 至 5 条要点；explainer 面向非专业读者。',
     '',
     `<article-title>${String(title || '').trim()}</article-title>`,
     '<article-body>',
@@ -261,13 +261,72 @@ function extractGeminiText(payload) {
   return text;
 }
 
+function defaultSleep(delay) {
+  return new Promise(resolve => setTimeout(resolve, delay));
+}
+
+function retryAfterDelay(response, now) {
+  const value = response && response.headers && response.headers.get('retry-after');
+  if (typeof value !== 'string' || !value.trim()) return 0;
+
+  const seconds = Number(value);
+  if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1000;
+
+  const retryAt = Date.parse(value);
+  if (!Number.isFinite(retryAt)) return 0;
+  return Math.max(0, retryAt - now());
+}
+
+async function performGeminiRequest({
+  fetchImpl,
+  url,
+  requestOptions,
+  requestTimeoutMs,
+  createAbortController,
+  setTimeoutImpl,
+  clearTimeoutImpl
+}) {
+  const controller = createAbortController();
+  const timeoutHandle = setTimeoutImpl(() => controller.abort(), requestTimeoutMs);
+  try {
+    let response;
+    try {
+      response = await fetchImpl(url, {
+        ...requestOptions,
+        signal: controller.signal
+      });
+    } catch (error) {
+      const requestError = controller.signal.aborted
+        ? new Error(`Gemini request timed out after ${requestTimeoutMs} ms`)
+        : error;
+      requestError.aiSummaryRetryable = true;
+      throw requestError;
+    }
+
+    return {
+      response,
+      payload: response.ok ? await response.json() : null
+    };
+  } finally {
+    clearTimeoutImpl(timeoutHandle);
+  }
+}
+
 async function requestGeminiSummary({
   fetchImpl = globalThis.fetch,
   apiKey,
   model = 'gemini-3.6-flash',
   title,
   body,
-  retries = 2
+  retries = 2,
+  requestTimeoutMs = 15_000,
+  retryBaseDelayMs = 500,
+  maxRetryDelayMs = 30_000,
+  sleepImpl = defaultSleep,
+  now = Date.now,
+  createAbortController = () => new AbortController(),
+  setTimeoutImpl = setTimeout,
+  clearTimeoutImpl = clearTimeout
 }) {
   if (!apiKey) throw new Error('GEMINI_API_KEY is required');
   if (typeof fetchImpl !== 'function') throw new Error('fetch is unavailable');
@@ -283,21 +342,58 @@ async function requestGeminiSummary({
     }],
     generationConfig: {
       responseMimeType: 'application/json',
+      responseSchema: {
+        type: 'OBJECT',
+        properties: {
+          general: {
+            type: 'STRING',
+            description: '120 至 180 个字符的单段中文概览'
+          },
+          bullets: {
+            type: 'ARRAY',
+            items: { type: 'STRING' },
+            minItems: 3,
+            maxItems: 5
+          },
+          explainer: {
+            type: 'STRING'
+          }
+        },
+        required: ['general', 'bullets', 'explainer'],
+        additionalProperties: false
+      },
       maxOutputTokens: 1200
     }
   };
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
-    const response = await fetchImpl(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': apiKey
-      },
-      body: JSON.stringify(requestBody)
-    });
+    let response;
+    let payload;
+    try {
+      ({ response, payload } = await performGeminiRequest({
+        fetchImpl,
+        url,
+        requestOptions: {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': apiKey
+          },
+          body: JSON.stringify(requestBody)
+        },
+        requestTimeoutMs,
+        createAbortController,
+        setTimeoutImpl,
+        clearTimeoutImpl
+      }));
+    } catch (error) {
+      if (!error.aiSummaryRetryable || attempt === retries) throw error;
+      const delay = Math.min(maxRetryDelayMs, retryBaseDelayMs * (2 ** attempt));
+      await sleepImpl(delay);
+      continue;
+    }
+
     if (response.ok) {
-      const payload = await response.json();
       let parsed;
       try {
         parsed = JSON.parse(extractGeminiText(payload));
@@ -310,6 +406,12 @@ async function requestGeminiSummary({
     if (!retryable || attempt === retries) {
       throw new Error(`Gemini request failed with HTTP ${response.status}`);
     }
+    const exponentialDelay = retryBaseDelayMs * (2 ** attempt);
+    const serverDelay = retryAfterDelay(response, now);
+    await sleepImpl(Math.min(
+      maxRetryDelayMs,
+      Math.max(exponentialDelay, serverDelay)
+    ));
   }
   throw new Error('Gemini request failed');
 }

@@ -7,16 +7,8 @@ const CSS_PATH = '/css/blog-reading-experience.css';
 const JS_PATH = '/js/blog-reading-experience.js';
 const MARKER = 'data-blog-reading-experience';
 const AI_SUMMARIES_DIR = path.join(__dirname, '..', 'source', '_data', 'ai-summaries');
-const AI_SUMMARY_CUTOFF_DATE = '2026-07-30';
-const AI_SUMMARY_BACKFILL_SLUGS = [
-  '2026-07-22-agentic-devops-practice-report',
-  '2026-07-23-kubernetes-pod-creation-workflow',
-  '2026-07-27-from-graph-platform-to-devops-agent-control-plane'
-];
 const injectAiSummary = createAiSummaryFilter({
-  summariesDir: AI_SUMMARIES_DIR,
-  cutoffDate: AI_SUMMARY_CUTOFF_DATE,
-  backfillSlugs: AI_SUMMARY_BACKFILL_SLUGS
+  summariesDir: AI_SUMMARIES_DIR
 });
 
 function isPost(data) {

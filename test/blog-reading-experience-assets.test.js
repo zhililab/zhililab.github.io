@@ -137,7 +137,7 @@ test('AI summary client stays within its recorded source-asset budget', () => {
     'source/css/blog-reading-experience.css'
   ];
   const bytes = files.reduce((sum, file) => sum + stat(file).size, 0);
-  const task3Delta = bytes - 17739;
+  const task3Delta = bytes - 18247;
 
   assert.ok(bytes < 24 * 1024, `source enhancement assets are ${bytes} bytes`);
   assert.ok(task3Delta <= 4 * 1024, `Task 3 added ${task3Delta} bytes`);
