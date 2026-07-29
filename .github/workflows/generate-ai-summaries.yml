@@ -7,6 +7,7 @@ on:
       - dev-optimize
     paths:
       - 'source/_posts/**'
+      - '.gitmodules'
       - '.github/workflows/generate-ai-summaries.yml'
       - 'scripts/generate-ai-summary.js'
       - 'scripts/lib/ai-summary*.js'
