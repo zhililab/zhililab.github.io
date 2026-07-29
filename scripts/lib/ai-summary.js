@@ -339,33 +339,37 @@ async function requestGeminiSummary({
       parts: [{ text: buildSummaryPrompt({ title, body }) }]
     }],
     generationConfig: {
-      responseMimeType: 'application/json',
-      responseSchema: {
-        type: 'object',
-        properties: {
-          general: {
-            type: 'string',
-            description: '120 至 180 个字符的单段中文概览'
-          },
-          bullets: {
-            type: 'array',
-            items: {
-              type: 'string'
+      responseFormat: {
+        text: {
+          mimeType: 'APPLICATION_JSON',
+          schema: {
+            type: 'object',
+            properties: {
+              general: {
+                type: 'string',
+                description: '120 至 180 个字符的单段中文概览'
+              },
+              bullets: {
+                type: 'array',
+                items: {
+                  type: 'string'
+                },
+                minItems: 3,
+                maxItems: 5
+              },
+              explainer: {
+                type: 'string'
+              }
             },
-            minItems: 3,
-            maxItems: 5
-          },
-          explainer: {
-            type: 'string'
+            required: ['general', 'bullets', 'explainer'],
+            additionalProperties: false
           }
-        },
-        required: [
-          'general',
-          'bullets',
-          'explainer'
-        ]
+        }
       },
-      maxOutputTokens: 1200
+      thinkingConfig: {
+        thinkingLevel: 'LOW'
+      },
+      maxOutputTokens: 4096
     }
   };
 
@@ -397,13 +401,44 @@ async function requestGeminiSummary({
     }
 
     if (response.ok) {
+      const candidate = payload && payload.candidates && payload.candidates[0];
+      const finishReason = candidate && candidate.finishReason;
+      if (finishReason && finishReason !== 'STOP') {
+        const finishError = new AiSummaryValidationError(
+          `Gemini stopped before completing the summary: ${finishReason}`
+        );
+        finishError.aiSummaryRetryable =
+          finishReason === 'MAX_TOKENS' || finishReason === 'OTHER';
+        if (!finishError.aiSummaryRetryable || attempt === retries) {
+          throw finishError;
+        }
+        const delay = Math.min(maxRetryDelayMs, retryBaseDelayMs * (2 ** attempt));
+        await sleepImpl(delay);
+        continue;
+      }
+
       let parsed;
       try {
         parsed = JSON.parse(extractGeminiText(payload));
       } catch (error) {
-        throw new AiSummaryValidationError(`Gemini returned invalid JSON: ${error.message}`);
+        const validationError = new AiSummaryValidationError(
+          `Gemini returned invalid JSON: ${error.message}`
+        );
+        if (attempt === retries) throw validationError;
+        const delay = Math.min(maxRetryDelayMs, retryBaseDelayMs * (2 ** attempt));
+        await sleepImpl(delay);
+        continue;
       }
-      return validateModelContent(parsed);
+      try {
+        return validateModelContent(parsed);
+      } catch (error) {
+        if (!(error instanceof AiSummaryValidationError) || attempt === retries) {
+          throw error;
+        }
+        const delay = Math.min(maxRetryDelayMs, retryBaseDelayMs * (2 ** attempt));
+        await sleepImpl(delay);
+        continue;
+      }
     }
     const retryable = response.status === 429 || response.status >= 500;
     if (!retryable || attempt === retries) {
