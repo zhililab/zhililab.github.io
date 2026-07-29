@@ -7,6 +7,8 @@ tags:
   - 个人成长
 categories:
   - 思考
+index_img: /assets/images/cover/why-google-adsense.webp
+banner_img: /assets/images/cover/why-google-adsense.webp
 date: 2026-07-29 23:17:00
 ---
 
