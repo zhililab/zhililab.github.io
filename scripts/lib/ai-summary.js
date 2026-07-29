@@ -339,30 +339,31 @@ async function requestGeminiSummary({
       parts: [{ text: buildSummaryPrompt({ title, body }) }]
     }],
     generationConfig: {
-      responseFormat: {
-        text: {
-          mimeType: 'application/json',
-          schema: {
-            type: 'object',
-            properties: {
-              general: {
-                type: 'string',
-                description: '120 至 180 个字符的单段中文概览'
-              },
-              bullets: {
-                type: 'array',
-                items: { type: 'string' },
-                minItems: 3,
-                maxItems: 5
-              },
-              explainer: {
-                type: 'string'
-              }
+      responseMimeType: 'application/json',
+      responseSchema: {
+        type: 'object',
+        properties: {
+          general: {
+            type: 'string',
+            description: '120 至 180 个字符的单段中文概览'
+          },
+          bullets: {
+            type: 'array',
+            items: {
+              type: 'string'
             },
-            required: ['general', 'bullets', 'explainer'],
-            additionalProperties: false
+            minItems: 3,
+            maxItems: 5
+          },
+          explainer: {
+            type: 'string'
           }
-        }
+        },
+        required: [
+          'general',
+          'bullets',
+          'explainer'
+        ]
       },
       maxOutputTokens: 1200
     }
