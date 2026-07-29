@@ -1,6 +1,7 @@
 name: Generate draft AI summaries
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev-optimize

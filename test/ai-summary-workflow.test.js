@@ -20,7 +20,8 @@ test('AI summary workflow generates draft summaries only for changed posts on de
     /^\s{2}commit:\n(?:^(?!\s{2}\S).*\n|^\s{4,}.*\n)*/m
   );
 
-  assert.match(workflow, /on:\s*\n\s*push:\s*\n\s*branches:\s*\n\s*-\s*dev-optimize/m);
+  assert.match(workflow, /^\s{2}push:\s*\n\s*branches:\s*\n\s*-\s*dev-optimize/m);
+  assert.match(workflow, /on:\s*\n\s*workflow_dispatch:\s*\n\s*push:/m);
   assert.match(workflow, /paths:\s*\n\s*-\s*['\"]?source\/_posts\/\*\*['\"]?/m);
   assert.match(workflow, /^permissions:\s*\n\s{2}contents:\s*read/m);
   assert.doesNotMatch(workflow, /^\s{4}env:/m);
