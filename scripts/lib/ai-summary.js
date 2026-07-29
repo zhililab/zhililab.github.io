@@ -296,7 +296,7 @@ async function performGeminiRequest({
       });
       return {
         response,
-        payload: response.ok ? await response.json() : null
+        payload: await response.json()
       };
     } catch (error) {
       const requestError = controller.signal.aborted
@@ -406,7 +406,11 @@ async function requestGeminiSummary({
     }
     const retryable = response.status === 429 || response.status >= 500;
     if (!retryable || attempt === retries) {
-      throw new Error(`Gemini request failed with HTTP ${response.status}`);
+      const providerMessage = payload && payload.error &&
+        typeof payload.error.message === 'string'
+        ? `: ${payload.error.message}`
+        : '';
+      throw new Error(`Gemini request failed with HTTP ${response.status}${providerMessage}`);
     }
     const exponentialDelay = retryBaseDelayMs * (2 ** attempt);
     const serverDelay = retryAfterDelay(response, now);

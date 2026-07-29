@@ -332,6 +332,27 @@ test('retries a 5xx response once and then succeeds', async () => {
   assert.equal(result.general, modelSummary().general);
 });
 
+test('surfaces the provider diagnostic for a non-retryable HTTP error', async () => {
+  const fetchImpl = sequenceFetch([
+    response(400, {
+      error: {
+        message: 'Invalid structured output configuration'
+      }
+    })
+  ]);
+
+  await assert.rejects(
+    () => requestGeminiSummary({
+      fetchImpl,
+      apiKey: 'secret',
+      title: '标题',
+      body: '正文',
+      retries: 0
+    }),
+    /HTTP 400: Invalid structured output configuration/
+  );
+});
+
 test('uses exponential backoff and honors Retry-After without real waiting', async () => {
   const waits = [];
   const fetchImpl = sequenceFetch([
