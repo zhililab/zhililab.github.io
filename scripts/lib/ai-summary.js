@@ -17,7 +17,20 @@ const SUMMARY_KEYS = [
   'explainer'
 ];
 const MODEL_KEYS = ['general', 'bullets', 'explainer'];
-const FORBIDDEN_MARKUP = /<[^>]*>|\[[^\]]+\]\([^)]+\)/;
+const CANONICAL_ISO_TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+const POST_DATE = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(Z|[+-]\d{2}:\d{2})?)?$/;
+const FORBIDDEN_MARKUP = [
+  /<[^>\n]*>/,
+  /!?\[[^\]\n]*\]\([^)\n]*\)/,
+  /!?\[[^\]\n]+\]\[[^\]\n]*\]/,
+  /(^|\n)[ \t]{0,3}#{1,6}(?:[ \t]+|$)/,
+  /(^|\n)[^\n]+\n[ \t]{0,3}(?:=+|-+)[ \t]*(?=\n|$)/,
+  /(^|\n)[ \t]{0,3}>[ \t]?/,
+  /(^|\n)[ \t]{0,3}(?:[-+*][ \t]+|\d{1,9}[.)][ \t]+)/,
+  /`|~~~/,
+  /\*\*[^*\n]+\*\*|__[^_\n]+__|(^|[^\w*])\*[^*\n]+\*(?!\*)|(^|[^\w_])_[^_\n]+_(?!_)/,
+  /~~[^~\n]+~~/
+];
 
 class AiSummaryValidationError extends Error {
   constructor(message) {
@@ -27,18 +40,105 @@ class AiSummaryValidationError extends Error {
 }
 
 function extractFrontmatterAndBody(markdown) {
-  const source = String(markdown || '').replace(/\r\n?/g, '\n');
-  if (!source.startsWith('---\n')) {
-    return { frontmatter: '', body: source };
+  const source = String(markdown || '').replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+  const lines = source.split('\n');
+  if (!/^---[ \t]*$/.test(lines[0])) {
+    throw new AiSummaryValidationError('post frontmatter must start with ---');
   }
-  const end = source.indexOf('\n---\n', 4);
-  const yamlEnd = end === -1 ? source.indexOf('\n...\n', 4) : end;
-  if (yamlEnd === -1) {
-    return { frontmatter: '', body: source };
+  const end = lines.findIndex(
+    (line, index) => index > 0 && /^(?:---|\.\.\.)[ \t]*$/.test(line)
+  );
+  if (end === -1) {
+    throw new AiSummaryValidationError('post frontmatter is not terminated');
   }
   return {
-    frontmatter: source.slice(4, yamlEnd),
-    body: source.slice(yamlEnd + 5)
+    frontmatter: lines.slice(1, end).join('\n'),
+    body: lines.slice(end + 1).join('\n')
+  };
+}
+
+function metadataValues(frontmatter, key) {
+  const pattern = new RegExp(`^${key}[ \\t]*:(.*)$`);
+  return frontmatter
+    .split('\n')
+    .map(line => line.match(pattern))
+    .filter(Boolean)
+    .map(match => match[1].trim());
+}
+
+function requiredScalar(frontmatter, key) {
+  const values = metadataValues(frontmatter, key);
+  if (values.length !== 1 || !values[0]) {
+    throw new AiSummaryValidationError(`post ${key} metadata must appear exactly once`);
+  }
+  const value = values[0];
+  if (value.startsWith('"') || value.startsWith("'")) {
+    const quote = value[0];
+    if (value.length < 2 || value[value.length - 1] !== quote) {
+      throw new AiSummaryValidationError(`post ${key} metadata has an unterminated quote`);
+    }
+    if (!value.slice(1, -1).trim()) {
+      throw new AiSummaryValidationError(`post ${key} metadata must not be empty`);
+    }
+    return value.slice(1, -1);
+  }
+  if (value === '|' || value === '>') {
+    throw new AiSummaryValidationError(`post ${key} metadata must be a scalar`);
+  }
+  return value;
+}
+
+function parsePostDate(value) {
+  const match = value.match(POST_DATE);
+  if (!match) {
+    throw new AiSummaryValidationError('post date metadata is invalid');
+  }
+  const [, year, month, day, hour = '00', minute = '00', second = '00', , zone] = match;
+  const daysInMonth = new Date(Date.UTC(Number(year), Number(month), 0)).getUTCDate();
+  const zoneParts = zone && zone !== 'Z' ? zone.slice(1).split(':').map(Number) : null;
+  if (
+    Number(month) < 1 ||
+    Number(month) > 12 ||
+    Number(day) < 1 ||
+    Number(day) > daysInMonth ||
+    Number(hour) > 23 ||
+    Number(minute) > 59 ||
+    Number(second) > 59 ||
+    (zoneParts && (zoneParts[0] > 23 || zoneParts[1] > 59))
+  ) {
+    throw new AiSummaryValidationError('post date metadata is invalid');
+  }
+  const normalized = value.includes('T') ? value : value.replace(' ', 'T');
+  const timestamp = value.length === 10
+    ? `${value}T00:00:00+08:00`
+    : `${normalized}${zone ? '' : '+08:00'}`;
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.valueOf())) {
+    throw new AiSummaryValidationError('post date metadata is invalid');
+  }
+  return date;
+}
+
+function parsePost(markdown) {
+  const { frontmatter, body } = extractFrontmatterAndBody(markdown);
+  const title = requiredScalar(frontmatter, 'title');
+  const dateValue = requiredScalar(frontmatter, 'date');
+  const aiSummaryValues = metadataValues(frontmatter, 'ai_summary');
+  if (
+    aiSummaryValues.length > 1 ||
+    (aiSummaryValues.length === 1 && !['true', 'false'].includes(aiSummaryValues[0]))
+  ) {
+    throw new AiSummaryValidationError('post ai_summary metadata must be true or false');
+  }
+  if (!normalizeBody(body)) {
+    throw new AiSummaryValidationError('post body must not be empty');
+  }
+  return {
+    frontmatter,
+    body,
+    title,
+    date: parsePostDate(dateValue),
+    optedOut: aiSummaryValues[0] === 'false'
   };
 }
 
@@ -66,7 +166,7 @@ function assertPlainText(value, field, minLength, maxLength) {
       `${field} must contain ${minLength}-${maxLength} characters`
     );
   }
-  if (FORBIDDEN_MARKUP.test(text)) {
+  if (FORBIDDEN_MARKUP.some(pattern => pattern.test(text))) {
     throw new AiSummaryValidationError(`${field} must contain plain text only`);
   }
 }
@@ -116,8 +216,13 @@ function validateSummary(summary, options = {}) {
     throw new AiSummaryValidationError('provider must be google');
   }
   assertPlainText(summary.model, 'model', 3, 100);
-  if (Number.isNaN(Date.parse(summary.generated_at))) {
-    throw new AiSummaryValidationError('generated_at must be an ISO date');
+  if (
+    typeof summary.generated_at !== 'string' ||
+    !CANONICAL_ISO_TIMESTAMP.test(summary.generated_at) ||
+    Number.isNaN(Date.parse(summary.generated_at)) ||
+    new Date(summary.generated_at).toISOString() !== summary.generated_at
+  ) {
+    throw new AiSummaryValidationError('generated_at must be a canonical ISO timestamp');
   }
   if (!['draft', 'approved'].includes(summary.status)) {
     throw new AiSummaryValidationError('status must be draft or approved');
@@ -209,11 +314,6 @@ async function requestGeminiSummary({
   throw new Error('Gemini request failed');
 }
 
-function titleFromFrontmatter(frontmatter, fallback) {
-  const match = String(frontmatter || '').match(/^title:\s*(?:"([^"]*)"|'([^']*)'|(.+))$/m);
-  return (match && (match[1] || match[2] || match[3]).trim()) || fallback;
-}
-
 async function generateSummaryForPost({
   postPath,
   outputDir,
@@ -223,13 +323,13 @@ async function generateSummaryForPost({
   now = () => new Date()
 }) {
   const markdown = fs.readFileSync(postPath, 'utf8');
-  const { frontmatter, body } = extractFrontmatterAndBody(markdown);
+  const { body, title } = parsePost(markdown);
   const slug = path.basename(postPath, path.extname(postPath));
   const generated = await requestGeminiSummary({
     fetchImpl,
     apiKey,
     model,
-    title: titleFromFrontmatter(frontmatter, slug),
+    title,
     body
   });
   const summary = validateSummary({
@@ -266,6 +366,7 @@ module.exports = {
   extractFrontmatterAndBody,
   generateSummaryForPost,
   normalizeBody,
+  parsePost,
   requestGeminiSummary,
   validateSummary
 };

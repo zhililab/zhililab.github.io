@@ -5,8 +5,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const {
   computeSourceHash,
-  extractFrontmatterAndBody,
   generateSummaryForPost,
+  parsePost,
   validateSummary
 } = require('./lib/ai-summary');
 
@@ -21,23 +21,42 @@ const BACKFILLS = new Set([
 ]);
 
 function readPostInfo(postPath) {
-  const markdown = fs.readFileSync(postPath, 'utf8');
-  const { frontmatter, body } = extractFrontmatterAndBody(markdown);
-  const slug = path.basename(postPath, path.extname(postPath));
-  const optedOut = /^ai_summary:\s*false\s*$/m.test(frontmatter);
-  const dateMatch = frontmatter.match(/^date:\s*(.+)$/m);
-  const date = dateMatch ? new Date(dateMatch[1].trim()) : null;
-  return { postPath, slug, body, optedOut, date };
+  try {
+    const markdown = fs.readFileSync(postPath, 'utf8');
+    const { body, optedOut, date } = parsePost(markdown);
+    const slug = path.basename(postPath, path.extname(postPath));
+    return { postPath, slug, body, optedOut, date };
+  } catch (error) {
+    throw new Error(`${path.basename(postPath)}: malformed post metadata (${error.message})`);
+  }
 }
 
 function requiredPosts() {
-  return fs.readdirSync(POSTS_DIR)
-    .filter(name => name.endsWith('.md'))
-    .map(name => readPostInfo(path.join(POSTS_DIR, name)))
-    .filter(post => !post.optedOut && (
-      BACKFILLS.has(post.slug) ||
-      (post.date && !Number.isNaN(post.date.valueOf()) && post.date > CUTOFF)
-    ));
+  const posts = [];
+  const failures = [];
+  for (const name of fs.readdirSync(POSTS_DIR).filter(file => file.endsWith('.md')).sort()) {
+    const postPath = path.join(POSTS_DIR, name);
+    const slug = path.basename(name, path.extname(name));
+    const filenameDate = name.match(/^(\d{4}-\d{2}-\d{2})-/);
+    const namedAsRequired = BACKFILLS.has(slug) || (
+      filenameDate &&
+      new Date(`${filenameDate[1]}T23:59:59+08:00`) > CUTOFF
+    );
+    const markdown = fs.readFileSync(postPath, 'utf8');
+    if (!namedAsRequired && !markdown.replace(/^\uFEFF/, '').startsWith('---')) {
+      continue;
+    }
+    try {
+      const post = readPostInfo(postPath);
+      if (namedAsRequired || post.date > CUTOFF) posts.push(post);
+    } catch (error) {
+      if (namedAsRequired) failures.push(error.message);
+    }
+  }
+  if (failures.length) {
+    throw new Error(`Malformed posts:\n${failures.map(message => `- ${message}`).join('\n')}`);
+  }
+  return posts.filter(post => !post.optedOut);
 }
 
 function summaryFile(slug) {
@@ -87,6 +106,9 @@ async function main() {
     postPaths = requiredPosts()
       .filter(post => !currentSummary(post))
       .map(post => post.postPath);
+  }
+  if (!args.includes('--scan')) {
+    postPaths.forEach(readPostInfo);
   }
   if (!postPaths.length) {
     console.log('No AI summaries need generation.');
