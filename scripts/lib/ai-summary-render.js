@@ -106,6 +106,9 @@ function createAiSummaryFilter({ summariesDir }) {
       throw new Error(`Required AI summary is not current for post "${slug}" (source hash mismatch).`);
     }
 
+    if (!data.description && !data.excerpt) {
+      data.description = data.content;
+    }
     data.content = `${renderAiSummary(validated)}\n${data.content}`;
     return data;
   };

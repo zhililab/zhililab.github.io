@@ -89,14 +89,16 @@ function modelSummary() {
 function createCliFixture(posts) {
   const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ai-summary-cli-'));
   const scriptsDir = path.join(fixtureRoot, 'scripts');
+  const toolsDir = path.join(fixtureRoot, 'tools');
   const libraryDir = path.join(scriptsDir, 'lib');
   const postsDir = path.join(fixtureRoot, 'source', '_posts');
 
   fs.mkdirSync(libraryDir, { recursive: true });
+  fs.mkdirSync(toolsDir, { recursive: true });
   fs.mkdirSync(postsDir, { recursive: true });
   fs.copyFileSync(
-    path.join(__dirname, '..', 'scripts', 'generate-ai-summary.js'),
-    path.join(scriptsDir, 'generate-ai-summary.js')
+    path.join(__dirname, '..', 'tools', 'generate-ai-summary.js'),
+    path.join(toolsDir, 'generate-ai-summary.js')
   );
   fs.copyFileSync(
     path.join(__dirname, '..', 'scripts', 'lib', 'ai-summary.js'),
@@ -115,7 +117,7 @@ function createCliFixture(posts) {
 function runCli(fixtureRoot, args, env = {}) {
   return spawnSync(
     process.execPath,
-    [path.join(fixtureRoot, 'scripts', 'generate-ai-summary.js'), ...args],
+    [path.join(fixtureRoot, 'tools', 'generate-ai-summary.js'), ...args],
     {
       cwd: fixtureRoot,
       encoding: 'utf8',

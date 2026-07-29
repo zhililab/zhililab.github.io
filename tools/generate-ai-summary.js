@@ -8,8 +8,8 @@ const {
   generateSummaryForPost,
   parsePost,
   validateSummary
-} = require('./lib/ai-summary');
-const { isAiSummaryRequired } = require('./lib/ai-summary-eligibility');
+} = require('../scripts/lib/ai-summary');
+const { isAiSummaryRequired } = require('../scripts/lib/ai-summary-eligibility');
 
 const ROOT = path.join(__dirname, '..');
 const POSTS_DIR = path.join(ROOT, 'source', '_posts');

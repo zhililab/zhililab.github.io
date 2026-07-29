@@ -5,7 +5,7 @@
   "provider": "google",
   "model": "gemini-3.6-flash",
   "generated_at": "2026-07-29T23:35:44.008Z",
-  "status": "draft",
+  "status": "approved",
   "general": "作者基于一次K8s Toolchain挂载故障，梳理了Pod从创建到Ready的完整状态收敛过程。文章指出Kubernetes的核心是声明式控制循环（Control Loop），通过API Server与List/Watch机制驱动组件异步执行Reconcile，推动实际状态向期望状态靠拢，并总结了相关故障排查路径与平台化沉淀经验。",
   "bullets": [
     "阐述了Kubernetes的核心运行模型是基于状态收敛的控制循环（Control Loop），组件间通过API Server和List/Watch机制协作。",

@@ -25,7 +25,7 @@ test('AI summary workflow generates draft summaries only for changed posts on de
   assert.match(workflow, /paths:\s*\n\s*-\s*['\"]?source\/_posts\/\*\*['\"]?/m);
   assert.match(workflow, /-\s*['\"]?\.gitmodules['\"]?/);
   assert.match(workflow, /-\s*['\"]?\.github\/workflows\/generate-ai-summaries\.yml['\"]?/);
-  assert.match(workflow, /-\s*['\"]?scripts\/generate-ai-summary\.js['\"]?/);
+  assert.match(workflow, /-\s*['\"]?tools\/generate-ai-summary\.js['\"]?/);
   assert.match(workflow, /-\s*['\"]?scripts\/lib\/ai-summary\*\.js['\"]?/);
   assert.match(workflow, /^permissions:\s*\n\s{2}contents:\s*read/m);
   assert.doesNotMatch(workflow, /^\s{4}env:/m);

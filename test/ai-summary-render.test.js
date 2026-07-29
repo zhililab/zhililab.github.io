@@ -98,6 +98,7 @@ test('prepends an approved current summary to a required post', () => {
     assert.equal(filter(data), data);
     assert.match(data.content, /^<details class="ai-summary"/);
     assert.match(data.content, /<p>正文内容<\/p>$/);
+    assert.equal(data.description, '<p>正文内容</p>');
   });
 });
 

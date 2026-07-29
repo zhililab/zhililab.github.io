@@ -5,7 +5,7 @@
   "provider": "google",
   "model": "gemini-3.6-flash",
   "generated_at": "2026-07-29T23:35:20.282Z",
-  "status": "draft",
+  "status": "approved",
   "general": "报告指出，针对中型互联网公司的 agentic DevOps 落地，不应追求“全自动运维”，而应将智能体嵌入高价值、可回滚和可审计的闭环中。落地路线建议优先建立“发布守门”与“故障诊断” MVP，再逐步扩展至自助测试编排与合规漂移治理。系统设计需依靠安全边界与人工审批，并以 SLO 和策略控制风险。",
   "bullets": [
     "核心落地场景包含变更评审与发布守门、Kubernetes 故障诊断与 ChatOps、测试编排以及 GitOps 合规与漂移治理。",

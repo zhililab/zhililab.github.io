@@ -7,8 +7,8 @@
     "clean": "hexo clean",
     "deploy": "hexo deploy",
     "measure:performance": "node tools/measure-blog-performance.js",
-    "summary:check": "node scripts/generate-ai-summary.js --check",
-    "summary:generate": "node scripts/generate-ai-summary.js",
+    "summary:check": "node tools/generate-ai-summary.js --check",
+    "summary:generate": "node tools/generate-ai-summary.js",
     "serve:public": "node tools/serve-public.js",
     "server": "hexo server",
     "test": "node --test test/*.test.js"

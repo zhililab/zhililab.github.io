@@ -73,31 +73,44 @@ test('all three backfills render one static reviewed AI summary and home renders
 
   for (const file of [articlePath, kubernetesArticlePath, graphArticlePath]) {
     const html = read(file);
+    const componentMatch = html.match(
+      /<details class="ai-summary" data-ai-summary>[\s\S]*?<\/details>/
+    );
+    const metaDescriptions = html.match(
+      /<meta\b[^>]*(?:name="description"|property="og:description")[^>]*>/g
+    ) || [];
 
     assert.equal(
       (html.match(/<details class="ai-summary" data-ai-summary>/g) || []).length,
       1,
       `${file} must contain exactly one AI summary component`
     );
+    assert.ok(componentMatch, `${file} must contain the complete AI summary component`);
+    const component = componentMatch[0];
     assert.equal(
-      (html.match(/role="tab"/g) || []).length,
+      (component.match(/role="tab"/g) || []).length,
       3,
       `${file} must contain exactly three AI summary tabs`
     );
     assert.equal(
-      (html.match(/✦ 阅读 AI 生成摘要/g) || []).length,
+      (component.match(/✦ 阅读 AI 生成摘要/g) || []).length,
       1,
       `${file} must contain the collapsed summary copy once`
     );
     assert.equal(
-      (html.match(/>通俗解释<\/button>/g) || []).length,
+      (component.match(/>通俗解释<\/button>/g) || []).length,
       1,
       `${file} must contain the exact third-tab copy once`
     );
     assert.equal(
-      html.split(disclosure).length - 1,
+      component.split(disclosure).length - 1,
       1,
       `${file} must contain the disclosure once`
+    );
+    assert.doesNotMatch(
+      metaDescriptions.join('\n'),
+      /✦ 阅读 AI 生成摘要|AI 生成 · 已由作者审核/,
+      `${file} must keep AI summary copy out of SEO descriptions`
     );
     assert.doesNotMatch(html, forbiddenRuntimeMarkers);
   }
