@@ -7,6 +7,18 @@ const path = require('node:path');
 
 const root = path.join(__dirname, '..');
 const workflowPath = path.join(root, '.github/workflows/generate-ai-summaries.yml');
+const radarPostPath = path.join(
+  root,
+  'source/_posts/2026-07-31-weekly-ai-engineering-radar.md'
+);
+
+test('weekly AI engineering radar uses automatic summary generation', () => {
+  const markdown = fs.readFileSync(radarPostPath, 'utf8');
+  const frontmatter = markdown.match(/^---\n([\s\S]*?)\n---/);
+
+  assert.ok(frontmatter, 'missing radar post frontmatter');
+  assert.doesNotMatch(frontmatter[1], /^ai_summary:\s*false\s*$/m);
+});
 
 test('AI summary workflow generates draft summaries only for changed posts on dev-optimize', () => {
   const workflow = fs.readFileSync(workflowPath, 'utf8');
