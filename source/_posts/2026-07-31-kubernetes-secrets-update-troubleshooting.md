@@ -126,7 +126,7 @@ LEGACY_ACCESS_TOKEN
 
 把整个过程串起来，可以看到旧变量是如何重新进入新 Pod 的：
 
-![alt text](image-3.png)
+![Secret 旧 key 残留并重新注入 Pod 的故障链路](/assets/images/posts/kubernetes-secret-stale-key-flow.png)
 
 这里真正需要更新的是集群中的 Secret，而不是反复重启 Deployment。
 
@@ -192,7 +192,7 @@ stage('Deploy to Kubernetes') {
 
 从流水线到新 Pod 就绪，底层链路可以概括为：
 
-![alt text](image-1.png)
+![不可变镜像标签从 Jenkins 构建到 Kubernetes Pod 就绪的发布链路](/assets/images/posts/kubernetes-immutable-image-deployment-flow.png)
 
 这条链路解决的是“构建产物能否被唯一标识并准确部署”的问题；Secret 清理解决的是“运行配置是否与声明一致”的问题。两者都需要验证，但不能混为同一个根因。
 
