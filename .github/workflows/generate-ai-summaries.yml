@@ -40,11 +40,12 @@ jobs:
           path: source/_data/ai-summaries
           if-no-files-found: error
 
-  commit:
+  review:
     needs: generate
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
       - name: Download draft summaries
@@ -52,13 +53,48 @@ jobs:
         with:
           name: ai-summary-drafts
           path: source/_data/ai-summaries
-      - name: Commit generated draft summaries
+      - name: Prepare AI summary review branch
+        id: prepare
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add source/_data/ai-summaries
           if git diff --cached --quiet; then
+            echo 'has_changes=false' >> "$GITHUB_OUTPUT"
+            echo '### No AI summary review required' >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
+          unexpected_paths="$(git diff --cached --name-only | sed -n '\|^source/_data/ai-summaries/[^/]\+\.json$|!p')"
+          if [ -n "$unexpected_paths" ]; then
+            echo 'Unexpected staged paths; refusing to create review PR.' >&2
+            exit 1
+          fi
+          branch="ai-summary/run-${GITHUB_RUN_ID}"
+          git switch -c "$branch"
           git commit -m 'chore: generate draft AI summaries [skip ci]'
-          git push
+          git push --set-upstream origin "$branch"
+          echo 'has_changes=true' >> "$GITHUB_OUTPUT"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+      - name: Create AI summary review PR
+        if: steps.prepare.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_BODY: |
+            Automated AI summary drafts are ready for review.
+
+            Source run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Review checklist:
+            - [ ] The summary matches the article's core claims.
+            - [ ] Evidence boundaries and qualifications are preserved.
+            - [ ] No unsupported facts, numbers, or causal claims were added.
+            - [ ] No sensitive or unpublished information is present.
+            - [ ] `general`, `bullets`, and `explainer` serve distinct reading needs.
+            - [ ] Change `status` from `draft` to `approved` before merge.
+        run: |
+          gh pr create \
+            --base dev-optimize \
+            --head "${{ steps.prepare.outputs.branch }}" \
+            --title 'review: approve generated AI summaries' \
+            --body "$PR_BODY" \
+            --reviewer zhililab
