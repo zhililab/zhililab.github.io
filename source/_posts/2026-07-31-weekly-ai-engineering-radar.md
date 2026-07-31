@@ -10,6 +10,7 @@ categories:
 index_img: /assets/images/cover/weekly-ai-engineering-radar.svg
 banner_img: /assets/images/cover/weekly-ai-engineering-radar.svg
 date: 2026-07-31 12:00:00
+ai_summary: false
 ---
 
 本周值得关注的不是“哪个模型又刷榜”，而是三个更稳定的工程信号：
