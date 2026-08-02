@@ -1,5 +1,8 @@
 'use strict';
 
+const { decodeHTML } = require('entities');
+const { stripHTML } = require('hexo-util');
+
 const MARKER = 'data-site-identity';
 const HOME_CSS_PATH = '/css/blog-site-identity.css';
 
@@ -70,6 +73,20 @@ function normalizePostAuthor(data, fallbackAuthor) {
   return data;
 }
 
+function summarizeDescription(value, fallback, maxLength = 200) {
+  const source = String(value || fallback || '').replace(
+    /<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi,
+    ' '
+  );
+  const text = decodeHTML(stripHTML(source)).replace(/\s+/g, ' ').trim();
+  const characters = Array.from(text);
+
+  if (characters.length <= maxLength) {
+    return text;
+  }
+  return `${characters.slice(0, maxLength - 1).join('').trimEnd()}…`;
+}
+
 function isHome(page) {
   return page.layout === 'index' || !page.path || /^index\.html?$/i.test(page.path);
 }
@@ -97,7 +114,10 @@ function structuredData(page, canonicalUrl, options) {
       '@context': 'https://schema.org',
       '@type': 'BlogPosting',
       headline: page.title,
-      description: page.description || page.excerpt || options.description,
+      description: summarizeDescription(
+        page.description || page.excerpt,
+        options.description
+      ),
       image,
       datePublished: isoDate(page.date),
       dateModified: isoDate(page.updated || page.date),
@@ -217,5 +237,6 @@ module.exports = {
   normalizePostAuthor,
   register,
   safeJson,
+  summarizeDescription,
   structuredData
 };

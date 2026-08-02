@@ -72,7 +72,7 @@ test('post receives canonical BlogPosting data with HTML-safe JSON', () => {
     page: {
       cover: '/assets/images/cover/post.jpg',
       date: new Date('2026-08-01T12:00:00.000Z'),
-      description: '一次真实的工程复盘 </script><script>alert(1)</script>',
+      description: `<p>一次真实的工程复盘 &amp; 验证。</p><script>alert(1)</script>${'<p>后续分析与改进。</p>'.repeat(40)}`,
       layout: 'post',
       path: '2026/08/01/engineering-review/index.html',
       title: '工程复盘',
@@ -89,6 +89,9 @@ test('post receives canonical BlogPosting data with HTML-safe JSON', () => {
   assert.equal(schema['@type'], 'BlogPosting');
   assert.equal(schema.headline, '工程复盘');
   assert.equal(schema.author.name, 'Walker');
+  assert.match(schema.description, /^一次真实的工程复盘 & 验证。/);
+  assert.ok(schema.description.length <= 200);
+  assert.doesNotMatch(schema.description, /<[^>]+>|alert\(1\)/);
   assert.equal(
     schema.image,
     'https://www.zhililab.cn/assets/images/cover/post.jpg'
@@ -96,7 +99,11 @@ test('post receives canonical BlogPosting data with HTML-safe JSON', () => {
   assert.equal(schema.datePublished, '2026-08-01T12:00:00.000Z');
   assert.equal(schema.dateModified, '2026-08-02T12:00:00.000Z');
   assert.doesNotMatch(output, /<\/script><script>alert/);
-  assert.match(output, /\\u003c\/script\\u003e/);
+});
+
+test('JSON-LD serialization escapes HTML-significant characters', () => {
+  const { safeJson } = require('../scripts/blog-site-identity');
+  assert.equal(safeJson({ value: '<tag>&' }), '{"value":"\\u003ctag\\u003e\\u0026"}');
 });
 
 test('root homepage receives the Reading Desk introduction and writing map', () => {
@@ -235,6 +242,18 @@ test('generated post renders canonical BlogPosting metadata', () => {
   assert.match(html, /"@type":"BlogPosting"/);
   assert.match(html, /"name":"Walker"/);
   assert.doesNotMatch(html, /walker-intro/);
+});
+
+test('generated long-form post keeps structured description concise', () => {
+  const html = readPublic(
+    '2026/07/31/2026-07-31-kubernetes-secrets-update-troubleshooting/index.html'
+  );
+  const schema = extractStructuredData(html);
+
+  assert.equal(schema['@type'], 'BlogPosting');
+  assert.ok(schema.description.length <= 200);
+  assert.doesNotMatch(schema.description, /<[^>]+>/);
+  assert.match(schema.description, /^最近在 Kubernetes 集群中遇到了一次环境变量残留问题/);
 });
 
 test('generated personal pages contain their current route content', () => {
