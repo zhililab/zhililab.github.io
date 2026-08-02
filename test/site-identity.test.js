@@ -21,7 +21,7 @@ test('public site configuration uses the production identity', () => {
 });
 
 test('Fluid override presents the Walker Reading Desk navigation', () => {
-  const fluid = read('_config.fluid.yml');
+  const fluid = read('source/_data/fluid_config.yml');
 
   assert.match(fluid, /blog_title:\s*["']?Walker["']?/);
   assert.match(fluid, /把实践写成可复用的系统/);
@@ -141,6 +141,26 @@ test('inner routes do not receive the homepage introduction', () => {
   assert.doesNotMatch(output, /walker-featured/);
 });
 
+test('legacy object author metadata is normalized without changing article HTML', () => {
+  const {
+    enhanceSiteHtml,
+    normalizePostAuthor
+  } = require('../scripts/blog-site-identity');
+  const html = [
+    '<html><head><meta name="author" content="[object Object]"></head>',
+    '<body><article>Keep [object Object] as written.</article></body></html>'
+  ].join('');
+  const data = { page: { layout: 'post', path: 'legacy/index.html' } };
+  const output = enhanceSiteHtml(html, data, identityOptions());
+
+  assert.match(output, /<meta name="author" content="Walker">/);
+  assert.match(output, /<article>Keep \[object Object\] as written\.<\/article>/);
+
+  const post = { author: { link: 'https://example.com', nick: 'Zhi Li' } };
+  assert.equal(normalizePostAuthor(post, 'Walker').author, 'Zhi Li');
+  assert.equal(normalizePostAuthor({ author: {} }, 'Walker').author, 'Walker');
+});
+
 test('About source explains the current role, focus, and publishing boundary', () => {
   const about = read('source/about/index.md');
 
@@ -149,6 +169,7 @@ test('About source explains the current role, focus, and publishing boundary', (
   assert.match(about, /AI 原生/);
   assert.match(about, /内容即代码/);
   assert.match(about, /人工确认/);
+  assert.match(about, /^layout:\s+page$/m);
   assert.match(about, /https:\/\/github\.com\/zhililab/);
 });
 
@@ -159,6 +180,7 @@ test('Field Notes has a clear identity and preserves the historical notes', () =
   assert.match(notes, /历史摘录（2018）/);
   assert.match(notes, /做事要么做到位，要么干脆不做/);
   assert.match(notes, /Yes I can/);
+  assert.match(notes, /^layout:\s+page$/m);
 });
 
 test('Projects source lists only grounded ContentOps capabilities', () => {
@@ -171,4 +193,68 @@ test('Projects source lists only grounded ContentOps capabilities', () => {
   assert.match(projects, /Hexo/);
   assert.match(projects, /GitHub Pages/);
   assert.doesNotMatch(projects, /用户量|访问量|提升了?\s*\d+|节省了?\s*\d+/);
+});
+
+function readPublic(relativePath) {
+  return read(path.join('public', relativePath));
+}
+
+function publicHtmlFiles(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const absolutePath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      return publicHtmlFiles(absolutePath);
+    }
+    return entry.isFile() && entry.name.endsWith('.html') ? [absolutePath] : [];
+  });
+}
+
+test('generated homepage renders the Reading Desk identity and Person schema', () => {
+  const html = readPublic('index.html');
+
+  assert.match(html, /<title>Walker \| ZHILILAB<\/title>/);
+  assert.match(html, /href="https:\/\/www\.zhililab\.cn\/" data-site-identity/);
+  assert.match(html, /"@type":"Person"/);
+  assert.match(html, /class="walker-intro"/);
+  assert.match(html, /把实践写成可复用的系统/);
+  assert.match(html, /<strong>Walker<\/strong>/);
+  assert.match(html, /href="\/projects\/"/);
+  assert.match(html, /assets\/images\/cover\/header_cover\.jpg/);
+  assert.equal((html.match(/walker-featured/g) || []).length, 1);
+});
+
+test('generated post renders canonical BlogPosting metadata', () => {
+  const html = readPublic(
+    '2026/07/31/2026-07-31-weekly-ai-engineering-radar/index.html'
+  );
+
+  assert.match(
+    html,
+    /href="https:\/\/www\.zhililab\.cn\/2026\/07\/31\/2026-07-31-weekly-ai-engineering-radar\/"/
+  );
+  assert.match(html, /"@type":"BlogPosting"/);
+  assert.match(html, /"name":"Walker"/);
+  assert.doesNotMatch(html, /walker-intro/);
+});
+
+test('generated personal pages contain their current route content', () => {
+  const about = readPublic('about/index.html');
+  const notes = readPublic('notes/index.html');
+  const projects = readPublic('projects/index.html');
+
+  assert.match(about, /关于 Walker/);
+  assert.match(about, /内容即代码/);
+  assert.match(about, /href="https:\/\/www\.zhililab\.cn\/about\/"/);
+  assert.match(notes, /Field Notes \| 随记/);
+  assert.match(notes, /历史摘录（2018）/);
+  assert.match(projects, /ContentOps 内容工作流/);
+  assert.match(projects, /GitHub Pages/);
+});
+
+test('generated HTML contains no object-form author output', () => {
+  const html = publicHtmlFiles(path.join(root, 'public'))
+    .map((file) => fs.readFileSync(file, 'utf8'))
+    .join('\n');
+
+  assert.doesNotMatch(html, /\[object Object\]/);
 });

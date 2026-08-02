@@ -2,8 +2,8 @@
 title: Field Notes | 随记
 date: 2018-03-20 11:36:12
 description: 工作、学习与长期成长过程中的简短观察。
-layout: about
-type: about
+layout: page
+type: page
 comments: false
 ---
 

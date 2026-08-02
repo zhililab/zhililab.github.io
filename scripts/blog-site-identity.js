@@ -45,6 +45,31 @@ function safeJson(value) {
     .replace(/\u2029/g, '\\u2029');
 }
 
+function escapeAttribute(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function normalizeAuthorMeta(html, author) {
+  return html.replace(
+    /<meta\b(?=[^>]*\bname=["']author["'])[^>]*>/gi,
+    (tag) => tag.replace(
+      /\bcontent=(["'])[^"']*\1/i,
+      `content="${escapeAttribute(author)}"`
+    )
+  );
+}
+
+function normalizePostAuthor(data, fallbackAuthor) {
+  if (data && data.author && typeof data.author === 'object') {
+    data.author = data.author.nick || data.author.name || fallbackAuthor;
+  }
+  return data;
+}
+
 function isHome(page) {
   return page.layout === 'index' || !page.path || /^index\.html?$/i.test(page.path);
 }
@@ -128,8 +153,12 @@ function enhanceHomepage(html, data) {
 }
 
 function enhanceSiteHtml(html, data, options) {
-  if (!html || html.includes(MARKER)) {
+  if (!html) {
     return html;
+  }
+  const normalizedHtml = normalizeAuthorMeta(html, options.author);
+  if (normalizedHtml.includes(MARKER)) {
+    return normalizedHtml;
   }
 
   const page = pageData(data);
@@ -145,7 +174,7 @@ function enhanceSiteHtml(html, data, options) {
     );
   }
 
-  const withoutCanonical = html.replace(
+  const withoutCanonical = normalizedHtml.replace(
     /\s*<link\b(?=[^>]*\brel=["']canonical["'])[^>]*>/gi,
     ''
   );
@@ -165,6 +194,10 @@ function register(hexoInstance) {
   };
 
   hexoInstance.extend.filter.register(
+    'before_post_render',
+    (data) => normalizePostAuthor(data, options.author)
+  );
+  hexoInstance.extend.filter.register(
     'after_render:html',
     (html, data) => enhanceSiteHtml(html, data, options)
   );
@@ -180,6 +213,8 @@ module.exports = {
   enhanceHomepage,
   enhanceSiteHtml,
   homepageMarkup,
+  normalizeAuthorMeta,
+  normalizePostAuthor,
   register,
   safeJson,
   structuredData

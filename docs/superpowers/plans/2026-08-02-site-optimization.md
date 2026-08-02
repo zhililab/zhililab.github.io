@@ -23,7 +23,7 @@
 
 **Files:**
 - Modify: `_config.yml`
-- Create: `_config.fluid.yml`
+- Create: `source/_data/fluid_config.yml`
 - Create: `test/site-identity.test.js`
 
 **Interfaces:**
@@ -32,7 +32,7 @@
 
 - [ ] **Step 1: Write failing source-configuration tests**
 
-Add tests that assert `_config.yml` contains `url: https://www.zhililab.cn`, a scalar `author: Walker`, no `clientSecret`, no `password_hash`, and no active `hexo_admin` or `gitTalk` block. Assert `_config.fluid.yml` contains the Walker nav label, approved slogan, Projects route, and experience-first footer copy.
+Add tests that assert `_config.yml` contains `url: https://www.zhililab.cn`, a scalar `author: Walker`, no `clientSecret`, no `password_hash`, and no active `hexo_admin` or `gitTalk` block. Assert `source/_data/fluid_config.yml` contains the Walker nav label, approved slogan, Projects route, and experience-first footer copy.
 
 - [ ] **Step 2: Run the focused test and verify RED**
 
@@ -42,7 +42,7 @@ Expected: failures for the current GitHub URL, object author, tracked credential
 
 - [ ] **Step 3: Apply minimal configuration changes**
 
-Update `_config.yml` to use the custom domain and current Walker identity. Remove the obsolete GitTalk and Hexo Admin authentication blocks. Create `_config.fluid.yml` with only the supported keys needed for navbar, homepage banner/slogan, navigation, and footer.
+Update `_config.yml` to use the custom domain and current Walker identity. Remove the obsolete GitTalk and Hexo Admin authentication blocks. Create `source/_data/fluid_config.yml` with only the supported keys needed for navbar, homepage banner/slogan, navigation, and footer.
 
 - [ ] **Step 4: Run the focused test and verify GREEN**
 
@@ -52,7 +52,7 @@ Expected: source-configuration tests pass.
 
 - [ ] **Step 5: Commit**
 
-Run: `git add _config.yml _config.fluid.yml test/site-identity.test.js && git commit -m "fix: harden blog identity configuration"`
+Run: `git add _config.yml source/_data/fluid_config.yml test/site-identity.test.js && git commit -m "fix: harden blog identity configuration"`
 
 ### Task 2: Generate canonical metadata and structured data
 

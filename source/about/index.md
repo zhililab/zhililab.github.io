@@ -2,8 +2,8 @@
 title: 关于 Walker
 date: 2020-12-06 23:14:00
 description: Walker 的实践方向、写作方式与个人网站工作流。
-type: about
-layout: about
+type: page
+layout: page
 comments: true
 ---
 

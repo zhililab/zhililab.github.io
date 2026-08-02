@@ -22,7 +22,7 @@ Upgrade ZHILILAB from a generic chronological technology blog into Walker's pers
 
 ### A. Incremental Fluid override and site enhancement script
 
-Create a root `_config.fluid.yml`, update Hexo identity metadata, add one tested HTML enhancement script, and add focused CSS. This preserves the existing article system and provides a controlled path toward the Reading Desk direction.
+Create a Fluid data override at `source/_data/fluid_config.yml`, update Hexo identity metadata, add one tested HTML enhancement script, and add focused CSS. This preserves the existing article system and provides a controlled path toward the Reading Desk direction.
 
 This is the selected approach because it has the smallest blast radius and keeps future Fluid upgrades possible.
 
@@ -44,7 +44,7 @@ Rejected for this phase.
 
 `_config.yml` becomes the canonical source for the public domain, site title, author, description, keywords, and publication-safe settings. Obsolete GitTalk and Hexo Admin authentication material is removed.
 
-`_config.fluid.yml` becomes the supported override layer for the Walker navbar label, homepage slogan, banner sizing, navigation, and footer copy. The pinned theme submodule remains unchanged.
+`source/_data/fluid_config.yml` becomes the supported override layer for the Walker navbar label, homepage slogan, banner sizing, navigation, and footer copy. The pinned theme submodule remains unchanged. This path is loaded directly by Fluid and avoids Hexo keying alternate root configuration to the checked-out directory name `hexo-theme-fluid`.
 
 ### HTML enhancement
 
