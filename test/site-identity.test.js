@@ -140,3 +140,35 @@ test('inner routes do not receive the homepage introduction', () => {
   assert.doesNotMatch(output, /blog-site-identity\.css/);
   assert.doesNotMatch(output, /walker-featured/);
 });
+
+test('About source explains the current role, focus, and publishing boundary', () => {
+  const about = read('source/about/index.md');
+
+  assert.match(about, /^title:\s+关于 Walker$/m);
+  assert.match(about, /DevOps 实践者/);
+  assert.match(about, /AI 原生/);
+  assert.match(about, /内容即代码/);
+  assert.match(about, /人工确认/);
+  assert.match(about, /https:\/\/github\.com\/zhililab/);
+});
+
+test('Field Notes has a clear identity and preserves the historical notes', () => {
+  const notes = read('source/notes/index.md');
+
+  assert.match(notes, /^title:\s+Field Notes \| 随记$/m);
+  assert.match(notes, /历史摘录（2018）/);
+  assert.match(notes, /做事要么做到位，要么干脆不做/);
+  assert.match(notes, /Yes I can/);
+});
+
+test('Projects source lists only grounded ContentOps capabilities', () => {
+  const projects = read('source/projects/index.md');
+
+  assert.match(projects, /^title:\s+项目$/m);
+  assert.match(projects, /ContentOps/);
+  assert.match(projects, /AI 摘要/);
+  assert.match(projects, /人工审核/);
+  assert.match(projects, /Hexo/);
+  assert.match(projects, /GitHub Pages/);
+  assert.doesNotMatch(projects, /用户量|访问量|提升了?\s*\d+|节省了?\s*\d+/);
+});

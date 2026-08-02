@@ -1,10 +1,15 @@
 ---
-title: notes
+title: Field Notes | 随记
 date: 2018-03-20 11:36:12
+description: 工作、学习与长期成长过程中的简短观察。
 layout: about
 type: about
 comments: false
 ---
+
+这里保存尚未展开为长文的观察、判断和自我提醒。它们可以很短，但会尽量保留时间与上下文。
+
+## 历史摘录（2018）
 
 2018年4月10日 12点31分 @自己
 
