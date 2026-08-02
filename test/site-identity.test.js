@@ -98,3 +98,45 @@ test('post receives canonical BlogPosting data with HTML-safe JSON', () => {
   assert.doesNotMatch(output, /<\/script><script>alert/);
   assert.match(output, /\\u003c\/script\\u003e/);
 });
+
+test('root homepage receives the Reading Desk introduction and writing map', () => {
+  const { enhanceSiteHtml } = require('../scripts/blog-site-identity');
+  const html = [
+    '<html><head></head><body>',
+    '<main><div class="container nopadding-x-md">',
+    '<div id="board"><div class="row mx-auto index-card">Latest</div></div>',
+    '</div></main></body></html>'
+  ].join('');
+  const data = { page: { layout: 'index', path: 'index.html' } };
+  const output = enhanceSiteHtml(html, data, identityOptions());
+
+  assert.equal((output.match(/blog-site-identity\.css/g) || []).length, 1);
+  assert.equal((output.match(/class="walker-intro"/g) || []).length, 1);
+  assert.match(output, /把实践写成可复用的系统/);
+  assert.match(output, /内容由 Walker 创作与确认/);
+  assert.match(output, /href="#board"/);
+  assert.match(output, /href="\/projects\/"/);
+  assert.equal((output.match(/class="walker-topic"/g) || []).length, 4);
+  assert.equal((output.match(/walker-featured/g) || []).length, 1);
+});
+
+test('inner routes do not receive the homepage introduction', () => {
+  const { enhanceSiteHtml } = require('../scripts/blog-site-identity');
+  const html = [
+    '<html><head></head><body><main>',
+    '<div id="board"><div class="row mx-auto index-card">Post</div></div>',
+    '</main></body></html>'
+  ].join('');
+  const data = {
+    page: {
+      layout: 'post',
+      path: '2026/08/01/engineering-review/index.html',
+      title: '工程复盘'
+    }
+  };
+  const output = enhanceSiteHtml(html, data, identityOptions());
+
+  assert.doesNotMatch(output, /walker-intro/);
+  assert.doesNotMatch(output, /blog-site-identity\.css/);
+  assert.doesNotMatch(output, /walker-featured/);
+});

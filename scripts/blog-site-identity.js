@@ -1,6 +1,7 @@
 'use strict';
 
 const MARKER = 'data-site-identity';
+const HOME_CSS_PATH = '/css/blog-site-identity.css';
 
 function pageData(data) {
   return (data && data.page) || data || {};
@@ -87,6 +88,45 @@ function structuredData(page, canonicalUrl, options) {
   return null;
 }
 
+function homepageMarkup() {
+  return [
+    '<section class="walker-intro" aria-labelledby="walker-intro-title" data-site-identity-home>',
+    '  <div class="walker-intro__copy">',
+    '    <p class="walker-intro__eyebrow">Walker · Reading Desk</p>',
+    '    <h1 id="walker-intro-title">把实践写成可复用的系统</h1>',
+    '    <p class="walker-intro__lead">这里记录 DevOps、Kubernetes、AI 原生工作流与内容工程中的真实问题、证据链和可执行方法。</p>',
+    '    <p class="walker-intro__boundary">内容由 Walker 创作与确认，自动化负责整理、检查和发布准备。</p>',
+    '    <div class="walker-intro__actions">',
+    '      <a class="walker-action walker-action--primary" href="#board">阅读最新文章</a>',
+    '      <a class="walker-action" href="/projects/">查看项目</a>',
+    '    </div>',
+    '  </div>',
+    '  <nav class="walker-topics" aria-label="长期写作主题">',
+    '    <a class="walker-topic" href="/tags/DevOps/"><span>01</span>DevOps 与 SRE</a>',
+    '    <a class="walker-topic" href="/tags/Kubernetes/"><span>02</span>Kubernetes</a>',
+    '    <a class="walker-topic" href="/tags/AI/"><span>03</span>AI 原生工作流</a>',
+    '    <a class="walker-topic" href="/categories/技术/"><span>04</span>内容工程</a>',
+    '  </nav>',
+    '</section>'
+  ].join('\n');
+}
+
+function enhanceHomepage(html, data) {
+  if (canonicalPath(data) !== '/') {
+    return html;
+  }
+
+  let output = html.replace(
+    /<\/head>/i,
+    `<link rel="stylesheet" href="${HOME_CSS_PATH}" data-site-identity-home>\n</head>`
+  );
+  output = output.replace(/<div id="board"/i, `${homepageMarkup()}\n<div id="board"`);
+  return output.replace(
+    /class="row mx-auto index-card"/i,
+    'class="row mx-auto index-card walker-featured"'
+  );
+}
+
 function enhanceSiteHtml(html, data, options) {
   if (!html || html.includes(MARKER)) {
     return html;
@@ -109,7 +149,11 @@ function enhanceSiteHtml(html, data, options) {
     /\s*<link\b(?=[^>]*\brel=["']canonical["'])[^>]*>/gi,
     ''
   );
-  return withoutCanonical.replace(/<\/head>/i, `${metadata.join('\n')}\n</head>`);
+  const withMetadata = withoutCanonical.replace(
+    /<\/head>/i,
+    `${metadata.join('\n')}\n</head>`
+  );
+  return enhanceHomepage(withMetadata, data);
 }
 
 function register(hexoInstance) {
@@ -133,7 +177,9 @@ if (typeof hexo !== 'undefined') {
 module.exports = {
   absoluteUrl,
   canonicalPath,
+  enhanceHomepage,
   enhanceSiteHtml,
+  homepageMarkup,
   register,
   safeJson,
   structuredData
