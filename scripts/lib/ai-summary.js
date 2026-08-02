@@ -251,6 +251,19 @@ function buildSummaryPrompt({ title, body }) {
   ].join('\n');
 }
 
+function buildGeneralRevisionPrompt(general) {
+  return [
+    '请只改写下面这段中文文章概览，不要返回其他摘要字段。',
+    `当前概览实际长度为 ${String(general).length} 个字符，请改写为 140 至 160 个字符。`,
+    '保留原意，不得增加新的事实、数字、引用、链接或因果关系。',
+    '返回 JSON，且只包含 general 字段。',
+    '',
+    '<current-general>',
+    String(general),
+    '</current-general>'
+  ].join('\n');
+}
+
 function extractGeminiText(payload) {
   const parts = payload && payload.candidates && payload.candidates[0] &&
     payload.candidates[0].content && payload.candidates[0].content.parts;
@@ -330,50 +343,68 @@ async function requestGeminiSummary({
   if (typeof fetchImpl !== 'function') throw new Error('fetch is unavailable');
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-  const requestBody = {
-    system_instruction: {
-      parts: [{ text: '你是严谨的中文技术文章摘要编辑，只能总结输入资料。' }]
+  const fullSchema = {
+    type: 'object',
+    properties: {
+      general: {
+        type: 'string',
+        description: '120 至 180 个字符的单段中文概览'
+      },
+      bullets: {
+        type: 'array',
+        items: {
+          type: 'string'
+        },
+        minItems: 3,
+        maxItems: 5
+      },
+      explainer: {
+        type: 'string'
+      }
     },
-    contents: [{
-      role: 'user',
-      parts: [{ text: buildSummaryPrompt({ title, body }) }]
-    }],
-    generationConfig: {
-      responseFormat: {
-        text: {
-          mimeType: 'APPLICATION_JSON',
-          schema: {
-            type: 'object',
-            properties: {
-              general: {
-                type: 'string',
-                description: '120 至 180 个字符的单段中文概览'
-              },
-              bullets: {
-                type: 'array',
-                items: {
-                  type: 'string'
-                },
-                minItems: 3,
-                maxItems: 5
-              },
-              explainer: {
-                type: 'string'
-              }
-            },
-            required: ['general', 'bullets', 'explainer'],
-            additionalProperties: false
-          }
-        }
-      },
-      thinkingConfig: {
-        thinkingLevel: 'LOW'
-      },
-      maxOutputTokens: 4096
-    }
+    required: ['general', 'bullets', 'explainer'],
+    additionalProperties: false
   };
+  const generalRevisionSchema = {
+    type: 'object',
+    properties: {
+      general: {
+        type: 'string',
+        description: '140 至 160 个字符的单段中文概览'
+      }
+    },
+    required: ['general'],
+    additionalProperties: false
+  };
+  let revisionBase = null;
+  let invalidGeneral = null;
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const requestBody = {
+      system_instruction: {
+        parts: [{ text: '你是严谨的中文技术文章摘要编辑，只能总结输入资料。' }]
+      },
+      contents: [{
+        role: 'user',
+        parts: [{
+          text: revisionBase
+            ? buildGeneralRevisionPrompt(invalidGeneral)
+            : buildSummaryPrompt({ title, body })
+        }]
+      }],
+      generationConfig: {
+        responseFormat: {
+          text: {
+            mimeType: 'APPLICATION_JSON',
+            schema: revisionBase ? generalRevisionSchema : fullSchema
+          }
+        },
+        thinkingConfig: {
+          thinkingLevel: 'LOW'
+        },
+        maxOutputTokens: 4096
+      }
+    };
     let response;
     let payload;
     try {
@@ -430,10 +461,30 @@ async function requestGeminiSummary({
         continue;
       }
       try {
+        if (revisionBase) {
+          assertExactKeys(parsed, ['general'], 'general revision');
+          const revised = { ...revisionBase, general: parsed.general };
+          return validateModelContent(revised);
+        }
         return validateModelContent(parsed);
       } catch (error) {
         if (!(error instanceof AiSummaryValidationError) || attempt === retries) {
           throw error;
+        }
+        if (!revisionBase && /^general must contain 120-180 characters$/.test(error.message)) {
+          try {
+            validateModelContent({ ...parsed, general: '摘'.repeat(140) });
+            revisionBase = {
+              bullets: parsed.bullets,
+              explainer: parsed.explainer
+            };
+            invalidGeneral = parsed.general;
+          } catch {
+            revisionBase = null;
+            invalidGeneral = null;
+          }
+        } else if (revisionBase && typeof parsed.general === 'string') {
+          invalidGeneral = parsed.general;
         }
         const delay = Math.min(maxRetryDelayMs, retryBaseDelayMs * (2 ** attempt));
         await sleepImpl(delay);

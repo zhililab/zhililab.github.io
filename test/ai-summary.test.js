@@ -344,6 +344,38 @@ test('retries truncated JSON from a successful provider response', async () => {
   assert.equal(result.general, modelSummary().general);
 });
 
+test('repairs only an out-of-range general with length feedback', async () => {
+  const original = modelSummary();
+  const shortGeneral = '这是一段过短概览。';
+  const revisedGeneral = '本文复盘一次Kubernetes环境变量残留故障，沿着Pod运行时、Deployment的envFrom引用、Secret实际数据与last-applied-configuration逐层定位，确认旧key仍留在集群对象中。文章区分Secret清理与Pod重建，并补充不可变镜像标签和发布验证链路，强调最终结论必须由声明状态、集群对象和容器运行状态共同证明。';
+  const fetchImpl = sequenceFetch([
+    response(200, geminiPayload({ ...original, general: shortGeneral })),
+    response(200, geminiPayload({ general: revisedGeneral }))
+  ]);
+
+  const result = await requestGeminiSummary({
+    fetchImpl,
+    apiKey: 'secret',
+    title: '标题',
+    body: '正文',
+    retries: 1,
+    sleepImpl: async () => {}
+  });
+
+  assert.equal(fetchImpl.calls.length, 2);
+  assert.equal(result.general, revisedGeneral);
+  assert.deepEqual(result.bullets, original.bullets);
+  assert.equal(result.explainer, original.explainer);
+
+  const repairBody = JSON.parse(fetchImpl.calls[1][1].body);
+  const repairPrompt = repairBody.contents[0].parts[0].text;
+  const repairSchema = repairBody.generationConfig.responseFormat.text.schema;
+  assert.match(repairPrompt, new RegExp(`实际长度为 ${shortGeneral.length} 个字符`));
+  assert.match(repairPrompt, /改写为 140 至 160 个字符/);
+  assert.deepEqual(Object.keys(repairSchema.properties), ['general']);
+  assert.deepEqual(repairSchema.required, ['general']);
+});
+
 test('retries a MAX_TOKENS candidate before parsing partial JSON', async () => {
   const waits = [];
   const fetchImpl = sequenceFetch([
