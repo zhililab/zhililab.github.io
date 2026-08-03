@@ -266,8 +266,41 @@ test('generated personal pages contain their current route content', () => {
   assert.match(about, /href="https:\/\/www\.zhililab\.cn\/about\/"/);
   assert.match(notes, /Field Notes \| 随记/);
   assert.match(notes, /历史摘录（2018）/);
-  assert.match(projects, /ContentOps 内容工作流/);
-  assert.match(projects, /GitHub Pages/);
+  assert.match(projects, /class="builder-projects"/);
+  assert.equal((projects.match(/class="builder-project"/g) || []).length, 4);
+  assert.match(projects, /DevOps Agent Control Plane/);
+  assert.match(projects, /Tutorial-to-Template/);
+  assert.match(projects, /ZHILILAB ContentOps/);
+  assert.match(projects, /Python Learning Resources/);
+  assert.match(projects, /href="\/css\/blog-projects\.css"/);
+  assert.match(projects, /src="\/js\/blog-projects\.js"/);
+  assert.match(projects, /data-project-carousel/);
+  assert.equal((projects.match(/data-project-trace/g) || []).length, 2);
+  assert.match(
+    projects,
+    /data-trace-kind="tutorial" role="group" aria-label="Tutorial-to-Template 执行流程"/
+  );
+  assert.match(
+    projects,
+    /data-trace-kind="python-resources" role="group" aria-label="Python Learning Resources 执行流程"/
+  );
+  assert.match(
+    projects,
+    /class="builder-trace__outputs" role="group" aria-label="生成产物"/
+  );
+  assert.match(
+    projects,
+    /class="builder-trace__outputs" role="group" aria-label="README 内容"/
+  );
+  assert.match(projects, /FALLBACK_PROJECTS/);
+  assert.doesNotMatch(projects, /tutorial-to-template-(?:960|1600)\.webp/);
+  assert.doesNotMatch(projects, /python-learning-resources-(?:960|1600)\.webp/);
+  assert.match(projects, /<body[^>]*\bclass="[^"]*\bbuilder-projects-page\b/);
+
+  const projectsCss = readPublic('css/blog-projects.css');
+  assert.match(projectsCss, /\.builder-projects-page \.header-inner\s*\{[^}]*height:\s*64px !important;/);
+  assert.match(projectsCss, /\.builder-projects-page #navbar\s*\{[^}]*background-color:\s*var\(--projects-bg\) !important;/);
+  assert.match(projectsCss, /\.builder-trace\.is-trace-active/);
 });
 
 test('generated HTML contains no object-form author output', () => {
