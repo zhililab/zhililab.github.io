@@ -5,9 +5,12 @@ description: 工作、学习与长期成长过程中的简短观察。
 layout: page
 type: page
 comments: false
+banner_img: https://i.imgtg.com/2023/05/28/OoZhHB.png
+banner_img_height: 60
+banner_mask_alpha: 0.3
 ---
 
-这里保存尚未展开为长文的观察、判断和自我提醒。它们可以很短，但会尽量保留时间与上下文。
+这里放一些还没有写成长文的记录。它们很短，也不一定有结论，先留在这里。
 
 ## 历史摘录（2018）
 
@@ -17,7 +20,7 @@ comments: false
 
 2018年3月22日 21点27分 @自己
 
-> 热练春天，是为了盛夏更加睛彩夺目 —— 博士伦 
+> 热练春天，是为了盛夏更加睛彩夺目 —— 博士伦
 
 2018年3月20日 11点14分 困难说 @自己
 
