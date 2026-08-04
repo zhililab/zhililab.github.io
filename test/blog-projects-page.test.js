@@ -21,17 +21,17 @@ test('projects frontmatter opts out of Fluid lazyloading', () => {
   assert.match(source, /^lazyload:\s*false$/m);
 });
 
-test('projects source contains four evidence-first builds in order', () => {
+test('projects source contains five evidence-first builds in order', () => {
   const source = read('source/projects/index.md');
-  const names = ['DevOps Agent Control Plane', 'Tutorial-to-Template', 'ZHILILAB ContentOps', 'Python Learning Resources'];
+  const names = ['DevOps Agent Control Plane', 'Tutorial-to-Template', 'Kubernetes 生产现场', 'ZHILILAB ContentOps', 'Python Learning Resources'];
   const positions = names.map((name) => source.indexOf(name));
   assert.ok(positions.every((position) => position >= 0));
   assert.deepEqual(positions, [...positions].sort((a, b) => a - b));
-  assert.equal((source.match(/class="builder-project"/g) || []).length, 4);
-  assert.equal((source.match(/<dt>动机<\/dt>/g) || []).length, 4);
-  assert.equal((source.match(/<dt>方法<\/dt>/g) || []).length, 4);
-  assert.equal((source.match(/<dt>结果<\/dt>/g) || []).length, 4);
-  assert.equal((source.match(/<dt>当前边界<\/dt>/g) || []).length, 4);
+  assert.equal((source.match(/class="builder-project"/g) || []).length, 5);
+  assert.equal((source.match(/<dt>动机<\/dt>/g) || []).length, 5);
+  assert.equal((source.match(/<dt>方法<\/dt>/g) || []).length, 5);
+  assert.equal((source.match(/<dt>结果<\/dt>/g) || []).length, 5);
+  assert.equal((source.match(/<dt>当前边界<\/dt>/g) || []).length, 5);
   assert.doesNotMatch(source, unsupportedNumberClaim);
   assert.match('提升 25', unsupportedNumberClaim);
   assert.match('节省了 30', unsupportedNumberClaim);
@@ -47,7 +47,7 @@ test('DevOps uses one media viewport with two real slides', () => {
 });
 
 test('project media has desktop and mobile high-resolution variants', async () => {
-  const bases = ['devops-control-plane-home', 'devops-control-plane-quality', 'zhililab-contentops'];
+  const bases = ['devops-control-plane-home', 'devops-control-plane-quality', 'zhililab-contentops', 'kubernetes-production-field'];
   for (const base of bases) {
     const desktop = path.join(root, `source/assets/images/projects/${base}-1600.webp`);
     const mobile = path.join(root, `source/assets/images/projects/${base}-960.webp`);
@@ -69,7 +69,8 @@ test('project desktop images declare their real source dimensions', () => {
   const dimensions = [
     ['devops-control-plane-home', 1280, 720],
     ['devops-control-plane-quality', 1280, 720],
-    ['zhililab-contentops', 1440, 810]
+    ['zhililab-contentops', 1440, 810],
+    ['kubernetes-production-field', 1600, 900]
   ];
 
   for (const [base, width, height] of dimensions) {

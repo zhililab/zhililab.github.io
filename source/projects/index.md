@@ -12,7 +12,7 @@ lazyload: false
     <p class="builder-projects__eyebrow">Studio Casebook</p>
     <h1 id="builder-projects-title">Selected Builds</h1>
     <p>项目不是陈列品，是判断、实现与验证留下的证据。</p>
-    <time datetime="2026-08-03">Updated 2026-08-03</time>
+    <time datetime="2026-08-05">Updated 2026-08-05</time>
   </header>
 
   <article class="builder-project" id="devops-agent-control-plane">
@@ -90,9 +90,28 @@ lazyload: false
     </div>
   </article>
 
-  <article class="builder-project" id="zhililab-contentops">
+  <article class="builder-project" id="kubernetes-production-field">
     <div class="builder-project__story">
       <p class="builder-project__number">Build 03</p>
+      <h2>Kubernetes 生产现场</h2>
+      <p class="builder-project__status">线上运行 · 生产工程学习站</p>
+      <p class="builder-project__stack">Kubernetes · 发布治理 · 可观测性 · Runbook</p>
+      <dl class="builder-project__evidence">
+        <dt>动机</dt><dd>把 Kubernetes 知识从组件记忆，转成能在生产场景中提出判断、收集证据并执行可逆处置的能力。</dd>
+        <dt>方法</dt><dd>围绕调度、网络、存储、发布与安全建立学习路径；用故障图谱、发布门禁、架构决策和证据链串起现场动作。</dd>
+        <dt>结果</dt><dd>在线站点提供可展开的故障演练、发布控制步骤、决策卡片、证据链与本机进度保存的实战清单。</dd>
+        <dt>当前边界</dt><dd>页面中的集群状态、故障对象和指标用于学习演练，不代表实时生产集群数据或操作指令。</dd>
+      </dl>
+      <nav class="builder-project__links" aria-label="Kubernetes 生产现场 项目链接"><a href="https://kubernetes-production-field.zhili1993.chatgpt.site/" target="_blank" rel="noopener"><i class="iconfont icon-link-fill" aria-hidden="true"></i>在线访问</a></nav>
+    </div>
+    <figure class="builder-project__media">
+      <picture><source media="(max-width: 767px)" srcset="/assets/images/projects/kubernetes-production-field-960.webp"><img src="/assets/images/projects/kubernetes-production-field-1600.webp" width="1600" height="900" alt="Kubernetes 生产现场首页，展示集群状态与生产工程学习路径"></picture>
+    </figure>
+  </article>
+
+  <article class="builder-project" id="zhililab-contentops">
+    <div class="builder-project__story">
+      <p class="builder-project__number">Build 04</p>
       <h2>ZHILILAB ContentOps</h2>
       <p class="builder-project__status">持续维护 · 线上运行</p>
       <p class="builder-project__stack">Hexo · Fluid · Node.js · GitHub Pages</p>
@@ -111,7 +130,7 @@ lazyload: false
 
   <article class="builder-project" id="python-learning-resources">
     <div class="builder-project__story">
-      <p class="builder-project__number">Build 04</p>
+      <p class="builder-project__number">Build 05</p>
       <h2>Python Learning Resources</h2>
       <p class="builder-project__status">自动更新 · 公开仓库</p>
       <p class="builder-project__stack">Python · GitHub Actions · Markdown</p>
@@ -125,7 +144,7 @@ lazyload: false
     </div>
     <div class="builder-project__media builder-trace" data-project-trace data-trace-kind="python-resources" role="group" aria-label="Python Learning Resources 执行流程">
       <div class="builder-trace__header">
-        <p><span>Build 04</span> scheduled workflow</p>
+        <p><span>Build 05</span> scheduled workflow</p>
         <span data-trace-status aria-hidden="true">Trace 01 / 06</span>
       </div>
       <ol class="builder-trace__stages">
@@ -143,4 +162,5 @@ lazyload: false
       <p class="builder-trace__detail" data-trace-detail aria-live="polite">选择一个阶段查看对应代码职责。</p>
     </div>
   </article>
+
 </section>

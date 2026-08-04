@@ -267,11 +267,13 @@ test('generated personal pages contain their current route content', () => {
   assert.match(notes, /Field Notes \| 随记/);
   assert.match(notes, /历史摘录（2018）/);
   assert.match(projects, /class="builder-projects"/);
-  assert.equal((projects.match(/class="builder-project"/g) || []).length, 4);
+  assert.equal((projects.match(/class="builder-project"/g) || []).length, 5);
   assert.match(projects, /DevOps Agent Control Plane/);
   assert.match(projects, /Tutorial-to-Template/);
   assert.match(projects, /ZHILILAB ContentOps/);
   assert.match(projects, /Python Learning Resources/);
+  assert.match(projects, /Kubernetes 生产现场/);
+  assert.match(projects, /https:\/\/kubernetes-production-field\.zhili1993\.chatgpt\.site\//);
   assert.match(projects, /href="\/css\/blog-projects\.css"/);
   assert.match(projects, /src="\/js\/blog-projects\.js"/);
   assert.match(projects, /data-project-carousel/);
