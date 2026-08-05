@@ -12,7 +12,7 @@ lazyload: false
     <p class="builder-projects__eyebrow">Studio Casebook</p>
     <h1 id="builder-projects-title">Selected Builds</h1>
     <p>项目不是陈列品，是判断、实现与验证留下的证据。</p>
-    <time datetime="2026-08-05">Updated 2026-08-05</time>
+    <time datetime="2026-08-06">Updated 2026-08-06</time>
   </header>
 
   <article class="builder-project" id="devops-agent-control-plane">
@@ -94,14 +94,16 @@ lazyload: false
     <div class="builder-project__story">
       <p class="builder-project__number">Build 03</p>
       <h2>Kubernetes 生产现场</h2>
-      <p class="builder-project__status">线上运行 · 生产工程学习站</p>
+      <p class="builder-project__status">2026-08-06 部署已验证 · Azure East Asia</p>
       <p class="builder-project__stack">Kubernetes · 发布治理 · 可观测性 · Runbook</p>
       <dl class="builder-project__evidence">
         <dt>动机</dt><dd>把 Kubernetes 知识从组件记忆，转成能在生产场景中提出判断、收集证据并执行可逆处置的能力。</dd>
         <dt>方法</dt><dd>围绕调度、网络、存储、发布与安全建立学习路径；用故障图谱、发布门禁、架构决策和证据链串起现场动作。</dd>
-        <dt>结果</dt><dd>在线站点提供可展开的故障演练、发布控制步骤、决策卡片、证据链与本机进度保存的实战清单。</dd>
-        <dt>最新工程落地</dt><dd>在学习站基础上，进一步完成 Jenkins Controller + Kubernetes 动态 Pod Agent 的真实云端部署，并通过 Pipeline 验证。</dd>
-        <dt>当前边界</dt><dd>页面中的集群状态、故障对象和指标用于学习演练，不代表实时生产集群数据或操作指令。</dd>
+        <dt>结果</dt><dd>学习站提供可展开的故障演练、发布控制步骤、决策卡片、证据链与本机进度保存的实战清单。</dd>
+        <dt>工程主线</dt><dd>从生产知识整理，到故障场景训练，再到可运行的平台工程。</dd>
+        <dt>能力表达</dt><dd>Walker 的 Kubernetes 生产工程实践：以证据链完成架构设计、部署验证、故障诊断与可逆运维。</dd>
+        <dt>最新工程落地</dt><dd>在学习站基础上，完成 Jenkins Controller + Kubernetes 动态 Pod Agent 的云端部署；Pipeline 验证确认动态 Pod Agent 已创建、执行并回收。</dd>
+        <dt>当前边界</dt><dd>页面中的集群状态、故障对象和指标用于学习演练，不代表实时生产集群数据或操作指令。以上是 2026-08-06 的一次部署验证，不是实时监控、持续在线或 SLA 承诺；为节省云额度，Jenkins 可能暂停运行。</dd>
       </dl>
       <nav class="builder-project__links" aria-label="Kubernetes 生产现场 项目链接"><a href="https://kubernetes-production-field.zhili1993.chatgpt.site/" target="_blank" rel="noopener">查看学习站</a><a href="https://kubernetes-production-field.zhili1993.chatgpt.site/#jenkins-case" target="_blank" rel="noopener">阅读 Jenkins 工程案例</a><a href="https://github.com/zhililab/kubernetes-production-field" target="_blank" rel="noopener">查看源码</a></nav>
     </div>

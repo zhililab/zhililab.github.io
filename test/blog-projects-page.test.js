@@ -41,7 +41,12 @@ test('Kubernetes project links the learning site, Jenkins case, and source', () 
   const source = read('source/projects/index.md');
 
   assert.match(source, /最新工程落地/);
-  assert.match(source, /Jenkins Controller \+ Kubernetes 动态 Pod Agent/);
+  assert.match(source, /从生产知识整理，到故障场景训练，再到可运行的平台工程。/);
+  assert.match(source, /Walker 的 Kubernetes 生产工程实践：以证据链完成架构设计、部署验证、故障诊断与可逆运维。/);
+  assert.match(source, /2026-08-06 部署已验证 · Azure East Asia/);
+  assert.match(source, /动态 Pod Agent 已创建、执行并回收/);
+  assert.match(source, /2026-08-06 的一次部署验证，不是实时监控、持续在线或 SLA 承诺；为节省云额度，Jenkins 可能暂停运行。/);
+  assert.doesNotMatch(source, /线上运行 · 生产工程学习站/);
   assert.match(source, /href="https:\/\/kubernetes-production-field\.zhili1993\.chatgpt\.site\/"[^>]*>[^<]*查看学习站/);
   assert.match(source, /href="https:\/\/kubernetes-production-field\.zhili1993\.chatgpt\.site\/#jenkins-case"[^>]*>[^<]*阅读 Jenkins 工程案例/);
   assert.match(source, /href="https:\/\/github\.com\/zhililab\/kubernetes-production-field"[^>]*>[^<]*查看源码/);
