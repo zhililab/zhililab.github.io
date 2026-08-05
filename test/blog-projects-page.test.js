@@ -37,6 +37,16 @@ test('projects source contains five evidence-first builds in order', () => {
   assert.match('节省了 30', unsupportedNumberClaim);
 });
 
+test('Kubernetes project links the learning site, Jenkins case, and source', () => {
+  const source = read('source/projects/index.md');
+
+  assert.match(source, /最新工程落地/);
+  assert.match(source, /Jenkins Controller \+ Kubernetes 动态 Pod Agent/);
+  assert.match(source, /href="https:\/\/kubernetes-production-field\.zhili1993\.chatgpt\.site\/"[^>]*>[^<]*查看学习站/);
+  assert.match(source, /href="https:\/\/kubernetes-production-field\.zhili1993\.chatgpt\.site\/#jenkins-case"[^>]*>[^<]*阅读 Jenkins 工程案例/);
+  assert.match(source, /href="https:\/\/github\.com\/zhililab\/kubernetes-production-field"[^>]*>[^<]*查看源码/);
+});
+
 test('DevOps uses one media viewport with two real slides', () => {
   const source = read('source/projects/index.md');
   assert.equal((source.match(/data-project-carousel/g) || []).length, 1);
