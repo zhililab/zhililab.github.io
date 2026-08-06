@@ -13,29 +13,29 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="Zhi Li">
-  <meta name="keywords" content="python, devops">
+  <meta name="author" content="Walker">
+  <meta name="keywords" content="DevOps, Kubernetes, AI Native, ContentOps, SRE">
   
     <meta name="description" content="探索 Autoware：开源自动驾驶软件平台前言随着自动驾驶技术的快速发展，开源软件在推动这一领域的创新和进步中扮演着重要角色。Autoware 是一个由 Autoware Foundation 开发和维护的开源自动驾驶软件平台，它集成了各种先进的技术和工具，为研究人员和开发者提供了一个强大的开发框架。本文将详细介绍 Autoware 的功能、架构、技术栈以及如何参与该项目。 Autoware 的">
 <meta property="og:type" content="article">
 <meta property="og:title" content="AutoWare 初探">
-<meta property="og:url" content="https://github.com/zhililab/2024/08/07/AutoWare-Intro/index.html">
-<meta property="og:site_name" content="ZHILI">
+<meta property="og:url" content="https://www.zhililab.cn/2024/08/07/AutoWare-Intro/index.html">
+<meta property="og:site_name" content="Walker | ZHILILAB">
 <meta property="og:description" content="探索 Autoware：开源自动驾驶软件平台前言随着自动驾驶技术的快速发展，开源软件在推动这一领域的创新和进步中扮演着重要角色。Autoware 是一个由 Autoware Foundation 开发和维护的开源自动驾驶软件平台，它集成了各种先进的技术和工具，为研究人员和开发者提供了一个强大的开发框架。本文将详细介绍 Autoware 的功能、架构、技术栈以及如何参与该项目。 Autoware 的">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://github.com/assets/images/cover/Autoware_Cover.jpg">
+<meta property="og:image" content="https://www.zhililab.cn/assets/images/cover/Autoware_Cover.jpg">
 <meta property="article:published_time" content="2024-08-07T01:23:34.000Z">
 <meta property="article:modified_time" content="2026-07-29T00:12:50.478Z">
-<meta property="article:author" content="[object Object]">
+<meta property="article:author" content="Walker">
 <meta property="article:tag" content="OS">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://github.com/assets/images/cover/Autoware_Cover.jpg">
+<meta name="twitter:image" content="https://www.zhililab.cn/assets/images/cover/Autoware_Cover.jpg">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>AutoWare 初探 - ZHILI</title>
+  <title>AutoWare 初探 - Walker | ZHILILAB</title>
 
   <link  rel="stylesheet" href="/vendor/blog/bootstrap.min.css" />
 
@@ -73,7 +73,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"github.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"www.zhililab.cn","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -102,6 +102,8 @@
 
   
 <meta name="generator" content="Hexo 6.3.0">  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
+<link rel="canonical" href="https://www.zhililab.cn/2024/08/07/AutoWare-Intro/" data-site-identity>
+<script type="application/ld+json" data-site-identity>{"@context":"https://schema.org","@type":"BlogPosting","headline":"AutoWare 初探","description":"Walker 的个人博客，记录 DevOps 实践、AI 原生工作流、内容自动化与工程复盘。","image":"https://www.zhililab.cn/assets/images/cover/header_cover.jpg","datePublished":"2024-08-07T01:23:34.000Z","dateModified":"2026-07-29T00:12:50.478Z","author":{"@type":"Person","name":"Walker","url":"https://www.zhililab.cn/"},"mainEntityOfPage":"https://www.zhililab.cn/2024/08/07/AutoWare-Intro/"}</script>
 </head>
 
 
@@ -115,7 +117,7 @@
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>博客</strong>
+      <strong>Walker</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -181,9 +183,9 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                <span>关于</span>
+              <a class="nav-link" href="/projects/">
+                <i class="iconfont icon-code"></i>
+                <span>项目</span>
               </a>
             </li>
           
@@ -193,9 +195,21 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                <span>友链</span>
+              <a class="nav-link" href="/notes/">
+                <i class="iconfont icon-book"></i>
+                <span>随记</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
               </a>
             </li>
           
@@ -359,7 +373,7 @@
 </ol>
 <h4 id="如何开始"><a href="#如何开始" class="headerlink" title="如何开始"></a>如何开始</h4><p>Autoware 项目在 GitHub 上开源，用户可以通过以下步骤开始使用：</p>
 <ol>
-<li><strong>克隆代码库</strong>：访问 <a href="https://github.com/autowarefoundation/autoware">Autoware GitHub 仓库</a> 并克隆代码库。</li>
+<li><strong>克隆代码库</strong>：访问 <a target="_blank" rel="noopener" href="https://github.com/autowarefoundation/autoware">Autoware GitHub 仓库</a> 并克隆代码库。</li>
 <li><strong>安装依赖</strong>：根据文档安装所需的依赖，包括 ROS、OpenCV、PCL 等。</li>
 <li><strong>编译项目</strong>：使用 Bazel 构建系统编译 Autoware。</li>
 <li><strong>运行示例</strong>：根据文档运行示例项目，体验 Autoware 的功能。</li>
@@ -416,7 +430,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>AutoWare 初探</div>
-      <div>https://github.com/zhililab/2024/08/07/AutoWare-Intro/</div>
+      <div>https://www.zhililab.cn/2024/08/07/AutoWare-Intro/</div>
     </div>
     <div class="license-meta">
       
@@ -606,7 +620,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+      Walker · Content as Code
     </div>
   
   

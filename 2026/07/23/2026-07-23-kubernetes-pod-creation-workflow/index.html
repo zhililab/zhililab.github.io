@@ -13,30 +13,30 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="Zhi Li">
-  <meta name="keywords" content="python, devops">
+  <meta name="author" content="Walker">
+  <meta name="keywords" content="DevOps, Kubernetes, AI Native, ContentOps, SRE">
   
     <meta name="description" content="最近在工作中遇到了一次 Kubernetes Toolchain 挂载问题，涉及 Linux 文件系统、Kubernetes 集群、Volume 挂载、Mount Options、节点环境差异等多个层面。 最开始，这只是一个具体的故障排查问题：  为什么同一套 Toolchain，在不同节点或不同 Pod 中表现不一致？为什么 Volume 已经声明成功，容器内仍然会出现权限、性能或挂载行为异常？">
 <meta property="og:type" content="article">
 <meta property="og:title" content="从一次 K8s Toolchain 挂载故障，重新理解 Pod 从创建到 Ready 的全过程">
-<meta property="og:url" content="https://github.com/zhililab/2026/07/23/2026-07-23-kubernetes-pod-creation-workflow/index.html">
-<meta property="og:site_name" content="ZHILI">
+<meta property="og:url" content="https://www.zhililab.cn/2026/07/23/2026-07-23-kubernetes-pod-creation-workflow/index.html">
+<meta property="og:site_name" content="Walker | ZHILILAB">
 <meta property="og:description" content="最近在工作中遇到了一次 Kubernetes Toolchain 挂载问题，涉及 Linux 文件系统、Kubernetes 集群、Volume 挂载、Mount Options、节点环境差异等多个层面。 最开始，这只是一个具体的故障排查问题：  为什么同一套 Toolchain，在不同节点或不同 Pod 中表现不一致？为什么 Volume 已经声明成功，容器内仍然会出现权限、性能或挂载行为异常？">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://github.com/assets/images/cover/Kubernetes-logo.webp">
+<meta property="og:image" content="https://www.zhililab.cn/assets/images/cover/Kubernetes-logo.webp">
 <meta property="article:published_time" content="2026-07-23T15:48:27.000Z">
 <meta property="article:modified_time" content="2026-07-29T00:12:50.478Z">
-<meta property="article:author" content="[object Object]">
+<meta property="article:author" content="Walker">
 <meta property="article:tag" content="Kubernetes">
 <meta property="article:tag" content="Linux">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://github.com/assets/images/cover/Kubernetes-logo.webp">
+<meta name="twitter:image" content="https://www.zhililab.cn/assets/images/cover/Kubernetes-logo.webp">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>从一次 K8s Toolchain 挂载故障，重新理解 Pod 从创建到 Ready 的全过程 - ZHILI</title>
+  <title>从一次 K8s Toolchain 挂载故障，重新理解 Pod 从创建到 Ready 的全过程 - Walker | ZHILILAB</title>
 
   <link  rel="stylesheet" href="/vendor/blog/bootstrap.min.css" />
 
@@ -74,7 +74,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"github.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"www.zhililab.cn","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -103,6 +103,8 @@
 
   
 <meta name="generator" content="Hexo 6.3.0">  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
+<link rel="canonical" href="https://www.zhililab.cn/2026/07/23/2026-07-23-kubernetes-pod-creation-workflow/" data-site-identity>
+<script type="application/ld+json" data-site-identity>{"@context":"https://schema.org","@type":"BlogPosting","headline":"从一次 K8s Toolchain 挂载故障，重新理解 Pod 从创建到 Ready 的全过程","description":"最近在工作中遇到了一次 Kubernetes Toolchain 挂载问题，涉及 Linux 文件系统、Kubernetes 集群、Volume 挂载、Mount Options、节点环境差异等多个层面。 最开始，这只是一个具体的故障排查问题： 为什么同一套 Toolchain，在不同节点或不同 Pod 中表现不一致？为什么 Volume 已经声明成功，容器内仍然会出现权限、性能或挂载行为异常？…","image":"https://www.zhililab.cn/assets/images/cover/header_cover.jpg","datePublished":"2026-07-23T15:48:27.000Z","dateModified":"2026-07-29T00:12:50.478Z","author":{"@type":"Person","name":"Walker","url":"https://www.zhililab.cn/"},"mainEntityOfPage":"https://www.zhililab.cn/2026/07/23/2026-07-23-kubernetes-pod-creation-workflow/"}</script>
 </head>
 
 
@@ -116,7 +118,7 @@
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>博客</strong>
+      <strong>Walker</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -182,9 +184,9 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                <span>关于</span>
+              <a class="nav-link" href="/projects/">
+                <i class="iconfont icon-code"></i>
+                <span>项目</span>
               </a>
             </li>
           
@@ -194,9 +196,21 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                <span>友链</span>
+              <a class="nav-link" href="/notes/">
+                <i class="iconfont icon-book"></i>
+                <span>随记</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
               </a>
             </li>
           
@@ -264,7 +278,7 @@
         
         
         
-          114 分钟
+          120 分钟
         
       </span>
     
@@ -315,7 +329,30 @@
             
               <div class="markdown-body">
                 
-                <p>最近在工作中遇到了一次 Kubernetes Toolchain 挂载问题，涉及 Linux 文件系统、Kubernetes 集群、Volume 挂载、Mount Options、节点环境差异等多个层面。</p>
+                <details class="ai-summary" data-ai-summary>
+  <summary>✦ 阅读 AI 生成摘要</summary>
+  <p class="ai-summary__disclosure">AI 生成 · 已由作者审核 · 仅供快速预览，请以原文为准</p>
+  <div class="ai-summary__tabs" role="tablist" aria-label="文章摘要" aria-orientation="horizontal">
+    <button type="button" role="tab" id="ai-summary-2026-07-23-kubernetes-pod-creation-workflow-tab-overview" aria-controls="ai-summary-2026-07-23-kubernetes-pod-creation-workflow-panel-overview" aria-selected="true" tabindex="0">概览</button>
+    <button type="button" role="tab" id="ai-summary-2026-07-23-kubernetes-pod-creation-workflow-tab-points" aria-controls="ai-summary-2026-07-23-kubernetes-pod-creation-workflow-panel-points" aria-selected="false" tabindex="-1">要点</button>
+    <button type="button" role="tab" id="ai-summary-2026-07-23-kubernetes-pod-creation-workflow-tab-explainer" aria-controls="ai-summary-2026-07-23-kubernetes-pod-creation-workflow-panel-explainer" aria-selected="false" tabindex="-1">通俗解释</button>
+  </div>
+  <section role="tabpanel" id="ai-summary-2026-07-23-kubernetes-pod-creation-workflow-panel-overview" aria-labelledby="ai-summary-2026-07-23-kubernetes-pod-creation-workflow-tab-overview" aria-label="概览">
+    <p>作者基于一次K8s Toolchain挂载故障，梳理了Pod从创建到Ready的完整状态收敛过程。文章指出Kubernetes的核心是声明式控制循环（Control Loop），通过API Server与List/Watch机制驱动组件异步执行Reconcile，推动实际状态向期望状态靠拢，并总结了相关故障排查路径与平台化沉淀经验。</p>
+  </section>
+  <section role="tabpanel" id="ai-summary-2026-07-23-kubernetes-pod-creation-workflow-panel-points" aria-labelledby="ai-summary-2026-07-23-kubernetes-pod-creation-workflow-tab-points" aria-label="要点" hidden>
+    <ul>
+        <li>阐述了Kubernetes的核心运行模型是基于状态收敛的控制循环（Control Loop），组件间通过API Server和List/Watch机制协作。</li>
+        <li>梳理了Pod从API Server接收请求、Scheduler调度、kubelet接管，到通过CRI/CNI/CSI创建容器与挂载存储的全过程。</li>
+        <li>结合Toolchain挂载故障，说明存储配置正确不代表文件系统行为正确，还需要关注Linux内核级挂载参数与CSI卸载/挂载流程对缓存的影响。</li>
+        <li>提出了排查Pod Pending、ContainerCreating、Ready=False等常见故障的分类路径，并倡导将排障经验沉淀为平台自动化能力。</li>
+    </ul>
+  </section>
+  <section role="tabpanel" id="ai-summary-2026-07-23-kubernetes-pod-creation-workflow-panel-explainer" aria-labelledby="ai-summary-2026-07-23-kubernetes-pod-creation-workflow-tab-explainer" aria-label="通俗解释" hidden>
+    <p>这篇文章把Kubernetes的工作原理比作一个“自动纠偏系统”。用户不需要给各个组件下达一步步的具体命令，只需提交Pod的“期望状态”（如想要运行什么容器、挂载什么目录）。Kubernetes内的各个组件会持续观察系统的“实际状态”，一旦发现实际与期望不一致，就会自动执行调整动作，逐步让实际状态向期望状态靠拢。文章结合实际排查存储挂载问题的经历，详细介绍了从提交配置、选择节点、启动容器、挂载底层文件系统到最终让Pod准备好接收流量的全过程。</p>
+  </section>
+</details>
+<p>最近在工作中遇到了一次 Kubernetes Toolchain 挂载问题，涉及 Linux 文件系统、Kubernetes 集群、Volume 挂载、Mount Options、节点环境差异等多个层面。</p>
 <p>最开始，这只是一个具体的故障排查问题：</p>
 <blockquote>
 <p>为什么同一套 Toolchain，在不同节点或不同 Pod 中表现不一致？<br><br>为什么 Volume 已经声明成功，容器内仍然会出现权限、性能或挂载行为异常？<br><br>问题究竟发生在 Kubernetes、Linux Mount、CSI，还是应用运行环境？</p>
@@ -917,7 +954,7 @@
 <p>更多细节可以参考：</p>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/concepts/overview">Kubernetes 架构</a></li>
-<li><a href="https://github.com/zhililab/DevOps-Agent-Control-Plane">DevOps Agent Control Plane</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/zhililab/DevOps-Agent-Control-Plane">DevOps Agent Control Plane</a></li>
 </ul>
 <p>当真正建立这套思维框架后，理解 Kubernetes 只是其中一个结果。</p>
 <p>更重要的是，它会逐渐形成一种可迁移的系统设计能力：</p>
@@ -1058,7 +1095,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>从一次 K8s Toolchain 挂载故障，重新理解 Pod 从创建到 Ready 的全过程</div>
-      <div>https://github.com/zhililab/2026/07/23/2026-07-23-kubernetes-pod-creation-workflow/</div>
+      <div>https://www.zhililab.cn/2026/07/23/2026-07-23-kubernetes-pod-creation-workflow/</div>
     </div>
     <div class="license-meta">
       
@@ -1248,7 +1285,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+      Walker · Content as Code
     </div>
   
   

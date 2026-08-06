@@ -348,11 +348,65 @@ function initPet(documentObject, windowObject) {
   return true;
 }
 
+function initAiSummaries(documentObject) {
+  if (!documentObject || typeof documentObject.querySelectorAll !== 'function') {
+    return 0;
+  }
+
+  return Array.from(documentObject.querySelectorAll('[data-ai-summary]')).reduce(
+    (initialized, summary) => {
+      if (summary.dataset.aiSummaryInitialized === 'true') return initialized;
+
+      const tabs = Array.from(summary.querySelectorAll('[role="tab"]'));
+      const panels = Array.from(summary.querySelectorAll('[role="tabpanel"]'));
+      if (!tabs.length || tabs.length !== panels.length) return initialized;
+
+      const select = (index, focus) => {
+        tabs.forEach((tab, tabIndex) => {
+          const active = tabIndex === index;
+          tab.setAttribute('aria-selected', String(active));
+          tab.setAttribute('tabindex', active ? '0' : '-1');
+          panels[tabIndex].hidden = !active;
+        });
+        if (focus) tabs[index].focus();
+      };
+      const selectedIndex = tabs.findIndex(
+        (tab) => tab.getAttribute('aria-selected') === 'true'
+      );
+      select(selectedIndex === -1 ? 0 : selectedIndex, false);
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => select(index, false));
+        tab.addEventListener('keydown', (event) => {
+          let nextIndex = null;
+          if (event.key === 'ArrowLeft') {
+            nextIndex = (index + tabs.length - 1) % tabs.length;
+          } else if (event.key === 'ArrowRight') {
+            nextIndex = (index + 1) % tabs.length;
+          } else if (event.key === 'Home') {
+            nextIndex = 0;
+          } else if (event.key === 'End') {
+            nextIndex = tabs.length - 1;
+          }
+          if (nextIndex === null) return;
+          event.preventDefault();
+          select(nextIndex, true);
+        });
+      });
+
+      summary.dataset.aiSummaryInitialized = 'true';
+      return initialized + 1;
+    },
+    0
+  );
+}
+
 function boot(documentObject, windowObject) {
   enhanceTables(documentObject);
   enhanceImages(documentObject);
   initMermaid(documentObject, windowObject);
   initPet(documentObject, windowObject);
+  initAiSummaries(documentObject);
   initSelectionShare(documentObject, windowObject);
   deferAnalytics(documentObject, windowObject);
   prefetchResponsiveImages(documentObject, windowObject);
@@ -367,6 +421,7 @@ const api = {
   enhanceImages,
   enhanceTables,
   initMermaid,
+  initAiSummaries,
   initPet,
   initSelectionShare,
   normalizeSelection,

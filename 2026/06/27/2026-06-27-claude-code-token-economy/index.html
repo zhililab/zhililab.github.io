@@ -13,32 +13,32 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="Zhi Li">
-  <meta name="keywords" content="python, devops">
+  <meta name="author" content="Walker">
+  <meta name="keywords" content="DevOps, Kubernetes, AI Native, ContentOps, SRE">
   
     <meta name="description" content="开头：这篇文章要冷静看今天读到机器之心整理的一篇访谈文章，标题很抓人：Claude Code 之父谈「品味」是不是人类护城河，以及工程师不再亲手写代码以后，公司应该看什么。 文章里最容易被转发的一句话，大概是「少招人，多给 token」。 这句话很有冲击力，也很适合传播。但越是这种话，越不能只按字面理解。 一方面，Claude Code 确实代表了一个真实趋势：AI 编程工具正在从补全、问答，走向">
 <meta property="og:type" content="article">
 <meta property="og:title" content="少招人，多买 Token？Claude Code 叙事背后的第一性原理">
-<meta property="og:url" content="https://github.com/zhililab/2026/06/27/2026-06-27-claude-code-token-economy/index.html">
-<meta property="og:site_name" content="ZHILI">
+<meta property="og:url" content="https://www.zhililab.cn/2026/06/27/2026-06-27-claude-code-token-economy/index.html">
+<meta property="og:site_name" content="Walker | ZHILILAB">
 <meta property="og:description" content="开头：这篇文章要冷静看今天读到机器之心整理的一篇访谈文章，标题很抓人：Claude Code 之父谈「品味」是不是人类护城河，以及工程师不再亲手写代码以后，公司应该看什么。 文章里最容易被转发的一句话，大概是「少招人，多给 token」。 这句话很有冲击力，也很适合传播。但越是这种话，越不能只按字面理解。 一方面，Claude Code 确实代表了一个真实趋势：AI 编程工具正在从补全、问答，走向">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://github.com/assets/images/cover/claude-code-token-economy.svg">
+<meta property="og:image" content="https://www.zhililab.cn/assets/images/cover/claude-code-token-economy.svg">
 <meta property="article:published_time" content="2026-06-27T00:43:46.000Z">
 <meta property="article:modified_time" content="2026-06-27T00:43:46.000Z">
-<meta property="article:author" content="[object Object]">
+<meta property="article:author" content="Walker">
 <meta property="article:tag" content="Claude Code">
 <meta property="article:tag" content="AI Agent">
 <meta property="article:tag" content="DevOps">
 <meta property="article:tag" content="Token 经济">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://github.com/assets/images/cover/claude-code-token-economy.svg">
+<meta name="twitter:image" content="https://www.zhililab.cn/assets/images/cover/claude-code-token-economy.svg">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
   
   
-  <title>少招人，多买 Token？Claude Code 叙事背后的第一性原理 - ZHILI</title>
+  <title>少招人，多买 Token？Claude Code 叙事背后的第一性原理 - Walker | ZHILILAB</title>
 
   <link  rel="stylesheet" href="/vendor/blog/bootstrap.min.css" />
 
@@ -76,7 +76,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"github.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"www.zhililab.cn","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -105,6 +105,8 @@
 
   
 <meta name="generator" content="Hexo 6.3.0">  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
+<link rel="canonical" href="https://www.zhililab.cn/2026/06/27/2026-06-27-claude-code-token-economy/" data-site-identity>
+<script type="application/ld+json" data-site-identity>{"@context":"https://schema.org","@type":"BlogPosting","headline":"少招人，多买 Token？Claude Code 叙事背后的第一性原理","description":"Walker 的个人博客，记录 DevOps 实践、AI 原生工作流、内容自动化与工程复盘。","image":"https://www.zhililab.cn/assets/images/cover/header_cover.jpg","datePublished":"2026-06-27T00:43:46.000Z","dateModified":"2026-06-27T00:43:46.000Z","author":{"@type":"Person","name":"Walker","url":"https://www.zhililab.cn/"},"mainEntityOfPage":"https://www.zhililab.cn/2026/06/27/2026-06-27-claude-code-token-economy/"}</script>
 </head>
 
 
@@ -118,7 +120,7 @@
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>博客</strong>
+      <strong>Walker</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -184,9 +186,9 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                <span>关于</span>
+              <a class="nav-link" href="/projects/">
+                <i class="iconfont icon-code"></i>
+                <span>项目</span>
               </a>
             </li>
           
@@ -196,9 +198,21 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                <span>友链</span>
+              <a class="nav-link" href="/notes/">
+                <i class="iconfont icon-book"></i>
+                <span>随记</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
               </a>
             </li>
           
@@ -488,7 +502,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>少招人，多买 Token？Claude Code 叙事背后的第一性原理</div>
-      <div>https://github.com/zhililab/2026/06/27/2026-06-27-claude-code-token-economy/</div>
+      <div>https://www.zhililab.cn/2026/06/27/2026-06-27-claude-code-token-economy/</div>
     </div>
     <div class="license-meta">
       
@@ -678,7 +692,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+      Walker · Content as Code
     </div>
   
   

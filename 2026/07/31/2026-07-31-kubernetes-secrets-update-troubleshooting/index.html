@@ -1,0 +1,894 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/assets/images/favicon/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Walker">
+  <meta name="keywords" content="DevOps, Kubernetes, AI Native, ContentOps, SRE">
+  
+    <meta name="description" content="最近在 Kubernetes 集群中遇到了一次环境变量残留问题。我明明已经重新部署，旧环境变量为什么还在？本篇博客将总结复盘本次 troubleshooting 全过程包括思路和定位方法，希望可以帮助到其他遇到类似问题的人。 一、问题背景1. 现象描述构建服务完成重新部署后，新的 Pod 已经生成并正常运行，但容器内仍然存在一个旧的环境变量，导致构建任务持续使用旧的 Build Service K">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一次 Kubernetes 环境变量残留故障：为什么重启 Pod 也没有解决问题？">
+<meta property="og:url" content="https://www.zhililab.cn/2026/07/31/2026-07-31-kubernetes-secrets-update-troubleshooting/index.html">
+<meta property="og:site_name" content="Walker | ZHILILAB">
+<meta property="og:description" content="最近在 Kubernetes 集群中遇到了一次环境变量残留问题。我明明已经重新部署，旧环境变量为什么还在？本篇博客将总结复盘本次 troubleshooting 全过程包括思路和定位方法，希望可以帮助到其他遇到类似问题的人。 一、问题背景1. 现象描述构建服务完成重新部署后，新的 Pod 已经生成并正常运行，但容器内仍然存在一个旧的环境变量，导致构建任务持续使用旧的 Build Service K">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.zhililab.cn/assets/images/cover/Kubernetes-logo.webp">
+<meta property="article:published_time" content="2026-07-31T14:30:00.000Z">
+<meta property="article:modified_time" content="2026-07-31T14:30:00.000Z">
+<meta property="article:author" content="Walker">
+<meta property="article:tag" content="DevOps">
+<meta property="article:tag" content="Kubernetes">
+<meta property="article:tag" content="troubleshooting">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://www.zhililab.cn/assets/images/cover/Kubernetes-logo.webp">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>一次 Kubernetes 环境变量残留故障：为什么重启 Pod 也没有解决问题？ - Walker | ZHILILAB</title>
+
+  <link  rel="stylesheet" href="/vendor/blog/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="/vendor/blog/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="/vendor/blog/hint.min.css" />
+
+  <link  rel="stylesheet" href="/vendor/blog/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="/vendor/blog/fluid-icons.css">
+
+
+
+<link rel="stylesheet" href="/vendor/blog/site-icons.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"www.zhililab.cn","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0">  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
+<link rel="canonical" href="https://www.zhililab.cn/2026/07/31/2026-07-31-kubernetes-secrets-update-troubleshooting/" data-site-identity>
+<script type="application/ld+json" data-site-identity>{"@context":"https://schema.org","@type":"BlogPosting","headline":"一次 Kubernetes 环境变量残留故障：为什么重启 Pod 也没有解决问题？","description":"最近在 Kubernetes 集群中遇到了一次环境变量残留问题。我明明已经重新部署，旧环境变量为什么还在？本篇博客将总结复盘本次 troubleshooting 全过程包括思路和定位方法，希望可以帮助到其他遇到类似问题的人。 一、问题背景1. 现象描述构建服务完成重新部署后，新的 Pod 已经生成并正常运行，但容器内仍然存在一个旧的环境变量，导致构建任务持续使用旧的 Build Service…","image":"https://www.zhililab.cn/assets/images/cover/header_cover.jpg","datePublished":"2026-07-31T14:30:00.000Z","dateModified":"2026-07-31T14:30:00.000Z","author":{"@type":"Person","name":"Walker","url":"https://www.zhililab.cn/"},"mainEntityOfPage":"https://www.zhililab.cn/2026/07/31/2026-07-31-kubernetes-secrets-update-troubleshooting/"}</script>
+</head>
+
+
+<body class="blog-post-enhanced">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Walker</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/projects/">
+                <i class="iconfont icon-code"></i>
+                <span>项目</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/notes/">
+                <i class="iconfont icon-book"></i>
+                <span>随记</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" data-post-banner-inline class="banner" parallax=true
+     style="background: url('data:image/webp;base64,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') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="一次 Kubernetes 环境变量残留故障：为什么重启 Pod 也没有解决问题？"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-07-31 22:30" pubdate>
+          2026年7月31日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          42 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">一次 Kubernetes 环境变量残留故障：为什么重启 Pod 也没有解决问题？</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <details class="ai-summary" data-ai-summary>
+  <summary>✦ 阅读 AI 生成摘要</summary>
+  <p class="ai-summary__disclosure">AI 生成 · 已由作者审核 · 仅供快速预览，请以原文为准</p>
+  <div class="ai-summary__tabs" role="tablist" aria-label="文章摘要" aria-orientation="horizontal">
+    <button type="button" role="tab" id="ai-summary-2026-07-31-kubernetes-secrets-update-troubleshooting-tab-overview" aria-controls="ai-summary-2026-07-31-kubernetes-secrets-update-troubleshooting-panel-overview" aria-selected="true" tabindex="0">概览</button>
+    <button type="button" role="tab" id="ai-summary-2026-07-31-kubernetes-secrets-update-troubleshooting-tab-points" aria-controls="ai-summary-2026-07-31-kubernetes-secrets-update-troubleshooting-panel-points" aria-selected="false" tabindex="-1">要点</button>
+    <button type="button" role="tab" id="ai-summary-2026-07-31-kubernetes-secrets-update-troubleshooting-tab-explainer" aria-controls="ai-summary-2026-07-31-kubernetes-secrets-update-troubleshooting-panel-explainer" aria-selected="false" tabindex="-1">通俗解释</button>
+  </div>
+  <section role="tabpanel" id="ai-summary-2026-07-31-kubernetes-secrets-update-troubleshooting-panel-overview" aria-labelledby="ai-summary-2026-07-31-kubernetes-secrets-update-troubleshooting-tab-overview" aria-label="概览">
+    <p>本文复盘 Kubernetes Pod 重建后旧环境变量仍存在的故障。排查从运行时追踪到 Deployment、Secret 与 last-applied-configuration，最终确认不受当前 apply 管理的历史 key 仍残留在 Secret 中。文章说明 rollout restart 只会重建 Pod，并总结旧 key 清理与配置验证方法。</p>
+  </section>
+  <section role="tabpanel" id="ai-summary-2026-07-31-kubernetes-secrets-update-troubleshooting-panel-points" aria-labelledby="ai-summary-2026-07-31-kubernetes-secrets-update-troubleshooting-tab-points" aria-label="要点" hidden>
+    <ul>
+        <li>故障现象：Pod 重新部署并成功启动后，容器内仍残留已删除的旧环境变量 BUILD_SERVICE_KEY。</li>
+        <li>根本原因：历史 key 不在当前 last-applied-configuration 的管理范围内，却仍存在于 Secret 的实际数据中。</li>
+        <li>解决措施：清理或受控重建 Secret 后再重建 Pod；不可变镜像标签则用于独立治理构建产物的版本漂移。</li>
+    </ul>
+  </section>
+  <section role="tabpanel" id="ai-summary-2026-07-31-kubernetes-secrets-update-troubleshooting-panel-explainer" aria-labelledby="ai-summary-2026-07-31-kubernetes-secrets-update-troubleshooting-tab-explainer" aria-label="通俗解释" hidden>
+    <p>Pod 重启只会重新读取当时集群里的配置。本案例中，旧字段不在当前 kubectl apply 的管理范围内，所以它虽然从新 YAML 消失，仍留在 Secret 里。新 Pod 再次读取 Secret 时，旧变量就又出现了。解决问题要先清理 Secret 的实际数据，再重建 Pod 并检查运行结果。</p>
+  </section>
+</details>
+<p>最近在 Kubernetes 集群中遇到了一次环境变量残留问题。我明明已经重新部署，旧环境变量为什么还在？本篇博客将总结复盘本次 troubleshooting 全过程包括思路和定位方法，希望可以帮助到其他遇到类似问题的人。</p>
+<h2 id="一、问题背景"><a href="#一、问题背景" class="headerlink" title="一、问题背景"></a>一、问题背景</h2><h3 id="1-现象描述"><a href="#1-现象描述" class="headerlink" title="1. 现象描述"></a>1. 现象描述</h3><p>构建服务完成重新部署后，新的 Pod 已经生成并正常运行，但容器内仍然存在一个旧的环境变量，导致构建任务持续使用旧的 Build Service Key 并且开启了调试模式（DEBUG&#x3D;true）。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">BUILD_SERVICE_KEY=&lt;legacy-value&gt;<br></code></pre></td></tr></table></figure>
+
+<p>我最初的直觉是 Deployment 没有真正更新，或者 Pod 仍然运行了旧版本。但继续排查后发现，问题并不在 Rollout，也不在镜像，而在 Kubernetes Secret 的更新方式。</p>
+<h3 id="2-业务影响"><a href="#2-业务影响" class="headerlink" title="2. 业务影响"></a>2. 业务影响</h3><p>残留的硬编码配置可能导致 CI&#x2F;CD 构建任务继续使用错误的凭证或参数，带来安全合规风险，也让构建结果的可信度受到影响。</p>
+<p>因此，不能只确认 Pod 是否启动，还需要继续追踪变量究竟来自哪里。</p>
+<blockquote>
+<p><strong>Pod 重建成功，不代表它依赖的配置已经按预期完成清理。</strong></p>
+</blockquote>
+<h2 id="二、排查思路"><a href="#二、排查思路" class="headerlink" title="二、排查思路"></a>二、排查思路</h2><p>整个排查过程按照“先确认现象，再向上追踪配置来源”的思路展开。</p>
+<h3 id="1-确认-Pod-内变量存在"><a href="#1-确认-Pod-内变量存在" class="headerlink" title="1. 确认 Pod 内变量存在"></a>1. 确认 Pod 内变量存在</h3><p>首先进入容器检查运行时环境：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">kubectl <span class="hljs-built_in">exec</span> deploy/build-service -n tools -c build-service-node -- <span class="hljs-built_in">env</span> | grep BUILD_SERVICE_KEY<br></code></pre></td></tr></table></figure>
+
+<p>结果确认：新 Pod 中仍然存在旧变量。</p>
+<p>这一步只能证明旧的 BUILD_SERVICE_KEY 确实还在，但还不能确定来自镜像、Deployment，还是外部配置对象。下一步我需要排查定位到具体是哪个配置对象导致。很好，我就喜欢 debug 🐛，开干开干～～</p>
+<h3 id="2-检查-Deployment-的变量来源"><a href="#2-检查-Deployment-的变量来源" class="headerlink" title="2. 检查 Deployment 的变量来源"></a>2. 检查 Deployment 的变量来源</h3><p>继续检查 Deployment 中的环境变量声明：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">kubectl get deploy build-service -n tools -o yaml | grep -A10 envFrom<br></code></pre></td></tr></table></figure>
+
+<p>结果显示，容器通过 <code>envFrom</code> 引用了一个 Secret：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">envFrom:</span><br>  <span class="hljs-bullet">-</span> <span class="hljs-attr">secretRef:</span><br>      <span class="hljs-attr">name:</span> <span class="hljs-string">build-service-secrets</span><br></code></pre></td></tr></table></figure>
+
+<p>到这里，排查范围已经从 Pod 和 Deployment 缩小到 Secret。</p>
+<h3 id="3-检查-Secret-的实际内容"><a href="#3-检查-Secret-的实际内容" class="headerlink" title="3. 检查 Secret 的实际内容"></a>3. 检查 Secret 的实际内容</h3><p>接下来检查集群中现存 Secret：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 查看 Secret 资源对象本身</span><br>[xxxx@server01 ~]$ kubectl get secret build-service-secrets -n tools<br>NAME                    TYPE     DATA   AGE<br>build-service-secrets   Opaque   12     109d<br>[xxxx@server01 ~]$<br><br><span class="hljs-comment"># 查看 Secret 内容</span><br>kubectl get secret build-service-secrets -n tools -o yaml<br></code></pre></td></tr></table></figure>
+
+<p>结果发现，Secret 当前包含的 key 数量多于声明文件，其中仍有已经从当前 YAML 删除的旧 key。</p>
+<p>这也解释了为什么 Pod 重建后，旧环境变量仍然存在：</p>
+<blockquote>
+<p>Deployment 每次都会通过 <code>envFrom</code> 读取当前 Secret；只要旧 key 还在 Secret 中，新 Pod 就会继续注入这个变量。</p>
+</blockquote>
+<h3 id="4-对比-last-applied-configuration"><a href="#4-对比-last-applied-configuration" class="headerlink" title="4. 对比 last-applied-configuration"></a>4. 对比 <code>last-applied-configuration</code></h3><p>最后对比 Secret 当前的 <code>.data</code> 与 annotation 中记录的 <code>kubectl.kubernetes.io/last-applied-configuration</code>。</p>
+<p>结果发现，当前声明文件只记录了部分 key，而下面这些历史 key 不在 <code>last-applied-configuration</code> 中，却仍然存在于 Secret 的 <code>.data</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs text">BUILD_SERVICE_KEY<br>DEBUG_MODE<br>BUILD_MATRIX_DEFAULT<br>BUILD_MATRIX_MAIN<br>BUILD_MATRIX_RELEASE<br>LEGACY_ACCESS_TOKEN<br></code></pre></td></tr></table></figure>
+
+<p>这一步最终解释了旧 key 为什么没有随着 YAML 变更而消失。</p>
+<h2 id="三、根因分析"><a href="#三、根因分析" class="headerlink" title="三、根因分析"></a>三、根因分析</h2><p>根因不是 Deployment 没有重启或者镜像没有更新，而是：</p>
+<blockquote>
+<p><strong><code>kubectl apply</code> 是合并更新，不是全量覆盖。对于不在当前 <code>last-applied-configuration</code> 管理范围内的旧 Secret key，仅从当前 YAML 中删除，并不会保证它自动从现存 Secret 的 <code>.data</code> 中消失。</strong></p>
+</blockquote>
+<p>在本次场景中，旧 key 仍然保留在 Secret 中。执行 <code>rollout restart</code> 后，新 Pod 重新读取的依然是这个包含旧 key 的 Secret，因此变量继续出现在容器环境中。</p>
+<p>这里我执行了两个动作：</p>
+<ul>
+<li><code>kubectl apply</code>：更新 Kubernetes 对象的声明内容；</li>
+<li><code>kubectl rollout restart</code>：触发工作负载重建 Pod。</li>
+</ul>
+<p><code>rollout restart</code> 只负责重建 Pod，不会修改或清理 Secret 本身。只要 Secret 中的旧数据没有被删除，重启 Pod 也无法解决问题。</p>
+<h3 id="1-故障链路"><a href="#1-故障链路" class="headerlink" title="1. 故障链路"></a>1. 故障链路</h3><p>把整个过程串起来，可以看到旧变量是如何重新进入新 Pod 的：</p>
+<p><picture><source type="image/webp" data-srcset="/assets/images/optimized/posts/kubernetes-secret-stale-key-flow-640.webp 640w, /assets/images/optimized/posts/kubernetes-secret-stale-key-flow-866.webp 866w" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px"><img alt="Secret 旧 key 残留并重新注入 Pod 的故障链路" loading="lazy" decoding="async" width="866" height="1164" fetchpriority="low" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px" data-blog-deferred-image="true" data-src="/assets/images/posts/kubernetes-secret-stale-key-flow.png" data-srcset="/assets/images/optimized/posts/kubernetes-secret-stale-key-flow-640.webp 640w, /assets/images/optimized/posts/kubernetes-secret-stale-key-flow-866.webp 866w" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22/%3E"></picture><noscript><img src="/assets/images/posts/kubernetes-secret-stale-key-flow.png" alt="Secret 旧 key 残留并重新注入 Pod 的故障链路" loading="lazy" decoding="async" width="866" height="1164" fetchpriority="low" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px"></noscript></p>
+<p>这里真正需要更新的是集群中的 Secret，而不是反复重启 Deployment。</p>
+<h3 id="2-Kubernetes-底层发生了什么"><a href="#2-Kubernetes-底层发生了什么" class="headerlink" title="2. Kubernetes 底层发生了什么"></a>2. Kubernetes 底层发生了什么</h3><p>执行 <code>rollout restart</code> 时，Kubernetes 执行背后的收敛过程（reconciliation process）：</p>
+<ol>
+<li>命令更新 Deployment 的 Pod Template annotation；</li>
+<li>kube-apiserver 保存新的期望状态；</li>
+<li>Deployment Controller 创建新的 ReplicaSet；</li>
+<li>Scheduler 为新 Pod 选择工作节点；</li>
+<li>目标节点上的 kubelet 同步 Pod；</li>
+<li>kubelet 根据 Pod Spec 读取 <code>envFrom</code> 引用的 Secret；</li>
+<li>CSI 容器运行时创建并启动容器；</li>
+<li>kubelet 持续更新 Pod Status，直到满足就绪条件。</li>
+</ol>
+<p>controller 负责让 Pod 完成重建，但不会删除 Secret 中的历史字段。这正是“Pod 已经是新的，变量却还是旧的”这一现象背后的原因。</p>
+<h2 id="四、解决方案"><a href="#四、解决方案" class="headerlink" title="四、解决方案"></a>四、解决方案</h2><h3 id="1-临时修复"><a href="#1-临时修复" class="headerlink" title="1. 临时修复"></a>1. 临时修复</h3><p>命令行删除 Secret 中不应继续存在的旧 key，或者在确认影响范围后（例如，仅影响当前 Pod），考虑重新创建 Secret。</p>
+<p>Secret 清理完成后，再重建 Pod，让容器读取更新后的配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">kubectl rollout restart deployment/build-service -n tools<br>kubectl rollout status deployment/build-service -n tools<br></code></pre></td></tr></table></figure>
+
+<p>最后进入新 Pod 验证旧变量是否已经消失：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">kubectl <span class="hljs-built_in">exec</span> deploy/build-service -n tools -c build-service-node -- <span class="hljs-built_in">env</span> | grep BUILD_SERVICE_KEY<br></code></pre></td></tr></table></figure>
+
+<p>结果是命令无输出，给自己一个赞 👍 </p>
+<h3 id="2-使用不可变镜像标签完善发布链路"><a href="#2-使用不可变镜像标签完善发布链路" class="headerlink" title="2. 使用不可变镜像标签完善发布链路"></a>2. 使用不可变镜像标签完善发布链路</h3><p>虽然镜像不是本次 Secret 残留问题的根因，但原来的发布方式如果长期复用可变标签（如 <code>latest</code>），仍然可能引入另一类版本漂移问题。</p>
+<p>可以在 Jenkins 流水线中使用“构建号 + Git Commit 短哈希”生成不可变标签，并在部署阶段显式更新 Deployment 的镜像：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs groovy">stage(<span class="hljs-string">&#x27;Deploy to Kubernetes&#x27;</span>) &#123;<br>    echo <span class="hljs-string">&#x27;Deploy to Kubernetes&#x27;</span><br><br>    <span class="hljs-comment">// Use an immutable tag: build number + short Git commit.</span><br>    <span class="hljs-keyword">def</span> imageTag = <span class="hljs-string">&quot;$&#123;env.BUILD_NUMBER&#125;-$&#123;env.GIT_COMMIT?.take(7) ?: &#x27;local&#x27;&#125;&quot;</span><br><br>    sh <span class="hljs-string">&#x27;kubectl apply -f k8s-deploy.yaml&#x27;</span><br>    sh <span class="hljs-string">&quot;kubectl set image deployment/build-service &quot;</span> +<br>       <span class="hljs-string">&quot;build-service-node=$&#123;IMAGE_NAME&#125;:$&#123;imageTag&#125; &quot;</span> +<br>       <span class="hljs-string">&quot;-n $&#123;K8S_NAMESPACE&#125;&quot;</span><br>    sh <span class="hljs-string">&quot;kubectl rollout status deployment/build-service &quot;</span> +<br>       <span class="hljs-string">&quot;--timeout=180s -n $&#123;K8S_NAMESPACE&#125;&quot;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>示例中的服务名和变量名均为脱敏后的通用名称。实际流水线还应确保前面的构建与推送阶段使用同一个 <code>imageTag</code>。</p>
+<p>从流水线到新 Pod 就绪，底层链路可以概括为：</p>
+<p><picture><source type="image/webp" data-srcset="/assets/images/optimized/posts/kubernetes-immutable-image-deployment-flow-640.webp 640w, /assets/images/optimized/posts/kubernetes-immutable-image-deployment-flow-960.webp 960w, /assets/images/optimized/posts/kubernetes-immutable-image-deployment-flow-1182.webp 1182w" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px"><img alt="不可变镜像标签从 Jenkins 构建到 Kubernetes Pod 就绪的发布链路" loading="lazy" decoding="async" width="1182" height="1484" fetchpriority="low" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px" data-blog-deferred-image="true" data-src="/assets/images/posts/kubernetes-immutable-image-deployment-flow.png" data-srcset="/assets/images/optimized/posts/kubernetes-immutable-image-deployment-flow-640.webp 640w, /assets/images/optimized/posts/kubernetes-immutable-image-deployment-flow-960.webp 960w, /assets/images/optimized/posts/kubernetes-immutable-image-deployment-flow-1182.webp 1182w" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22/%3E"></picture><noscript><img src="/assets/images/posts/kubernetes-immutable-image-deployment-flow.png" alt="不可变镜像标签从 Jenkins 构建到 Kubernetes Pod 就绪的发布链路" loading="lazy" decoding="async" width="1182" height="1484" fetchpriority="low" sizes="(max-width: 767px) calc(100vw - 32px), (max-width: 1199px) 83vw, 1000px"></noscript></p>
+<p>这条链路解决的是“构建产物能否被唯一标识并准确部署”的问题；Secret 清理解决的是“运行配置是否与声明一致”的问题。两者都需要验证，但不能混为同一个根因。</p>
+<h3 id="3-长期改进"><a href="#3-长期改进" class="headerlink" title="3. 长期改进"></a>3. 长期改进</h3><ol>
+<li><p><strong>明确 Secret 的唯一管理来源</strong><br>避免同一个 Secret 同时被脚本、人工命令和多个 YAML 文件更新。</p>
+</li>
+<li><p><strong>对比期望状态与集群实际状态</strong><br>不仅检查代码仓库中的 YAML，还要检查集群中 Secret 的实际 key 集合。</p>
+</li>
+<li><p><strong>将删除旧 key 纳入变更验证</strong><br>配置变更不能只验证新增和修改，也要验证应该删除的内容确实已经消失。</p>
+</li>
+<li><p><strong>分开验证配置更新与 Pod 重建</strong><br>先确认 Secret 已正确更新，再确认新 Pod 读取了正确配置。</p>
+</li>
+</ol>
+<h2 id="五、可复用的排查路径"><a href="#五、可复用的排查路径" class="headerlink" title="五、可复用的排查路径"></a>五、可复用的排查路径</h2><p>以后再遇到“配置明明删除了，Pod 中为什么还存在”的问题，可以按下面的顺序检查：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs text">确认 Pod 内实际环境变量<br>        ↓<br>检查 Pod / Deployment 的 env、envFrom<br>        ↓<br>定位 ConfigMap 或 Secret<br>        ↓<br>检查集群对象的实际 data<br>        ↓<br>对比 last-applied-configuration<br>        ↓<br>修正配置对象并重建 Pod<br>        ↓<br>再次验证运行时状态<br></code></pre></td></tr></table></figure>
+
+<p>这条排查路径的重点是：不要停留在代码仓库或 YAML 文件中，而要沿着引用关系，一直检查到集群中的实际对象和容器运行状态（注：理解 k8s 底层工作原理，deployment controller 如何更新 Pod 配置非常重要）</p>
+<h2 id="六、经验总结"><a href="#六、经验总结" class="headerlink" title="六、经验总结"></a>六、经验总结</h2><p>这次问题最容易产生的误判是：</p>
+<blockquote>
+<p>Deployment 已经 Rollout 成功，所以新 Pod 的配置一定是新的。</p>
+</blockquote>
+<p>但 Rollout 成功只说明 Pod 完成了重建，并不能证明它依赖的 Secret 已经被正确清理。</p>
+<p>对 Kubernetes 配置变更而言，完整的验证链路应该是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text">声明文件已更新<br>      ↓<br>集群对象实际内容正确<br>      ↓<br>Pod 已重新创建<br>      ↓<br>容器运行时配置符合预期<br></code></pre></td></tr></table></figure>
+
+<p>我从这次故障的收获的经验是：</p>
+<blockquote>
+<p><strong>不要把“执行过更新命令”当成配置已经生效，也不要把“Pod 已重启”当成旧配置已经消失。最终结论必须由集群对象和容器运行时的实际状态共同证明。</strong></p>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/DevOps/">#DevOps</a>
+      
+        <a href="/tags/Kubernetes/">#Kubernetes</a>
+      
+        <a href="/tags/troubleshooting/">#troubleshooting</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>一次 Kubernetes 环境变量残留故障：为什么重启 Pod 也没有解决问题？</div>
+      <div>https://www.zhililab.cn/2026/07/31/2026-07-31-kubernetes-secrets-update-troubleshooting/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Zhi Li</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年7月31日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/07/31/2026-07-31-weekly-ai-engineering-radar/" title="本周 AI 工程雷达：Agent 进入复杂迁移，RAG 回归朴素工程">
+                        <span class="hidden-mobile">本周 AI 工程雷达：Agent 进入复杂迁移，RAG 回归朴素工程</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://lib.baomitu.com/waline/2.14.1/waline.min.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/waline/2.14.1/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://comments.zhililab.cn","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["nick"],"lang":"zh-cn","emoji":[],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10,"placeholder":"评论提交后需审核，审核通过后公开显示"},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+      Walker · Content as Code
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+    <p class="blog-privacy-link" data-blog-privacy-link><a href="/privacy/">隐私与 Cookie 政策</a></p>
+</footer>
+
+  <!-- Scripts -->
+
+
+<script  src="/vendor/blog/jquery.min.js" ></script>
+<script  src="/vendor/blog/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+<script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=/vendor/blog/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<button id="blog-pet" type="button" aria-label="和博客机器人打个招呼" aria-describedby="blog-pet-message" data-blog-reading-experience>
+  <span class="blog-pet__bubble" id="blog-pet-message" role="status" aria-live="polite">今天也在持续进化</span>
+  <svg class="blog-pet__robot" viewBox="0 0 128 144" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="pet-body-gradient" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#78a7ff"/>
+        <stop offset="1" stop-color="#315ddc"/>
+      </linearGradient>
+    </defs>
+    <path class="blog-pet__antenna" d="M64 18v-8m-7 0h14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+    <rect x="22" y="20" width="84" height="62" rx="28" fill="url(#pet-body-gradient)" stroke="#17377d" stroke-width="5"/>
+    <rect x="34" y="36" width="60" height="30" rx="13" fill="#102b62"/>
+    <circle cx="51" cy="51" r="5" fill="#80ecff"/>
+    <circle cx="77" cy="51" r="5" fill="#80ecff"/>
+    <path d="M54 60h20" stroke="#80ecff" stroke-width="3" stroke-linecap="round"/>
+    <rect x="35" y="76" width="58" height="50" rx="20" fill="url(#pet-body-gradient)" stroke="#17377d" stroke-width="5"/>
+    <path d="M50 99h28" stroke="#d9e7ff" stroke-width="5" stroke-linecap="round"/>
+    <path class="blog-pet__arm blog-pet__arm--left" d="M36 88 18 104" fill="none" stroke="#315ddc" stroke-width="12" stroke-linecap="round"/>
+    <path class="blog-pet__arm blog-pet__arm--right" d="M92 88 112 72" fill="none" stroke="#315ddc" stroke-width="12" stroke-linecap="round"/>
+    <path d="M52 124v12m24-12v12" stroke="#17377d" stroke-width="10" stroke-linecap="round"/>
+  </svg>
+</button>
+<script src="/js/blog-reading-experience.js" defer data-blog-reading-experience></script>
+</body>
+</html>
