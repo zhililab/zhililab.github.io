@@ -1,0 +1,21 @@
+navbar:
+  blog_title: Walker
+  menu:
+    - { key: "home", link: "/", icon: "iconfont icon-home-fill" }
+    - { key: "archive", link: "/archives/", icon: "iconfont icon-archive-fill" }
+    - { key: "category", link: "/categories/", icon: "iconfont icon-category-fill" }
+    - { key: "tag", link: "/tags/", icon: "iconfont icon-tags-fill" }
+    - { key: "projects", name: "项目", link: "/projects/", icon: "iconfont icon-code" }
+    - { key: "notes", name: "随记", link: "/notes/", icon: "iconfont icon-book" }
+    - { key: "about", link: "/about/", icon: "iconfont icon-user-fill" }
+
+index:
+  banner_img: /assets/images/cover/header_cover.jpg
+  banner_img_height: 58
+  banner_mask_alpha: 0.45
+  slogan:
+    enable: true
+    text: 把实践写成可复用的系统
+
+footer:
+  content: Walker · Content as Code

@@ -10,7 +10,7 @@ ads: false
 
 ## 适用范围
 
-本政策适用于 ZHILI 博客（[zhililab.cn](https://zhililab.cn/)），说明本站在提供文章、评论和广告服务时如何处理访客信息。
+本政策适用于 ZHILI 博客（[www.zhililab.cn](https://www.zhililab.cn/)），说明本站在提供文章、评论和广告服务时如何处理访客信息。
 
 ## Google 广告与 Cookie
 

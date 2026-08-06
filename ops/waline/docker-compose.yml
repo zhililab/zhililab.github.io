@@ -6,7 +6,7 @@ services:
     environment:
       SQLITE_PATH: /app/data
       SITE_NAME: ZHILI
-      SITE_URL: https://zhililab.cn
+      SITE_URL: https://www.zhililab.cn
       SERVER_URL: https://comments.zhililab.cn
       SECURE_DOMAINS: www.zhililab.cn,zhililab.cn,comments.zhililab.cn
       COMMENT_AUDIT: "true"

@@ -24,6 +24,14 @@ const kubernetesArticlePath = path.join(
   '2026-07-23-kubernetes-pod-creation-workflow',
   'index.html'
 );
+const graphArticlePath = path.join(
+  publicRoot,
+  '2026',
+  '07',
+  '27',
+  '2026-07-27-from-graph-platform-to-devops-agent-control-plane',
+  'index.html'
+);
 const claudeArticlePath = path.join(
   publicRoot,
   '2026',
@@ -56,7 +64,60 @@ test('rendered enhancement assets exist and remain compact', () => {
 
   assert.ok(fs.statSync(css).size > 0);
   assert.ok(fs.statSync(js).size > 0);
-  assert.ok(fs.statSync(css).size + fs.statSync(js).size < 20 * 1024);
+  assert.ok(fs.statSync(css).size + fs.statSync(js).size < 24 * 1024);
+});
+
+test('all three backfills render one static reviewed AI summary and home renders none', () => {
+  const disclosure = 'AI 生成 · 已由作者审核 · 仅供快速预览，请以原文为准';
+  const forbiddenRuntimeMarkers = /generativelanguage\.googleapis\.com|GEMINI_API_KEY|x-goog-api-key/i;
+
+  for (const file of [articlePath, kubernetesArticlePath, graphArticlePath]) {
+    const html = read(file);
+    const componentMatch = html.match(
+      /<details class="ai-summary" data-ai-summary>[\s\S]*?<\/details>/
+    );
+    const metaDescriptions = html.match(
+      /<meta\b[^>]*(?:name="description"|property="og:description")[^>]*>/g
+    ) || [];
+
+    assert.equal(
+      (html.match(/<details class="ai-summary" data-ai-summary>/g) || []).length,
+      1,
+      `${file} must contain exactly one AI summary component`
+    );
+    assert.ok(componentMatch, `${file} must contain the complete AI summary component`);
+    const component = componentMatch[0];
+    assert.equal(
+      (component.match(/role="tab"/g) || []).length,
+      3,
+      `${file} must contain exactly three AI summary tabs`
+    );
+    assert.equal(
+      (component.match(/✦ 阅读 AI 生成摘要/g) || []).length,
+      1,
+      `${file} must contain the collapsed summary copy once`
+    );
+    assert.equal(
+      (component.match(/>通俗解释<\/button>/g) || []).length,
+      1,
+      `${file} must contain the exact third-tab copy once`
+    );
+    assert.equal(
+      component.split(disclosure).length - 1,
+      1,
+      `${file} must contain the disclosure once`
+    );
+    assert.doesNotMatch(
+      metaDescriptions.join('\n'),
+      /✦ 阅读 AI 生成摘要|AI 生成 · 已由作者审核/,
+      `${file} must keep AI summary copy out of SEO descriptions`
+    );
+    assert.doesNotMatch(html, forbiddenRuntimeMarkers);
+  }
+
+  const home = read(path.join(publicRoot, 'index.html'));
+  assert.doesNotMatch(home, /data-ai-summary|✦ 阅读 AI 生成摘要|通俗解释/);
+  assert.doesNotMatch(home, forbiddenRuntimeMarkers);
 });
 
 test('Kubernetes article uses the cached sequence diagram image', () => {
@@ -146,7 +207,7 @@ test('generated Pages CNAME contains one canonical domain', () => {
     .map((domain) => domain.trim())
     .filter(Boolean);
 
-  assert.deepEqual(domains, ['zhililab.cn']);
+  assert.deepEqual(domains, ['www.zhililab.cn']);
 });
 
 test('generated site exposes canonical crawler discovery files', () => {
@@ -156,11 +217,11 @@ test('generated site exposes canonical crawler discovery files', () => {
   const robots = read(path.join(publicRoot, 'robots.txt'));
   const sitemap = read(path.join(publicRoot, 'sitemap.xml'));
 
-  assert.match(home, /<link rel="canonical" href="https:\/\/zhililab\.cn\/">/);
-  assert.match(robots, /Sitemap: https:\/\/zhililab\.cn\/sitemap\.xml/);
-  assert.match(sitemap, /<loc>https:\/\/zhililab\.cn\//);
+  assert.match(home, /<link rel="canonical" href="https:\/\/www\.zhililab\.cn\/"/);
+  assert.match(robots, /Sitemap: https:\/\/www\.zhililab\.cn\/sitemap\.xml/);
+  assert.match(sitemap, /<loc>https:\/\/www\.zhililab\.cn\//);
   assert.doesNotMatch(sitemap, /https:\/\/github\.com\/zhililab/);
-  assert.doesNotMatch(sitemap, /https:\/\/www\.zhililab\.cn/);
+  assert.doesNotMatch(sitemap, /<loc>https:\/\/zhililab\.cn\//);
 });
 
 test('generated site exposes the privacy policy from every footer', () => {
@@ -177,7 +238,7 @@ test('generated site exposes the privacy policy from every footer', () => {
   assert.match(privacy, /Waline/);
   assert.match(
     privacy,
-    /href="https:\/\/zhililab\.cn\/">zhililab\.cn<\/a>/
+    /href="https:\/\/www\.zhililab\.cn\/">www\.zhililab\.cn<\/a>/
   );
   assert.doesNotMatch(privacy, /id="waline"/);
 });

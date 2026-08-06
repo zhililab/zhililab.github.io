@@ -17,12 +17,12 @@ menu:
 
 
 # Site
-title: ZHILI
-subtitle: WELCOME
-subtitle_desc: I learn everyday ;)
-keywords: python, devops
-description: 介绍：日常学习与技术交流的个人博客
-introduction: I learn everyday.
+title: Walker | ZHILILAB
+subtitle: 把实践写成可复用的系统
+subtitle_desc: DevOps 实践、AI 原生工作流与内容自动化
+keywords: DevOps, Kubernetes, AI Native, ContentOps, SRE
+description: Walker 的个人博客，记录 DevOps 实践、AI 原生工作流、内容自动化与工程复盘。
+introduction: 从真实问题出发，把经验沉淀为可复用的方法与系统。
 favicon_ico: /assets/images/favicon/favicon.ico
 logo: /assets/images/logo/logo-text-white.png
 # 头像/二维码（用于显示在底部）二选一
@@ -33,9 +33,7 @@ header_cover: /assets/images/cover/header_cover.jpg
 error_page_bg: http://oo12ugek5.bkt.clouddn.com/blog/images/dogs.jpg
 
 # 站长信息
-author:
-  name: ZHI LI
-  link: https://zhililab.github.io/
+author: Walker
 
 # 页面加载loading图标
 loader_img: http://oo12ugek5.bkt.clouddn.com/blog/images/loader.gif
@@ -47,7 +45,7 @@ about:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://zhililab.cn
+url: https://www.zhililab.cn
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -224,21 +222,6 @@ feed:
 # Sitemap
 sitemap:
   path: sitemap.xml
-
-# Comments
-gitTalk:
-  enable: true
-  clientID: 0d6506e4e87c6135870f
-  clientSecret: 453b1f30b04c679d76496ec98dcc95ffd9c29679
-  repo: zhililab.github.io
-  owner: zhililab
-  admin: [zhililab]
-
-# Admin
-hexo_admin:
-  username: admin
-  password_hash: 28e11f73e3a5b122d3726f2af1404f45df7c7e4c # 通过运行 `echo -n 'your_password' | openssl sha1` 命令生成密码的哈希值
-
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html

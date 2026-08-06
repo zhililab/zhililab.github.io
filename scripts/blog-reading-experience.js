@@ -1,8 +1,15 @@
 'use strict';
 
+const path = require('node:path');
+const { createAiSummaryFilter } = require('./lib/ai-summary-render');
+
 const CSS_PATH = '/css/blog-reading-experience.css';
 const JS_PATH = '/js/blog-reading-experience.js';
 const MARKER = 'data-blog-reading-experience';
+const AI_SUMMARIES_DIR = path.join(__dirname, '..', 'source', '_data', 'ai-summaries');
+const injectAiSummary = createAiSummaryFilter({
+  summariesDir: AI_SUMMARIES_DIR
+});
 
 function isPost(data) {
   return Boolean(
@@ -95,6 +102,7 @@ function enhancePostHtml(html, data) {
 
 function register(hexoInstance) {
   hexoInstance.extend.filter.register('before_post_render', enablePostComments);
+  hexoInstance.extend.filter.register('after_post_render', injectAiSummary);
   hexoInstance.extend.filter.register('after_render:html', enhancePostHtml);
 }
 
@@ -106,5 +114,6 @@ module.exports = {
   enablePostComments,
   enhancePostHtml,
   guardMermaidRefreshCallback,
+  injectAiSummary,
   register
 };

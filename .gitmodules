@@ -1,0 +1,6 @@
+[submodule "themes/hexo-theme-fluid"]
+	path = themes/hexo-theme-fluid
+	url = https://github.com/fluid-dev/hexo-theme-fluid.git
+[submodule "themes/hexo-theme-skapp"]
+	path = themes/hexo-theme-skapp
+	url = https://github.com/Mrminfive/hexo-theme-skapp.git

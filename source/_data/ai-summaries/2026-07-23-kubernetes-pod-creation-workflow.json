@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "slug": "2026-07-23-kubernetes-pod-creation-workflow",
+  "source_hash": "sha256:bf835c681ce62254c765047061b84c51a1eee1211c503756400204989bb0d788",
+  "provider": "google",
+  "model": "gemini-3.6-flash",
+  "generated_at": "2026-07-29T23:35:44.008Z",
+  "status": "approved",
+  "general": "作者基于一次K8s Toolchain挂载故障，梳理了Pod从创建到Ready的完整状态收敛过程。文章指出Kubernetes的核心是声明式控制循环（Control Loop），通过API Server与List/Watch机制驱动组件异步执行Reconcile，推动实际状态向期望状态靠拢，并总结了相关故障排查路径与平台化沉淀经验。",
+  "bullets": [
+    "阐述了Kubernetes的核心运行模型是基于状态收敛的控制循环（Control Loop），组件间通过API Server和List/Watch机制协作。",
+    "梳理了Pod从API Server接收请求、Scheduler调度、kubelet接管，到通过CRI/CNI/CSI创建容器与挂载存储的全过程。",
+    "结合Toolchain挂载故障，说明存储配置正确不代表文件系统行为正确，还需要关注Linux内核级挂载参数与CSI卸载/挂载流程对缓存的影响。",
+    "提出了排查Pod Pending、ContainerCreating、Ready=False等常见故障的分类路径，并倡导将排障经验沉淀为平台自动化能力。"
+  ],
+  "explainer": "这篇文章把Kubernetes的工作原理比作一个“自动纠偏系统”。用户不需要给各个组件下达一步步的具体命令，只需提交Pod的“期望状态”（如想要运行什么容器、挂载什么目录）。Kubernetes内的各个组件会持续观察系统的“实际状态”，一旦发现实际与期望不一致，就会自动执行调整动作，逐步让实际状态向期望状态靠拢。文章结合实际排查存储挂载问题的经历，详细介绍了从提交配置、选择节点、启动容器、挂载底层文件系统到最终让Pod准备好接收流量的全过程。"
+}

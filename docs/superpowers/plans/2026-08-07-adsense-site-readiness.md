@@ -4,20 +4,26 @@
 
 **Goal:** Make the AdSense-reviewed root domain consistently crawlable, canonical, indexable, and ready for Search Console submission without rewriting existing articles.
 
-**Architecture:** Hexo owns the canonical origin and generates discovery files during every build. Source and rendered tests lock the apex-domain contract, while GitHub Pages owns TLS and the www-to-apex redirect. A separate read-only audit script summarizes editorial readiness without mutating posts.
+**Architecture:** Hexo owns the canonical `www` origin and generates discovery files during every build. The existing site-identity module owns canonical metadata, while GitHub Pages owns TLS and the apex-to-www redirect. A separate read-only audit script summarizes editorial readiness without mutating posts.
 
 **Tech Stack:** Hexo 6, `hexo-generator-sitemap` 3.0.1, Node.js built-in test runner, GitHub Pages, DNSPod, Google Search Console.
 
 ## Global Constraints
 
-- Canonical origin: `https://zhililab.cn`.
-- Pages `CNAME`: exactly one line, `zhililab.cn`.
-- Keep `www.zhililab.cn` as an alias; do not delete its DNS CNAME.
+- Canonical origin: `https://www.zhililab.cn`.
+- Pages `CNAME`: exactly one line, `www.zhililab.cn`.
+- Keep `zhililab.cn` as the apex alias; do not delete its GitHub Pages A records.
 - Publish `robots.txt` and `sitemap.xml` at the site root.
 - Do not rewrite, delete, unpublish, or add `noindex` to existing posts.
 - Do not resubmit AdSense during this implementation.
 - Do not modify Waline behavior, advertisements, reading layout, images, or pet logic.
 - Exclude the pre-existing `HelloWorld_Cover.jpg` and `.playwright-cli/` changes.
+
+> **Integration amendment (2026-08-07):** `origin/dev-optimize` added a newer
+> site-identity architecture while this plan was in progress. It intentionally
+> establishes `www.zhililab.cn` as canonical. That architecture supersedes the
+> earlier apex-canonical snippets below: keep `www` in Hexo and `CNAME`, reuse
+> `scripts/blog-site-identity.js`, and make the apex host a strict-HTTPS redirect.
 
 ---
 
@@ -49,9 +55,9 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
-test('source declares the apex domain as the canonical origin', () => {
+test('source preserves the established www canonical origin', () => {
   assert.match(read('_config.yml'), /^url: https:\/\/zhililab\.cn$/m);
-  assert.equal(read('source/CNAME').trim(), 'zhililab.cn');
+  assert.equal(read('source/CNAME').trim(), 'www.zhililab.cn');
   assert.match(
     read('source/privacy/index.md'),
     /\[zhililab\.cn\]\(https:\/\/zhililab\.cn\/\)/
@@ -146,7 +152,7 @@ url: https://github.com/zhililab
 with:
 
 ```yaml
-url: https://zhililab.cn
+url: https://www.zhililab.cn
 ```
 
 - [ ] **Step 2: Change the Pages CNAME source**
@@ -165,7 +171,7 @@ Create `source/robots.txt`:
 User-agent: *
 Allow: /
 
-Sitemap: https://zhililab.cn/sitemap.xml
+Sitemap: https://www.zhililab.cn/sitemap.xml
 ```
 
 - [ ] **Step 4: Align public site identity references**
@@ -173,13 +179,13 @@ Sitemap: https://zhililab.cn/sitemap.xml
 Change the privacy-policy site link to:
 
 ```markdown
-[zhililab.cn](https://zhililab.cn/)
+[zhililab.cn](https://www.zhililab.cn/)
 ```
 
 Change Waline `SITE_URL` to:
 
 ```yaml
-SITE_URL: https://zhililab.cn
+SITE_URL: https://www.zhililab.cn
 ```
 
 Keep `SECURE_DOMAINS` unchanged so both apex and www remain accepted.
@@ -256,7 +262,7 @@ node --test --test-name-pattern="canonical domain|crawler discovery" test/blog-r
 npm test
 ```
 
-Expected: all tests pass and Sitemap URLs use only `https://zhililab.cn`.
+Expected: all tests pass and Sitemap URLs use only `https://www.zhililab.cn`.
 
 - [ ] **Step 5: Commit Sitemap generation**
 
@@ -370,10 +376,10 @@ Run:
 
 ```bash
 rg -n "canonical|og:url|sitemap" public/index.html public/robots.txt
-rg -n "<loc>https://zhililab.cn" public/sitemap.xml
+rg -n "<loc>https://www.zhililab.cn" public/sitemap.xml
 ```
 
-Expected: canonical origin is the apex domain; no generated page URL uses the
+Expected: canonical origin is the `www` domain; no generated page URL uses the
 old GitHub or www origins.
 
 - [ ] **Step 3: Preserve unrelated generated assets**
@@ -407,10 +413,10 @@ Do not enable "Enforce HTTPS" until GitHub reports the new certificate ready.
 Require:
 
 ```text
-https://zhililab.cn/                         strict TLS, HTTP 200
-https://www.zhililab.cn/                     strict TLS, redirect to apex
-https://zhililab.cn/robots.txt               HTTP 200, text/plain
-https://zhililab.cn/sitemap.xml              HTTP 200, XML
+https://www.zhililab.cn/                     strict TLS, HTTP 200
+https://zhililab.cn/                         strict TLS, redirect to www
+https://www.zhililab.cn/robots.txt               HTTP 200, text/plain
+https://www.zhililab.cn/sitemap.xml              HTTP 200, XML
 representative recent article routes         HTTP 200
 ```
 
@@ -436,7 +442,7 @@ adding a new DNS token and report the exact record Google requests.
 Submit:
 
 ```text
-https://zhililab.cn/sitemap.xml
+https://www.zhililab.cn/sitemap.xml
 ```
 
 Record whether Search Console reports Success, processing, or a concrete error.

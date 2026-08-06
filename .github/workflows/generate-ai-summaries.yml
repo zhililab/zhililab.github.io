@@ -1,0 +1,64 @@
+name: Generate draft AI summaries
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev-optimize
+    paths:
+      - 'source/_posts/**'
+      - '.gitmodules'
+      - '.github/workflows/generate-ai-summaries.yml'
+      - 'tools/generate-ai-summary.js'
+      - 'scripts/lib/ai-summary*.js'
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Generate draft AI summaries
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+        run: npm run summary:generate -- --scan
+      - name: Upload draft summaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-summary-drafts
+          path: source/_data/ai-summaries
+          if-no-files-found: error
+
+  commit:
+    needs: generate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download draft summaries
+        uses: actions/download-artifact@v4
+        with:
+          name: ai-summary-drafts
+          path: source/_data/ai-summaries
+      - name: Commit generated draft summaries
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add source/_data/ai-summaries
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'chore: generate draft AI summaries [skip ci]'
+          git push
