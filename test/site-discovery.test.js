@@ -33,3 +33,34 @@ test('source publishes crawler discovery files', () => {
   );
   assert.equal(pkg.dependencies['hexo-generator-sitemap'], '3.0.1');
 });
+
+test('canonical helper normalizes generated HTML routes', () => {
+  const helperPath = path.join(root, 'scripts/blog-site-discovery.js');
+  assert.ok(fs.existsSync(helperPath), 'canonical helper must exist');
+  const { buildCanonicalUrl, injectCanonicalLink } = require(helperPath);
+
+  assert.equal(
+    buildCanonicalUrl('https://zhililab.cn/', { path: 'index.html' }),
+    'https://zhililab.cn/'
+  );
+  assert.equal(
+    buildCanonicalUrl('https://zhililab.cn', {
+      path: '2026/07/29/example/index.html'
+    }),
+    'https://zhililab.cn/2026/07/29/example/'
+  );
+
+  const output = injectCanonicalLink(
+    '<head><meta property="og:url" content="https://old.example/index.html"></head>',
+    { path: 'index.html' },
+    'https://zhililab.cn'
+  );
+  assert.match(
+    output,
+    /<link rel="canonical" href="https:\/\/zhililab\.cn\/">/
+  );
+  assert.match(
+    output,
+    /<meta property="og:url" content="https:\/\/zhililab\.cn\/">/
+  );
+});
