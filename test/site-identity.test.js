@@ -12,7 +12,7 @@ function read(relativePath) {
 test('public site configuration uses the production identity', () => {
   const config = read('_config.yml');
 
-  assert.match(config, /^url:\s+https:\/\/www\.zhililab\.cn\s*$/m);
+  assert.match(config, /^url:\s+https:\/\/zhililab\.cn\s*$/m);
   assert.match(config, /^author:\s+Walker\s*$/m);
   assert.doesNotMatch(config, /clientSecret\s*:/i);
   assert.doesNotMatch(config, /password_hash\s*:/i);
@@ -34,7 +34,7 @@ function identityOptions() {
     author: 'Walker',
     defaultImage: '/assets/images/cover/header_cover.jpg',
     description: 'Walker 的个人博客',
-    siteUrl: 'https://www.zhililab.cn'
+    siteUrl: 'https://zhililab.cn'
   };
 }
 
@@ -54,13 +54,13 @@ test('homepage receives one canonical URL and Person structured data', () => {
   const schema = extractStructuredData(output);
 
   assert.equal((output.match(/rel="canonical"/g) || []).length, 1);
-  assert.match(output, /href="https:\/\/www\.zhililab\.cn\/"/);
+  assert.match(output, /href="https:\/\/zhililab\.cn\/"/);
   assert.equal(schema['@type'], 'Person');
   assert.equal(schema.name, 'Walker');
-  assert.equal(schema.url, 'https://www.zhililab.cn/');
+  assert.equal(schema.url, 'https://zhililab.cn/');
   assert.equal(
     schema.image,
-    'https://www.zhililab.cn/assets/images/cover/header_cover.jpg'
+    'https://zhililab.cn/assets/images/cover/header_cover.jpg'
   );
   assert.equal(enhanceSiteHtml(output, data, identityOptions()), output);
 });
@@ -84,7 +84,7 @@ test('post receives canonical BlogPosting data with HTML-safe JSON', () => {
 
   assert.match(
     output,
-    /href="https:\/\/www\.zhililab\.cn\/2026\/08\/01\/engineering-review\/"/
+    /href="https:\/\/zhililab\.cn\/2026\/08\/01\/engineering-review\/"/
   );
   assert.equal(schema['@type'], 'BlogPosting');
   assert.equal(schema.headline, '工程复盘');
@@ -94,7 +94,7 @@ test('post receives canonical BlogPosting data with HTML-safe JSON', () => {
   assert.doesNotMatch(schema.description, /<[^>]+>|alert\(1\)/);
   assert.equal(
     schema.image,
-    'https://www.zhililab.cn/assets/images/cover/post.jpg'
+    'https://zhililab.cn/assets/images/cover/post.jpg'
   );
   assert.equal(schema.datePublished, '2026-08-01T12:00:00.000Z');
   assert.equal(schema.dateModified, '2026-08-02T12:00:00.000Z');
@@ -220,7 +220,7 @@ test('generated homepage renders the Reading Desk identity and Person schema', (
   const html = readPublic('index.html');
 
   assert.match(html, /<title>Walker \| ZHILILAB<\/title>/);
-  assert.match(html, /href="https:\/\/www\.zhililab\.cn\/" data-site-identity/);
+  assert.match(html, /href="https:\/\/zhililab\.cn\/" data-site-identity/);
   assert.match(html, /"@type":"Person"/);
   assert.match(html, /class="walker-intro"/);
   assert.match(html, /把实践写成可复用的系统/);
@@ -237,7 +237,7 @@ test('generated post renders canonical BlogPosting metadata', () => {
 
   assert.match(
     html,
-    /href="https:\/\/www\.zhililab\.cn\/2026\/07\/31\/2026-07-31-weekly-ai-engineering-radar\/"/
+    /href="https:\/\/zhililab\.cn\/2026\/07\/31\/2026-07-31-weekly-ai-engineering-radar\/"/
   );
   assert.match(html, /"@type":"BlogPosting"/);
   assert.match(html, /"name":"Walker"/);
@@ -263,7 +263,7 @@ test('generated personal pages contain their current route content', () => {
 
   assert.match(about, /关于 Walker/);
   assert.match(about, /内容即代码/);
-  assert.match(about, /href="https:\/\/www\.zhililab\.cn\/about\/"/);
+  assert.match(about, /href="https:\/\/zhililab\.cn\/about\/"/);
   assert.match(notes, /Field Notes \| 随记/);
   assert.match(notes, /历史摘录（2018）/);
   assert.match(projects, /class="builder-projects"/);

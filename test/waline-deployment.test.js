@@ -16,7 +16,7 @@ test('Waline stays internal and persists SQLite data', () => {
 
   assert.match(compose, /lizheming\/waline:1\.41\.3/);
   assert.match(compose, /SQLITE_PATH:\s*\/app\/data/);
-  assert.match(compose, /SITE_URL:\s*https:\/\/www\.zhililab\.cn/);
+  assert.match(compose, /SITE_URL:\s*https:\/\/zhililab\.cn/);
   assert.match(compose, /\.\/data:\/app\/data/);
   assert.doesNotMatch(compose, /8360:8360/);
 });
