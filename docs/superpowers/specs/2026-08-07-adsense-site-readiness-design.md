@@ -10,9 +10,10 @@ AdSense review.
 ## Current Evidence
 
 - AdSense recognizes `ads.txt`; authorization is not the blocker.
-- `https://zhililab.cn/` currently fails strict TLS hostname validation.
-- `https://zhililab.cn/robots.txt` returns HTTP 404.
-- `https://zhililab.cn/sitemap.xml` returns HTTP 404.
+- The temporary apex-domain switch caused a certificate mismatch while GitHub
+  Pages was requesting a new certificate.
+- `https://www.zhililab.cn/robots.txt` returns HTTP 404.
+- `https://www.zhililab.cn/sitemap.xml` returns HTTP 404.
 - Hexo declares `url: https://github.com/zhililab`, so canonical and social
   metadata can point at the wrong origin.
 - `_config.yml` contains Sitemap settings, but the project does not install a
@@ -23,11 +24,11 @@ AdSense review.
 
 ### Included
 
-1. Make `https://zhililab.cn` the single canonical origin because AdSense
-   reviews the registrable root domain.
-2. Keep `www.zhililab.cn` as a strict-HTTPS alias that redirects to the
-   canonical apex origin.
-3. Align Hexo URL and Pages `CNAME` with the canonical apex origin.
+1. Keep `https://www.zhililab.cn` as the single canonical origin, per the final
+   owner decision.
+2. Keep the apex host as a secondary DNS alias; it is not the public URL shown
+   to readers.
+3. Align Hexo URL and Pages `CNAME` with the canonical `www` origin.
 4. Generate a valid XML Sitemap during every Hexo build.
 5. Publish a permissive `robots.txt` that references the canonical Sitemap.
 6. Add source and rendered-output regression tests.
@@ -50,14 +51,14 @@ AdSense review.
 
 ### Canonical Domain
 
-The source `CNAME` becomes `zhililab.cn` and Hexo `url` becomes
-`https://zhililab.cn`. DNS keeps the four GitHub Pages apex A records and the
-existing `www` CNAME. GitHub Pages is configured with `zhililab.cn` as its
-custom domain so it can provision the correct certificate and redirect `www`
-to the apex domain.
+The source `CNAME` remains `www.zhililab.cn` and Hexo `url` remains
+`https://www.zhililab.cn`. DNS keeps the four GitHub Pages apex A records and the
+existing `www` CNAME. GitHub Pages is configured with `www.zhililab.cn` as its
+custom domain so the established `www` certificate and public address remain
+stable.
 
 All generated canonical, Open Graph, Twitter, feed, Sitemap, and internal
-absolute URLs must use `https://zhililab.cn`.
+absolute URLs must use `https://www.zhililab.cn`.
 
 ### Discovery Files
 
@@ -68,7 +69,7 @@ Install a pinned `hexo-generator-sitemap` dependency. Keep the existing
 User-agent: *
 Allow: /
 
-Sitemap: https://zhililab.cn/sitemap.xml
+Sitemap: https://www.zhililab.cn/sitemap.xml
 ```
 
 Both files must be present in `public/` after a clean build and return HTTP 200
@@ -79,7 +80,7 @@ with appropriate text/XML content types in production.
 After canonical DNS/TLS has stabilized:
 
 1. Verify or select the `zhililab.cn` domain property.
-2. Submit `https://zhililab.cn/sitemap.xml`.
+2. Submit `https://www.zhililab.cn/sitemap.xml`.
 3. Request indexing only for the homepage and representative recent articles:
    Kubernetes Pod creation, Agentic DevOps, DevOps Agent Control Plane, and the
    AdSense reflection.
@@ -100,8 +101,8 @@ separate approval.
 
 Source-level tests require:
 
-- one-line `source/CNAME` equal to `zhililab.cn`;
-- `_config.yml` canonical URL equal to `https://zhililab.cn`;
+- one-line `source/CNAME` equal to `www.zhililab.cn`;
+- `_config.yml` canonical URL equal to `https://www.zhililab.cn`;
 - pinned Sitemap dependency;
 - `source/robots.txt` with the canonical Sitemap URL.
 
@@ -119,25 +120,24 @@ Rendered tests require:
 3. Run the complete test suite.
 4. Push the exact source commit to `dev-optimize`.
 5. Deploy the exact generated site to Pages `master`.
-6. Change the Pages custom domain to `zhililab.cn` and wait for its certificate.
+6. Keep the Pages custom domain at `www.zhililab.cn` and enable HTTPS once its
+   certificate reports approved.
 7. Wait for Pages/DNS/TLS propagation without repeated deploys.
 8. Require strict HTTPS success for apex and www, the intended redirect,
    robots, Sitemap, homepage, and representative articles.
 
 ## Rollback
 
-The source and Pages commits are independently revertible. If the apex
-certificate cannot be issued, restore the previous Pages custom domain and
-`CNAME`, while leaving Sitemap/robots generation available under the working
-origin. No DNS records are deleted without separately resolving the exact
-target and confirming the action remains necessary.
+The source and Pages commits are independently revertible. Keep the established
+`www` Pages custom domain and `CNAME`; Sitemap/robots generation remains
+available under that origin. No DNS records are deleted without separately
+resolving the exact target and confirming the action remains necessary.
 
 ## Acceptance Criteria
 
-- Apex and www both pass strict TLS validation.
-- One hostname is canonical and the other redirects to it.
+- `www` passes strict TLS validation and remains canonical.
 - `robots.txt` and `sitemap.xml` return HTTP 200.
-- Sitemap entries and canonical metadata use `https://zhililab.cn`.
+- Sitemap entries and canonical metadata use `https://www.zhililab.cn`.
 - Complete automated tests and Hexo build pass.
 - Existing article content and unrelated user changes remain untouched.
 - Search Console readiness is verified; AdSense review is not prematurely

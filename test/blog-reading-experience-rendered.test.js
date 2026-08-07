@@ -207,7 +207,7 @@ test('generated Pages CNAME contains one canonical domain', () => {
     .map((domain) => domain.trim())
     .filter(Boolean);
 
-  assert.deepEqual(domains, ['zhililab.cn']);
+  assert.deepEqual(domains, ['www.zhililab.cn']);
 });
 
 test('generated site exposes canonical crawler discovery files', () => {
@@ -217,11 +217,11 @@ test('generated site exposes canonical crawler discovery files', () => {
   const robots = read(path.join(publicRoot, 'robots.txt'));
   const sitemap = read(path.join(publicRoot, 'sitemap.xml'));
 
-  assert.match(home, /<link rel="canonical" href="https:\/\/zhililab\.cn\/"/);
-  assert.match(robots, /Sitemap: https:\/\/zhililab\.cn\/sitemap\.xml/);
-  assert.match(sitemap, /<loc>https:\/\/zhililab\.cn\//);
+  assert.match(home, /<link rel="canonical" href="https:\/\/www\.zhililab\.cn\/"/);
+  assert.match(robots, /Sitemap: https:\/\/www\.zhililab\.cn\/sitemap\.xml/);
+  assert.match(sitemap, /<loc>https:\/\/www\.zhililab\.cn\//);
   assert.doesNotMatch(sitemap, /https:\/\/github\.com\/zhililab/);
-  assert.doesNotMatch(sitemap, /https:\/\/www\.zhililab\.cn/);
+  assert.doesNotMatch(sitemap, /<loc>https:\/\/zhililab\.cn\//);
 });
 
 test('generated site exposes the privacy policy from every footer', () => {
@@ -238,7 +238,7 @@ test('generated site exposes the privacy policy from every footer', () => {
   assert.match(privacy, /Waline/);
   assert.match(
     privacy,
-    /href="https:\/\/zhililab\.cn\/">zhililab\.cn<\/a>/
+    /href="https:\/\/www\.zhililab\.cn\/">www\.zhililab\.cn<\/a>/
   );
   assert.doesNotMatch(privacy, /id="waline"/);
 });

@@ -24,6 +24,11 @@
 > than adding a second canonical injector; it reads the canonical origin from
 > Hexo configuration, so the confirmed apex-domain contract remains unchanged.
 
+> **Final owner decision:** Keep `www.zhililab.cn` as the public canonical host.
+> The final implementation, tests, Pages `CNAME`, Sitemap, privacy URL, and
+> Waline site URL use `https://www.zhililab.cn`; this supersedes the earlier
+> apex-domain steps below.
+
 ---
 
 ### Task 1: Lock the canonical and discovery contract
