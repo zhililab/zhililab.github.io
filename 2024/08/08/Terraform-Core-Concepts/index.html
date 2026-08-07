@@ -19,11 +19,11 @@
     <meta name="description" content="在现代 DevOps 和云计算的背景下，基础设施即代码（Infrastructure as Code, IaC）已经成为管理和部署基础设施的标准方式。Terraform 作为一种广受欢迎的 IaC 工具，因其多云支持和灵活性受到了广泛的青睐，更有很多 DevOps 岗位招聘的 JD 更是明确要求了解&#x2F;熟悉 Terraform。本文将会梳理 Terraform 的基本概念，通过学习、实践掌">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Terraform —— 核心概念">
-<meta property="og:url" content="https://zhililab.cn/2024/08/08/Terraform-Core-Concepts/index.html">
+<meta property="og:url" content="https://www.zhililab.cn/2024/08/08/Terraform-Core-Concepts/index.html">
 <meta property="og:site_name" content="Walker | ZHILILAB">
 <meta property="og:description" content="在现代 DevOps 和云计算的背景下，基础设施即代码（Infrastructure as Code, IaC）已经成为管理和部署基础设施的标准方式。Terraform 作为一种广受欢迎的 IaC 工具，因其多云支持和灵活性受到了广泛的青睐，更有很多 DevOps 岗位招聘的 JD 更是明确要求了解&#x2F;熟悉 Terraform。本文将会梳理 Terraform 的基本概念，通过学习、实践掌">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://zhililab.cn/assets/images/cover/Terraform_Cover.png">
+<meta property="og:image" content="https://www.zhililab.cn/assets/images/cover/Terraform_Cover.png">
 <meta property="article:published_time" content="2024-08-08T12:30:00.000Z">
 <meta property="article:modified_time" content="2026-07-29T00:12:50.481Z">
 <meta property="article:author" content="Walker">
@@ -31,7 +31,7 @@
 <meta property="article:tag" content="Terraform">
 <meta property="article:tag" content="IaC">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://zhililab.cn/assets/images/cover/Terraform_Cover.png">
+<meta name="twitter:image" content="https://www.zhililab.cn/assets/images/cover/Terraform_Cover.png">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -75,7 +75,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"zhililab.cn","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"www.zhililab.cn","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -103,9 +103,9 @@
 
 
   
-<meta name="generator" content="Hexo 6.3.0">  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
-<link rel="canonical" href="https://zhililab.cn/2024/08/08/Terraform-Core-Concepts/" data-site-identity>
-<script type="application/ld+json" data-site-identity>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Terraform —— 核心概念","description":"Walker 的个人博客，记录 DevOps 实践、AI 原生工作流、内容自动化与工程复盘。","image":"https://zhililab.cn/assets/images/cover/header_cover.jpg","datePublished":"2024-08-08T12:30:00.000Z","dateModified":"2026-07-29T00:12:50.481Z","author":{"@type":"Person","name":"Walker","url":"https://zhililab.cn/"},"mainEntityOfPage":"https://zhililab.cn/2024/08/08/Terraform-Core-Concepts/"}</script>
+<meta name="generator" content="Hexo 6.3.0"><link rel="canonical" href="https://www.zhililab.cn/2024/08/08/Terraform-Core-Concepts/" data-site-identity>
+<script type="application/ld+json" data-site-identity>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Terraform —— 核心概念","description":"Walker 的个人博客，记录 DevOps 实践、AI 原生工作流、内容自动化与工程复盘。","image":"https://www.zhililab.cn/assets/images/cover/header_cover.jpg","datePublished":"2024-08-08T12:30:00.000Z","dateModified":"2026-07-29T00:12:50.481Z","author":{"@type":"Person","name":"Walker","url":"https://www.zhililab.cn/"},"mainEntityOfPage":"https://www.zhililab.cn/2024/08/08/Terraform-Core-Concepts/"}</script>
+  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
 </head>
 
 
@@ -407,7 +407,7 @@
 <p>5.其他</p>
 <p>在 local 进行部署测试中，可以发现 <code>terraform apply</code> 后，自动化生成了 <code>terraform.tfstate</code>，它是 Terraform 用于管理和存储状态的文件，记录了 Terraform 管理的基础设施的当前状态。</p>
 <p>  <img src="https://imgos.cn/2024/08/09/66b4f10a4dd7e.png" alt="terraform.tfstate" loading="lazy" decoding="async"></p>
-<h4 id="示例-2-复合配置"><a href="#示例-2-复合配置" class="headerlink" title="示例 2 复合配置"></a>示例 2 复合配置</h4><p>下面一个例子定义一个 aws 使用云环境 —— Autoware是一个基于ROS的开源软件项目，专为自动驾驶车辆设计，涵盖了感知、定位、规划、控制等所有功能模块，并支持多种车辆类型和应用场景（感兴趣的朋友可以阅读我之前写的一篇文章 ——  <a target="_blank" rel="noopener" href="http://www.zhililab.cn/2024/08/07/AutoWare-Intro/">AutoWare 初探</a>）。这里为了配置文件将自动部署一个集成了高性能计算和存储资源的Kubernetes集群，并支持Autoware的核心模块。</p>
+<h4 id="示例-2-复合配置"><a href="#示例-2-复合配置" class="headerlink" title="示例 2 复合配置"></a>示例 2 复合配置</h4><p>下面一个例子定义一个 aws 使用云环境 —— Autoware是一个基于ROS的开源软件项目，专为自动驾驶车辆设计，涵盖了感知、定位、规划、控制等所有功能模块，并支持多种车辆类型和应用场景（感兴趣的朋友可以阅读我之前写的一篇文章 ——  <a href="http://www.zhililab.cn/2024/08/07/AutoWare-Intro/">AutoWare 初探</a>）。这里为了配置文件将自动部署一个集成了高性能计算和存储资源的Kubernetes集群，并支持Autoware的核心模块。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><code class="hljs hcl">provider &quot;aws&quot; &#123;<br>  region = &quot;us-west-2&quot;<br>&#125;<br><br>resource &quot;aws_vpc&quot; &quot;autoware_vpc&quot; &#123;<br>  cidr_block = &quot;10.0.0.0/16&quot;<br>&#125;<br><br>resource &quot;aws_subnet&quot; &quot;autoware_subnet&quot; &#123;<br>  vpc_id     = aws_vpc.autoware_vpc.id<br>  cidr_block = &quot;10.0.1.0/24&quot;<br>&#125;<br><br>resource &quot;aws_eks_cluster&quot; &quot;autoware_cluster&quot; &#123;<br>  name     = &quot;autoware-cluster&quot;<br>  role_arn = aws_iam_role.eks_role.arn<br><br>  vpc_config &#123;<br>    subnet_ids = [aws_subnet.autoware_subnet.id]<br>  &#125;<br><br>  # 设置Kubernetes版本和节点组<br>  version    = &quot;1.23&quot;<br>  node_group &#123;<br>    instance_type = &quot;m5.large&quot;<br>    desired_size  = 3<br>  &#125;<br>&#125;<br><br>resource &quot;aws_efs_file_system&quot; &quot;autoware_storage&quot; &#123;<br>  encrypted = true<br>&#125;<br><br>resource &quot;aws_efs_mount_target&quot; &quot;autoware_efs_mount&quot; &#123;<br>  file_system_id = aws_efs_file_system.autoware_storage.id<br>  subnet_id      = aws_subnet.autoware_subnet.id<br>&#125;<br><br># Autoware核心模块的配置<br>module &quot;autoware_core&quot; &#123;<br>  source = &quot;git::https://github.com/autowarefoundation/autoware&quot;<br>  <br>  eks_cluster_name = aws_eks_cluster.autoware_cluster.name<br>  efs_file_system_id = aws_efs_file_system.autoware_storage.id<br>&#125;<br><br># 输出集群信息<br>output &quot;cluster_endpoint&quot; &#123;<br>  value = aws_eks_cluster.autoware_cluster.endpoint<br>&#125;<br><br>output &quot;efs_dns_name&quot; &#123;<br>  value = aws_efs_file_system.autoware_storage.dns_name<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <blockquote>
@@ -471,7 +471,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>Terraform —— 核心概念</div>
-      <div>https://zhililab.cn/2024/08/08/Terraform-Core-Concepts/</div>
+      <div>https://www.zhililab.cn/2024/08/08/Terraform-Core-Concepts/</div>
     </div>
     <div class="license-meta">
       
@@ -525,7 +525,7 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/08/07/Learing-Golang-001/" title="Go 语言学习 —— strings 细说">
+                      <a href="/2024/08/07/Learning-Golang-001/" title="Go 语言学习 —— strings 细说">
                         <span class="hidden-mobile">Go 语言学习 —— strings 细说</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>

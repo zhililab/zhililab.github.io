@@ -19,11 +19,11 @@
     <meta name="description" content="本周值得关注的不是“哪个模型又刷榜”，而是三个更稳定的工程信号：  Agent 的价值正在从“多写代码”转向“迁移、验证与维护复杂工程”。 正确运行只是下限，性能、成本、安全和长期可维护性必须进入验收标准。 RAG 与 Agent 都开始回归朴素工程：可靠检索、可信来源、可观测轨迹、外部验证器。  如果把这些信号放进 EDA、HPC、Central Build 和企业知识平台，会发现它们指向同一件">
 <meta property="og:type" content="article">
 <meta property="og:title" content="本周 AI 工程雷达：Agent 进入复杂迁移，RAG 回归朴素工程">
-<meta property="og:url" content="https://zhililab.cn/2026/07/31/2026-07-31-weekly-ai-engineering-radar/index.html">
+<meta property="og:url" content="https://www.zhililab.cn/2026/07/31/2026-07-31-weekly-ai-engineering-radar/index.html">
 <meta property="og:site_name" content="Walker | ZHILILAB">
 <meta property="og:description" content="本周值得关注的不是“哪个模型又刷榜”，而是三个更稳定的工程信号：  Agent 的价值正在从“多写代码”转向“迁移、验证与维护复杂工程”。 正确运行只是下限，性能、成本、安全和长期可维护性必须进入验收标准。 RAG 与 Agent 都开始回归朴素工程：可靠检索、可信来源、可观测轨迹、外部验证器。  如果把这些信号放进 EDA、HPC、Central Build 和企业知识平台，会发现它们指向同一件">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://zhililab.cn/assets/images/cover/weekly-ai-engineering-radar.svg">
+<meta property="og:image" content="https://www.zhililab.cn/assets/images/cover/weekly-ai-engineering-radar.svg">
 <meta property="article:published_time" content="2026-07-31T04:00:00.000Z">
 <meta property="article:modified_time" content="2026-08-06T23:23:48.690Z">
 <meta property="article:author" content="Walker">
@@ -31,7 +31,7 @@
 <meta property="article:tag" content="Reports">
 <meta property="article:tag" content="TechRadar">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://zhililab.cn/assets/images/cover/weekly-ai-engineering-radar.svg">
+<meta name="twitter:image" content="https://www.zhililab.cn/assets/images/cover/weekly-ai-engineering-radar.svg">
   
   
     <meta name="referrer" content="no-referrer-when-downgrade">
@@ -75,7 +75,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"zhililab.cn","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+    var CONFIG = {"hostname":"www.zhililab.cn","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -103,9 +103,9 @@
 
 
   
-<meta name="generator" content="Hexo 6.3.0">  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
-<link rel="canonical" href="https://zhililab.cn/2026/07/31/2026-07-31-weekly-ai-engineering-radar/" data-site-identity>
-<script type="application/ld+json" data-site-identity>{"@context":"https://schema.org","@type":"BlogPosting","headline":"本周 AI 工程雷达：Agent 进入复杂迁移，RAG 回归朴素工程","description":"本周值得关注的不是“哪个模型又刷榜”，而是三个更稳定的工程信号： Agent 的价值正在从“多写代码”转向“迁移、验证与维护复杂工程”。 正确运行只是下限，性能、成本、安全和长期可维护性必须进入验收标准。 RAG 与 Agent 都开始回归朴素工程：可靠检索、可信来源、可观测轨迹、外部验证器。 如果把这些信号放进 EDA、HPC、Central Build 和企业知识平台，会发现它们指向同一件事…","image":"https://zhililab.cn/assets/images/cover/header_cover.jpg","datePublished":"2026-07-31T04:00:00.000Z","dateModified":"2026-08-06T23:23:48.690Z","author":{"@type":"Person","name":"Walker","url":"https://zhililab.cn/"},"mainEntityOfPage":"https://zhililab.cn/2026/07/31/2026-07-31-weekly-ai-engineering-radar/"}</script>
+<meta name="generator" content="Hexo 6.3.0"><link rel="canonical" href="https://www.zhililab.cn/2026/07/31/2026-07-31-weekly-ai-engineering-radar/" data-site-identity>
+<script type="application/ld+json" data-site-identity>{"@context":"https://schema.org","@type":"BlogPosting","headline":"本周 AI 工程雷达：Agent 进入复杂迁移，RAG 回归朴素工程","description":"本周值得关注的不是“哪个模型又刷榜”，而是三个更稳定的工程信号： Agent 的价值正在从“多写代码”转向“迁移、验证与维护复杂工程”。 正确运行只是下限，性能、成本、安全和长期可维护性必须进入验收标准。 RAG 与 Agent 都开始回归朴素工程：可靠检索、可信来源、可观测轨迹、外部验证器。 如果把这些信号放进 EDA、HPC、Central Build 和企业知识平台，会发现它们指向同一件事…","image":"https://www.zhililab.cn/assets/images/cover/header_cover.jpg","datePublished":"2026-07-31T04:00:00.000Z","dateModified":"2026-08-06T23:23:48.690Z","author":{"@type":"Person","name":"Walker","url":"https://www.zhililab.cn/"},"mainEntityOfPage":"https://www.zhililab.cn/2026/07/31/2026-07-31-weekly-ai-engineering-radar/"}</script>
+  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
 </head>
 
 
@@ -527,7 +527,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>本周 AI 工程雷达：Agent 进入复杂迁移，RAG 回归朴素工程</div>
-      <div>https://zhililab.cn/2026/07/31/2026-07-31-weekly-ai-engineering-radar/</div>
+      <div>https://www.zhililab.cn/2026/07/31/2026-07-31-weekly-ai-engineering-radar/</div>
     </div>
     <div class="license-meta">
       
