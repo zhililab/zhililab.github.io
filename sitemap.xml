@@ -29,7 +29,7 @@
   </url>
   
   <url>
-    <loc>https://www.zhililab.cn/projects/index.html</loc>
+    <loc>https://www.zhililab.cn/privacy/index.html</loc>
     
     <lastmod>2026-09-23</lastmod>
     
@@ -38,7 +38,7 @@
   </url>
   
   <url>
-    <loc>https://www.zhililab.cn/privacy/index.html</loc>
+    <loc>https://www.zhililab.cn/projects/index.html</loc>
     
     <lastmod>2026-09-23</lastmod>
     
@@ -101,7 +101,7 @@
   </url>
   
   <url>
-    <loc>https://www.zhililab.cn/2024/08/08/Terraform-Core-Concepts/</loc>
+    <loc>https://www.zhililab.cn/2023/05/29/XMind-Copilot/</loc>
     
     <lastmod>2026-09-23</lastmod>
     
@@ -110,7 +110,7 @@
   </url>
   
   <url>
-    <loc>https://www.zhililab.cn/2023/05/29/XMind-Copilot/</loc>
+    <loc>https://www.zhililab.cn/2024/08/08/Terraform-Core-Concepts/</loc>
     
     <lastmod>2026-09-23</lastmod>
     
@@ -155,15 +155,6 @@
   </url>
   
   <url>
-    <loc>https://www.zhililab.cn/2017/10/24/MachineLearning-SupervisedLearning-SVM/</loc>
-    
-    <lastmod>2026-09-23</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://www.zhililab.cn/2017/11/04/Nanjing-BigData-Meetup-10-Review/</loc>
     
     <lastmod>2026-09-23</lastmod>
@@ -173,7 +164,7 @@
   </url>
   
   <url>
-    <loc>https://www.zhililab.cn/2018/04/18/OWASP-Top10-2017-Part2/</loc>
+    <loc>https://www.zhililab.cn/2017/10/24/MachineLearning-SupervisedLearning-SVM/</loc>
     
     <lastmod>2026-09-23</lastmod>
     
@@ -192,6 +183,15 @@
   
   <url>
     <loc>https://www.zhililab.cn/2018/04/15/RAS-2018/</loc>
+    
+    <lastmod>2026-09-23</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.zhililab.cn/2018/04/18/OWASP-Top10-2017-Part2/</loc>
     
     <lastmod>2026-09-23</lastmod>
     
@@ -245,15 +245,6 @@
   </url>
   
   <url>
-    <loc>https://www.zhililab.cn/2024/08/07/Learing-Golang-001/</loc>
-    
-    <lastmod>2026-09-23</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>https://www.zhililab.cn/2024/08/13/Learning-Docker-001/</loc>
     
     <lastmod>2026-09-23</lastmod>
@@ -263,7 +254,7 @@
   </url>
   
   <url>
-    <loc>https://www.zhililab.cn/2024/08/24/Learning-Docker-002/</loc>
+    <loc>https://www.zhililab.cn/2024/08/07/Learing-Golang-001/</loc>
     
     <lastmod>2026-09-23</lastmod>
     
@@ -273,6 +264,15 @@
   
   <url>
     <loc>https://www.zhililab.cn/2024/08/07/Learning-Golang-001/</loc>
+    
+    <lastmod>2026-09-23</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.zhililab.cn/2024/08/24/Learning-Docker-002/</loc>
     
     <lastmod>2026-09-23</lastmod>
     
@@ -529,20 +529,6 @@
   </url>
   
   <url>
-    <loc>https://www.zhililab.cn/tags/Conan/</loc>
-    <lastmod>2026-09-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.zhililab.cn/tags/CM/</loc>
-    <lastmod>2026-09-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://www.zhililab.cn/tags/%E5%A8%81%E8%83%81%E6%83%85%E6%8A%A5/</loc>
     <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -578,7 +564,28 @@
   </url>
   
   <url>
+    <loc>https://www.zhililab.cn/tags/Conan/</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.zhililab.cn/tags/CM/</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://www.zhililab.cn/tags/%E9%9A%8F%E7%AC%94/</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.zhililab.cn/tags/Docker/</loc>
     <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -593,13 +600,6 @@
   
   <url>
     <loc>https://www.zhililab.cn/tags/Programming/</loc>
-    <lastmod>2026-09-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.zhililab.cn/tags/Docker/</loc>
     <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -634,6 +634,20 @@
   </url>
   
   <url>
+    <loc>https://www.zhililab.cn/tags/Meetup/</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.zhililab.cn/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
     <loc>https://www.zhililab.cn/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/</loc>
     <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -649,20 +663,6 @@
   
   <url>
     <loc>https://www.zhililab.cn/tags/SVM/</loc>
-    <lastmod>2026-09-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.zhililab.cn/tags/Meetup/</loc>
-    <lastmod>2026-09-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.zhililab.cn/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE/</loc>
     <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -690,20 +690,6 @@
   </url>
   
   <url>
-    <loc>https://www.zhililab.cn/tags/%E8%AF%BB%E4%B9%A6/</loc>
-    <lastmod>2026-09-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.zhililab.cn/tags/Kindle/</loc>
-    <lastmod>2026-09-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://www.zhililab.cn/tags/%E8%BD%AC%E8%BD%BD/</loc>
     <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -719,6 +705,20 @@
   
   <url>
     <loc>https://www.zhililab.cn/tags/CISO/</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.zhililab.cn/tags/%E8%AF%BB%E4%B9%A6/</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.zhililab.cn/tags/Kindle/</loc>
     <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -746,20 +746,6 @@
   </url>
   
   <url>
-    <loc>https://www.zhililab.cn/tags/Terraform/</loc>
-    <lastmod>2026-09-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://www.zhililab.cn/tags/IaC/</loc>
-    <lastmod>2026-09-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://www.zhililab.cn/tags/XMind/</loc>
     <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -768,6 +754,20 @@
   
   <url>
     <loc>https://www.zhililab.cn/tags/ChatGPT/</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.zhililab.cn/tags/Terraform/</loc>
+    <lastmod>2026-09-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.zhililab.cn/tags/IaC/</loc>
     <lastmod>2026-09-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>

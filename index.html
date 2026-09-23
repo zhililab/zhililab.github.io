@@ -282,7 +282,13 @@
   <div class="row mx-auto index-card walker-featured">
     
     
-    <article class="col-12 col-md-12 mx-auto index-info">
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2026/09/23/2026-09-23-jenkins-execution-model-troubleshooting/" target="_self">
+          <img src="/assets/images/cover/jenkins-execution-model-troubleshooting.webp" srcset="/img/loading.gif" lazyload alt="一次 Jenkins 连接超时，让我重新理解了 Pipeline 的真实执行位置">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
       <h1 class="index-header">
         
         <a href="/2026/09/23/2026-09-23-jenkins-execution-model-troubleshooting/" target="_self">
@@ -291,7 +297,7 @@
       </h1>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/09/23/2026-09-23-jenkins-execution-model-troubleshooting/" target="_self">
+      <a class="index-excerpt " href="/2026/09/23/2026-09-23-jenkins-execution-model-troubleshooting/" target="_self">
         <div>
           一次 Jenkins 连接超时，让我重新理解了 Pipeline 的真实执行位置一、一个看似普通的连接超时最近排查 Jenkins Pipeline 时，我遇到了一次很典型的 HTTP 连接超时。 流水线中的一段 Shared Library 代码通过 OkHttp 请求内部代码服务，等待一段时间后抛出异常： 1java.net.SocketTimeoutException: Connect ti
         </div>
