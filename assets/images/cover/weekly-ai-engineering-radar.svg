@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">AI ENGINEERING RADAR</title>
+  <desc id="desc">A technical radar cover representing agents, retrieval, and verification.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset="0.52" stop-color="#0b1f35"/>
+      <stop offset="1" stop-color="#102a42"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.72" cy="0.5" r="0.52">
+      <stop offset="0" stop-color="#3ddbd9" stop-opacity="0.22"/>
+      <stop offset="0.52" stop-color="#2a83ff" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#07111f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#56e0d0"/>
+      <stop offset="1" stop-color="#5c8dff"/>
+    </linearGradient>
+    <filter id="node-glow" x="-200%" y="-200%" width="400%" height="400%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#b9d4f0" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#background)"/>
+  <rect width="1600" height="900" fill="url(#grid)"/>
+  <rect width="1600" height="900" fill="url(#glow)"/>
+
+  <g transform="translate(1180 450)" fill="none" stroke="#8bb7d9">
+    <circle r="96" stroke-opacity="0.2" stroke-width="2"/>
+    <circle r="190" stroke-opacity="0.16" stroke-width="2"/>
+    <circle r="286" stroke-opacity="0.13" stroke-width="2"/>
+    <circle r="382" stroke-opacity="0.1" stroke-width="2"/>
+    <path d="M-430 0H430M0-430V430M-304-304L304 304M-304 304L304-304" stroke-opacity="0.09" stroke-width="2"/>
+    <path d="M0 0L260-188" stroke="url(#accent)" stroke-width="4" stroke-linecap="round"/>
+    <path d="M0 0A286 286 0 0 1 277-70" stroke="#56e0d0" stroke-opacity="0.34" stroke-width="12" stroke-linecap="round"/>
+  </g>
+
+  <g fill="none" stroke="url(#accent)" stroke-width="3" stroke-opacity="0.7">
+    <path d="M1010 545L1112 366L1268 282L1396 468L1290 612L1114 662Z"/>
+    <path d="M1112 366L1290 612M1268 282L1114 662"/>
+  </g>
+
+  <g fill="#72e3d3" filter="url(#node-glow)">
+    <circle cx="1010" cy="545" r="8"/>
+    <circle cx="1112" cy="366" r="8"/>
+    <circle cx="1268" cy="282" r="8"/>
+    <circle cx="1396" cy="468" r="8"/>
+    <circle cx="1290" cy="612" r="8"/>
+    <circle cx="1114" cy="662" r="8"/>
+  </g>
+
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif">
+    <text x="120" y="174" fill="#79e6d6" font-size="28" font-weight="700" letter-spacing="7">WEEKLY REPORT · 2026.07.31</text>
+    <rect x="120" y="222" width="96" height="7" rx="3.5" fill="url(#accent)"/>
+    <text x="120" y="344" fill="#f2f7fb" font-size="84" font-weight="760" letter-spacing="1">AI ENGINEERING</text>
+    <text x="120" y="442" fill="#f2f7fb" font-size="96" font-weight="760" letter-spacing="2">RADAR</text>
+    <text x="126" y="526" fill="#a9c1d6" font-size="28" font-weight="500" letter-spacing="5">AGENTS · RETRIEVAL · VERIFICATION</text>
+    <line x1="126" y1="574" x2="820" y2="574" stroke="#8db4d3" stroke-opacity="0.26" stroke-width="2"/>
+    <text x="126" y="636" fill="#d4e1ec" font-size="24" font-weight="500">Complex migrations. Reliable evidence. Durable systems.</text>
+    <text x="126" y="766" fill="#6f91ad" font-size="20" letter-spacing="3">REPORTS / TECHRADAR / AI</text>
+  </g>
+</svg>

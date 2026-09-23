@@ -1,0 +1,878 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/assets/images/favicon/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Walker">
+  <meta name="keywords" content="DevOps, Kubernetes, AI Native, ContentOps, SRE">
+  
+    <meta name="description" content="一次 Jenkins 连接超时，让我重新理解了 Pipeline 的真实执行位置一、一个看似普通的连接超时最近排查 Jenkins Pipeline 时，我遇到了一次很典型的 HTTP 连接超时。 流水线中的一段 Shared Library 代码通过 OkHttp 请求内部代码服务，等待一段时间后抛出异常： 1java.net.SocketTimeoutException: Connect ti">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一次 Jenkins 连接超时，让我重新理解了 Pipeline 的真实执行位置">
+<meta property="og:url" content="https://www.zhililab.cn/2026/09/23/2026-09-23-jenkins-execution-model-troubleshooting/index.html">
+<meta property="og:site_name" content="Walker | ZHILILAB">
+<meta property="og:description" content="一次 Jenkins 连接超时，让我重新理解了 Pipeline 的真实执行位置一、一个看似普通的连接超时最近排查 Jenkins Pipeline 时，我遇到了一次很典型的 HTTP 连接超时。 流水线中的一段 Shared Library 代码通过 OkHttp 请求内部代码服务，等待一段时间后抛出异常： 1java.net.SocketTimeoutException: Connect ti">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-09-23T12:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-23T12:00:00.000Z">
+<meta property="article:author" content="Walker">
+<meta property="article:tag" content="DevOps">
+<meta property="article:tag" content="Jenkins">
+<meta property="article:tag" content="故障排查">
+<meta property="article:tag" content="系统思维">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>一次 Jenkins 连接超时，让我重新理解了 Pipeline 的真实执行位置 - Walker | ZHILILAB</title>
+
+  <link  rel="stylesheet" href="/vendor/blog/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="/vendor/blog/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="/vendor/blog/hint.min.css" />
+
+  <link  rel="stylesheet" href="/vendor/blog/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="/vendor/blog/fluid-icons.css">
+
+
+
+<link rel="stylesheet" href="/vendor/blog/site-icons.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"www.zhililab.cn","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":1},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0">  <link rel="stylesheet" href="/css/blog-reading-experience.css" data-blog-reading-experience>
+<link rel="canonical" href="https://www.zhililab.cn/2026/09/23/2026-09-23-jenkins-execution-model-troubleshooting/" data-site-identity>
+<script type="application/ld+json" data-site-identity>{"@context":"https://schema.org","@type":"BlogPosting","headline":"一次 Jenkins 连接超时，让我重新理解了 Pipeline 的真实执行位置","description":"Walker 的个人博客，记录 DevOps 实践、AI 原生工作流、内容自动化与工程复盘。","image":"https://www.zhililab.cn/assets/images/cover/header_cover.jpg","datePublished":"2026-09-23T12:00:00.000Z","dateModified":"2026-09-23T12:00:00.000Z","author":{"@type":"Person","name":"Walker","url":"https://www.zhililab.cn/"},"mainEntityOfPage":"https://www.zhililab.cn/2026/09/23/2026-09-23-jenkins-execution-model-troubleshooting/"}</script>
+</head>
+
+
+<body class="blog-post-enhanced">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Walker</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/projects/">
+                <i class="iconfont icon-code"></i>
+                <span>项目</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/notes/">
+                <i class="iconfont icon-book"></i>
+                <span>随记</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="一次 Jenkins 连接超时，让我重新理解了 Pipeline 的真实执行位置"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-09-23 20:00" pubdate>
+          2026年9月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          29 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">一次 Jenkins 连接超时，让我重新理解了 Pipeline 的真实执行位置</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="一次-Jenkins-连接超时，让我重新理解了-Pipeline-的真实执行位置"><a href="#一次-Jenkins-连接超时，让我重新理解了-Pipeline-的真实执行位置" class="headerlink" title="一次 Jenkins 连接超时，让我重新理解了 Pipeline 的真实执行位置"></a>一次 Jenkins 连接超时，让我重新理解了 Pipeline 的真实执行位置</h1><h2 id="一、一个看似普通的连接超时"><a href="#一、一个看似普通的连接超时" class="headerlink" title="一、一个看似普通的连接超时"></a>一、一个看似普通的连接超时</h2><p>最近排查 Jenkins Pipeline 时，我遇到了一次很典型的 HTTP 连接超时。</p>
+<p>流水线中的一段 Shared Library 代码通过 OkHttp 请求内部代码服务，等待一段时间后抛出异常：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">java.net.SocketTimeoutException: Connect timed out<br></code></pre></td></tr></table></figure>
+
+<p>从调用栈看，失败发生在 Socket 建连阶段。请求还没有进入 HTTP 响应处理，更谈不上接口参数、鉴权结果或者返回内容。</p>
+<p>我的第一反应是：运行这条 Pipeline 的构建节点无法访问目标服务。</p>
+<p>这个判断看起来非常自然。Pipeline 明明被调度到某个 Agent，网络请求似乎也应该从这个 Agent 发出。于是排查很快进入熟悉的路径：检查 Agent、测试目标端口、确认 Git 是否还能拉取代码。</p>
+<p>结果却有些矛盾：Git checkout 正常，在 Agent 上执行手工 HTTP 连通性测试也正常，但 OkHttp 依然超时。</p>
+<blockquote>
+<p>真正的问题不是“为什么 OkHttp 超时”，而是“发起这次连接的到底是谁”。</p>
+</blockquote>
+<h2 id="二、为什么“Git-正常、HTTP-也能通”仍然不够"><a href="#二、为什么“Git-正常、HTTP-也能通”仍然不够" class="headerlink" title="二、为什么“Git 正常、HTTP 也能通”仍然不够"></a>二、为什么“Git 正常、HTTP 也能通”仍然不够</h2><p>当时最容易让人放松警惕的，是两条看起来很强的证据。</p>
+<p>第一条是 Git checkout 成功。它说明 Agent 能通过 Git 使用的协议和端口访问代码服务。</p>
+<p>第二条是在 Agent 上执行手工 HTTP 测试成功。它说明这个 Agent 到目标 HTTP 服务的网络路径可用。</p>
+<p>但这两条证据都有明确边界：它们只能证明<strong>执行测试的那个节点</strong>具备相应连通性。</p>
+<p>可以把三条证据的边界拆开来看：</p>
+<ol>
+<li><strong>Agent 上 Git checkout 成功</strong><ul>
+<li>能证明：Agent 的 Git 访问路径可用。</li>
+<li>不能证明：Controller 的 HTTP 路径可用。</li>
+</ul>
+</li>
+<li><strong>Agent 上手工 HTTP 测试成功</strong><ul>
+<li>能证明：Agent 到目标 HTTP 服务可达。</li>
+<li>不能证明：OkHttp 一定从 Agent 发包。</li>
+</ul>
+</li>
+<li><strong>OkHttp 报连接超时</strong><ul>
+<li>能证明：实际调用方未在超时窗口内完成建连。</li>
+<li>不能证明：一定是某条防火墙规则导致。</li>
+</ul>
+</li>
+</ol>
+<p>这次排查中，我一开始把“Pipeline 运行在哪个节点”错误地等同于“Pipeline 中所有代码都在哪里执行”。</p>
+<p>这在分布式自动化系统中是一个危险的简化。</p>
+<h2 id="三、真正的转折：失败代码到底在哪里执行"><a href="#三、真正的转折：失败代码到底在哪里执行" class="headerlink" title="三、真正的转折：失败代码到底在哪里执行"></a>三、真正的转折：失败代码到底在哪里执行</h2><p>Jenkins Pipeline 是一条逻辑流程，但它不是一个始终运行在同一台机器、同一个进程里的普通脚本。</p>
+<p>在这个案例中，真实执行关系更接近下面这样：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text">Jenkins Pipeline<br>├── Controller<br>│   └── Shared Library / HTTP client → 内部代码服务 API<br>└── Agent<br>    └── shell / Git / build → 源代码仓库<br></code></pre></td></tr></table></figure>
+
+<p>构建命令和 Git 操作发生在 Agent；发生超时的 Shared Library HTTP 调用，在这个具体调用路径中由 Controller JVM 执行。</p>
+<p>于是，看似属于同一条 Pipeline 的两个动作，实际上拥有不同的：</p>
+<ul>
+<li>执行进程；</li>
+<li>网络身份；</li>
+<li>源地址；</li>
+<li>访问路径；</li>
+<li>策略边界。</li>
+</ul>
+<p>这也解释了之前的矛盾：Agent 上的测试结果完全正确，只是测试位置与故障代码的执行位置不一致。</p>
+<p>这里需要保留一个技术边界：不能因此推出“所有 Shared Library 代码都一定运行在 Controller”。Jenkins Pipeline、CPS 上下文、步骤实现和外部进程之间存在不同执行方式。正确做法不是背下一条绝对规则，而是针对失败的那一行代码验证实际执行者。</p>
+<h2 id="四、从执行模型还原完整证据链"><a href="#四、从执行模型还原完整证据链" class="headerlink" title="四、从执行模型还原完整证据链"></a>四、从执行模型还原完整证据链</h2><p>确认执行位置后，原本零散的线索开始连成一条因果链。</p>
+<p>故障出现前，网络访问策略刚刚完成过一次重写。新策略生效后，真正发起 HTTP 请求的 Controller 身份没有被纳入对应访问规则；Agent 的访问路径则仍然正常。</p>
+<p>因此才会出现下面的组合现象：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text">Agent → Git 服务              成功<br>Agent → 内部代码服务 HTTP     成功<br>Controller → 内部代码服务 HTTP 超时<br></code></pre></td></tr></table></figure>
+
+<p>补充 Controller 所需的访问策略后，Pipeline 立即恢复。</p>
+<p>这一步非常重要。<code>Connect timed out</code> 本身只能说明连接没有在超时窗口内建立，不能独立证明是哪条策略、哪台设备或哪个组件造成了阻断。</p>
+<p>本次根因之所以能够闭环，依赖的是一组相互支持的证据：</p>
+<ol>
+<li>调用栈确认失败发生在 TCP 建连阶段；</li>
+<li>Agent 测试成功，将问题限定到不同执行环境之间；</li>
+<li>调用上下文确认 OkHttp 实际运行在 Controller JVM；</li>
+<li>网络策略变更与故障开始时间相符；</li>
+<li>Controller 身份确实缺失；</li>
+<li>补充策略后，同一条 Pipeline 立即恢复。</li>
+</ol>
+<blockquote>
+<p>日志给出事件，执行模型限定范围，变更记录形成假设，恢复验证完成因果闭环。</p>
+</blockquote>
+<h2 id="五、把一次故障压缩成-WIPPS-排障框架"><a href="#五、把一次故障压缩成-WIPPS-排障框架" class="headerlink" title="五、把一次故障压缩成 WIPPS 排障框架"></a>五、把一次故障压缩成 WIPPS 排障框架</h2><p>这次经历最值得留下的，不是一条具体的网络规则，而是一组可以迁移到其他系统的问题。</p>
+<p>我把它整理成 WIPPS：</p>
+<h3 id="1-Who：谁真正执行这个动作"><a href="#1-Who：谁真正执行这个动作" class="headerlink" title="1. Who：谁真正执行这个动作"></a>1. Who：谁真正执行这个动作</h3><p>不要只问“任务调度到了哪里”，而要问失败的这行代码属于哪个进程、容器、JVM 或外部服务。</p>
+<h3 id="2-Identity：它以什么身份行动"><a href="#2-Identity：它以什么身份行动" class="headerlink" title="2. Identity：它以什么身份行动"></a>2. Identity：它以什么身份行动</h3><p>身份可能是用户、ServiceAccount、Token、证书，也可能是网络设备看到的源地址。执行位置不同，身份往往也不同。</p>
+<h3 id="3-Path：数据实际经过什么路径"><a href="#3-Path：数据实际经过什么路径" class="headerlink" title="3. Path：数据实际经过什么路径"></a>3. Path：数据实际经过什么路径</h3><p>请求是否经过代理、网关、负载均衡、NAT、Service、Ingress 或额外的网络区域？同一个目标地址，从不同来源出发可能走完全不同的路径。</p>
+<h3 id="4-Policy：哪些策略允许、拒绝或改变它"><a href="#4-Policy：哪些策略允许、拒绝或改变它" class="headerlink" title="4. Policy：哪些策略允许、拒绝或改变它"></a>4. Policy：哪些策略允许、拒绝或改变它</h3><p>需要检查的不只是防火墙，还可能包括 RBAC、NetworkPolicy、代理规则、路由规则、合并策略和准入控制。</p>
+<h3 id="5-State：决策发生时系统处于什么状态"><a href="#5-State：决策发生时系统处于什么状态" class="headerlink" title="5. State：决策发生时系统处于什么状态"></a>5. State：决策发生时系统处于什么状态</h3><p>当时使用的是哪个 Commit、配置版本、队列状态、依赖版本和策略版本？今天复现时的系统状态，可能已经不是故障发生时的状态。</p>
+<p>在 WIPPS 之后，我还会加上最后一步：Evidence。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">Who → Identity → Path → Policy → State → Evidence<br></code></pre></td></tr></table></figure>
+
+<p>前五步用于建立模型，最后一步要求用可重复的观察、对照实验或恢复结果验证结论。</p>
+<h2 id="六、这个框架还能复用到哪里"><a href="#六、这个框架还能复用到哪里" class="headerlink" title="六、这个框架还能复用到哪里"></a>六、这个框架还能复用到哪里</h2><p>Execution Model 并不只适用于 Jenkins。</p>
+<h3 id="Kubernetes-流量排查"><a href="#Kubernetes-流量排查" class="headerlink" title="Kubernetes 流量排查"></a>Kubernetes 流量排查</h3><p>看到 Ingress 配置并不代表已经理解请求路径。客户端、负载均衡、Ingress Controller、Service、Endpoint 和 Pod 都可能拥有各自的身份与策略边界。测试 Pod 内访问成功，也不能直接证明外部入口正常。</p>
+<h3 id="CI-合并决策"><a href="#CI-合并决策" class="headerlink" title="CI 合并决策"></a>CI 合并决策</h3><p>一次构建成功只是决策输入，不一定是最终合并决定。构建对应的 Commit、当前分支状态、审批和合并策略可能已经变化。这里同样需要追问：谁做最终决策，使用了什么状态。</p>
+<h3 id="AI-故障诊断"><a href="#AI-故障诊断" class="headerlink" title="AI 故障诊断"></a>AI 故障诊断</h3><p>如果只把异常日志交给大模型，它很容易给出“检查代理、调整超时、确认服务状态”这类技术上正确但缺少定位力的建议。</p>
+<p>更可靠的诊断链路应该先收集执行位置、身份、拓扑、变更和策略证据，再让模型提出可验证的假设：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text">日志 + 拓扑 + 变更 + 策略<br>           ↓<br>       候选假设<br>           ↓<br>       工具化验证<br>           ↓<br>       证据化结论<br></code></pre></td></tr></table></figure>
+
+<p>LLM 可以帮助生成假设，但不应该同时充当自己结论的最终裁判。</p>
+<h2 id="七、下一次排障时可以直接使用的清单"><a href="#七、下一次排障时可以直接使用的清单" class="headerlink" title="七、下一次排障时可以直接使用的清单"></a>七、下一次排障时可以直接使用的清单</h2><p>遇到“某个自动化任务访问服务失败”时，可以先停止围绕错误字符串打转，依次回答下面的问题：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 失败发生在 DNS、TCP、TLS、HTTP 还是业务响应阶段？</li>
+<li><input disabled="" type="checkbox"> 失败的这一行代码由哪个进程或组件执行？</li>
+<li><input disabled="" type="checkbox"> 实际源身份是什么？</li>
+<li><input disabled="" type="checkbox"> 测试命令是否运行在与故障代码相同的位置和身份下？</li>
+<li><input disabled="" type="checkbox"> 目标地址、端口和协议是否与真实调用一致？</li>
+<li><input disabled="" type="checkbox"> 中间经过哪些代理、网关、NAT 或网络区域？</li>
+<li><input disabled="" type="checkbox"> 哪些策略可能允许、拒绝或改写请求？</li>
+<li><input disabled="" type="checkbox"> 故障前后发生过哪些配置、策略或拓扑变更？</li>
+<li><input disabled="" type="checkbox"> 当前证据只是相关性，还是已经通过对照或恢复验证因果？</li>
+<li><input disabled="" type="checkbox"> 修复后是否使用同一条失败路径完成复测？</li>
+</ul>
+<p>这份清单的目的不是增加排障步骤，而是尽早排除一个代价很高的错误：在错误的位置验证正确的问题。</p>
+<h2 id="结语：先找到真正执行动作的人"><a href="#结语：先找到真正执行动作的人" class="headerlink" title="结语：先找到真正执行动作的人"></a>结语：先找到真正执行动作的人</h2><p>过去遇到异常时，我经常直接进入错误本身：OkHttp 为什么超时、代理是否生效、超时时间是否太短。</p>
+<p>这次故障提醒我，在复杂系统里，更好的第一问通常是：</p>
+<blockquote>
+<p>这个动作到底由谁、在哪里、以什么身份执行？</p>
+</blockquote>
+<p>当真实执行模型还没有建立时，很多“成功的测试”都可能只是验证了另一条路径。只有把执行者、身份、路径、策略和状态放在同一张图里，日志才会从孤立的错误信息，变成可以验证的因果证据。</p>
+<p>解决一个故障当然重要。更有价值的是，把这次故障压缩成下一次仍然有效的判断框架。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%8A%80%E6%9C%AF/" class="category-chain-item">技术</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/DevOps/">#DevOps</a>
+      
+        <a href="/tags/Jenkins/">#Jenkins</a>
+      
+        <a href="/tags/%E6%95%85%E9%9A%9C%E6%8E%92%E6%9F%A5/">#故障排查</a>
+      
+        <a href="/tags/%E7%B3%BB%E7%BB%9F%E6%80%9D%E7%BB%B4/">#系统思维</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>一次 Jenkins 连接超时，让我重新理解了 Pipeline 的真实执行位置</div>
+      <div>https://www.zhililab.cn/2026/09/23/2026-09-23-jenkins-execution-model-troubleshooting/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Zhi Li</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年9月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/07/31/2026-07-31-kubernetes-secrets-update-troubleshooting/" title="一次 Kubernetes 环境变量残留故障：为什么重启 Pod 也没有解决问题？">
+                        <span class="hidden-mobile">一次 Kubernetes 环境变量残留故障：为什么重启 Pod 也没有解决问题？</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://lib.baomitu.com/waline/2.14.1/waline.min.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/waline/2.14.1/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://comments.zhililab.cn","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["nick"],"lang":"zh-cn","emoji":[],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10,"placeholder":"评论提交后需审核，审核通过后公开显示"},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+      Walker · Content as Code
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+    <p class="blog-privacy-link" data-blog-privacy-link><a href="/privacy/">隐私与 Cookie 政策</a></p>
+</footer>
+
+  <!-- Scripts -->
+
+
+<script  src="/vendor/blog/jquery.min.js" ></script>
+<script  src="/vendor/blog/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+<script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=/vendor/blog/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('/vendor/blog/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<button id="blog-pet" type="button" aria-label="和博客机器人打个招呼" aria-describedby="blog-pet-message" data-blog-reading-experience>
+  <span class="blog-pet__bubble" id="blog-pet-message" role="status" aria-live="polite">今天也在持续进化</span>
+  <svg class="blog-pet__robot" viewBox="0 0 128 144" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="pet-body-gradient" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#78a7ff"/>
+        <stop offset="1" stop-color="#315ddc"/>
+      </linearGradient>
+    </defs>
+    <path class="blog-pet__antenna" d="M64 18v-8m-7 0h14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+    <rect x="22" y="20" width="84" height="62" rx="28" fill="url(#pet-body-gradient)" stroke="#17377d" stroke-width="5"/>
+    <rect x="34" y="36" width="60" height="30" rx="13" fill="#102b62"/>
+    <circle cx="51" cy="51" r="5" fill="#80ecff"/>
+    <circle cx="77" cy="51" r="5" fill="#80ecff"/>
+    <path d="M54 60h20" stroke="#80ecff" stroke-width="3" stroke-linecap="round"/>
+    <rect x="35" y="76" width="58" height="50" rx="20" fill="url(#pet-body-gradient)" stroke="#17377d" stroke-width="5"/>
+    <path d="M50 99h28" stroke="#d9e7ff" stroke-width="5" stroke-linecap="round"/>
+    <path class="blog-pet__arm blog-pet__arm--left" d="M36 88 18 104" fill="none" stroke="#315ddc" stroke-width="12" stroke-linecap="round"/>
+    <path class="blog-pet__arm blog-pet__arm--right" d="M92 88 112 72" fill="none" stroke="#315ddc" stroke-width="12" stroke-linecap="round"/>
+    <path d="M52 124v12m24-12v12" stroke="#17377d" stroke-width="10" stroke-linecap="round"/>
+  </svg>
+</button>
+<script src="/js/blog-reading-experience.js" defer data-blog-reading-experience></script>
+</body>
+</html>
