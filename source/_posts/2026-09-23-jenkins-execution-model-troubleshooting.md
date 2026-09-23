@@ -45,11 +45,17 @@ java.net.SocketTimeoutException: Connect timed out
 
 但这两条证据都有明确边界：它们只能证明**执行测试的那个节点**具备相应连通性。
 
-| 已观察到的结果 | 实际能够证明什么 | 不能证明什么 |
-| --- | --- | --- |
-| Agent 上 Git checkout 成功 | Agent 的 Git 访问路径可用 | Controller 的 HTTP 路径可用 |
-| Agent 上手工 HTTP 测试成功 | Agent 到目标 HTTP 服务可达 | OkHttp 一定从 Agent 发包 |
-| OkHttp 报连接超时 | 实际调用方未在超时窗口内完成建连 | 一定是某条防火墙规则导致 |
+可以把三条证据的边界拆开来看：
+
+1. **Agent 上 Git checkout 成功**
+   - 能证明：Agent 的 Git 访问路径可用。
+   - 不能证明：Controller 的 HTTP 路径可用。
+2. **Agent 上手工 HTTP 测试成功**
+   - 能证明：Agent 到目标 HTTP 服务可达。
+   - 不能证明：OkHttp 一定从 Agent 发包。
+3. **OkHttp 报连接超时**
+   - 能证明：实际调用方未在超时窗口内完成建连。
+   - 不能证明：一定是某条防火墙规则导致。
 
 这次排查中，我一开始把“Pipeline 运行在哪个节点”错误地等同于“Pipeline 中所有代码都在哪里执行”。
 
