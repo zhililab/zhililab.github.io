@@ -10,6 +10,8 @@ categories:
   - 技术
 date: 2026-09-23 20:00:00
 updated: 2026-09-23 20:00:00
+index_img: /assets/images/cover/jenkins-execution-model-troubleshooting.webp
+banner_img: /assets/images/cover/jenkins-execution-model-troubleshooting.webp
 ai_summary: false
 ---
 
